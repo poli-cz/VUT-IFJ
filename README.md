@@ -1,1 +1,1 @@
-# VUT-IFJ-
+# VUT-IFJ
