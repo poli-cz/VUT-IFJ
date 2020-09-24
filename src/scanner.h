@@ -16,6 +16,10 @@ typedef struct{
     int value;
 }lex_token;
 
+lex_token get_token();
+
+int pos_counter;
+
 // definice stavů lexikálního analyzátoru
 typedef enum{
   error,
