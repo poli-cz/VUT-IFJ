@@ -30,7 +30,7 @@ typedef enum{
 
 // definice struktury tokenu posílaného z lexikálního analyzátoru
 typedef struct{
-    char value; // value of token
+    int value; // value of token
     int line;   // position of token
     int coll;
     token_type type;

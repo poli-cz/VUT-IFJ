@@ -11,10 +11,14 @@
 //-------------------------------------/
 int main(){
 
-  for (int i = 0; i < 100; i++) {
-    token = get_token();
+  while(1){
+     token = get_token();
+     if(token.value == -1){
+       printf("end of file\n");
+       return(0);
+     }
+     printf("%c",token.value);
 
-    printf("%c", token.value);
 
   }
 
