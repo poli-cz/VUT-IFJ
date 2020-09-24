@@ -1,18 +1,22 @@
 #include <stdio.h>
 #include <unistd.h>
-#include "lex_token.c"
+#include "scanner.c"
 
-
+// Initializing of main variables //
+  lex_state state;
   lex_token token;
 
+
+
+//-------------------------------------/
 int main(){
 
+  for (int i = 0; i < 100; i++) {
     token = get_token();
 
-    printf("%c\n", token.value);
+    printf("%c", token.value);
+
+  }
 
 
-    token = get_token();
-
-    printf("%c\n", token.value);
 }

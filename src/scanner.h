@@ -9,23 +9,29 @@
 #include <stdio.h>
 #include <string.h>
 
+typedef enum{
+  t_id,
+  t_def,
+  t_if,
+  t_and,
+  t_or,
+  // atd...
 
-// definice struktury tokenu posílaného z lexikálního analyzátoru
-typedef struct{
-    char* attribut;
-    int value;
-}lex_token;
-
-lex_token get_token();
-
-int pos_counter;
+}token_type;
 
 // definice stavů lexikálního analyzátoru
 typedef enum{
-  error,
-  EOL,
+  start,
+  key_word,
   integer,
-  // there will be more states
-
-
+  string,
+  // TODO add more states
 }lex_state;
+
+// definice struktury tokenu posílaného z lexikálního analyzátoru
+typedef struct{
+    char value; // value of token
+    int line;   // position of token
+    int coll;
+    token_type type;
+}lex_token;
