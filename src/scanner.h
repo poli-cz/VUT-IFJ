@@ -35,3 +35,12 @@ typedef struct{
     int coll;
     token_type type;
 }lex_token;
+
+
+
+
+// definition of used functions
+
+
+
+int parser();
