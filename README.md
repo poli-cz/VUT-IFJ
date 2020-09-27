@@ -5,4 +5,4 @@ Překladač jazyka IFJ20 založeného na jazyku GO 1.15
 
 * **doc** - Dokumentace překladače
 * **src** - Zdrojový kód překladače
-* **tests** - Složka s budocími testy 
+* **tests** - Složka s budoucími testy 
