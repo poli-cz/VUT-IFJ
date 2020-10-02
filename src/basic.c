@@ -1,6 +1,5 @@
 #include<stdio.h>
 
-
 // file for common functions and error handling
 
 void *mem_alloc(int size){
