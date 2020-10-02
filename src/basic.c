@@ -3,6 +3,16 @@
 
 // file for common functions and error handling
 
+void *mem_alloc(int size){
+	void *val = malloc(size);
+	if(val == NULL){
+    fprintf(stderr, "chyba alokace alokace paměti\n");
+		error_handler(99);
+    exit(99);
+	}
+	return val;
+}
+
 int error_handler(int code){
   switch (code) {
     case 1:

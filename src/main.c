@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 #include "parser.c"
 #include "basic.c"
@@ -7,9 +8,6 @@
 // Initializing of main variables //
 
   lex_token token;
-
-
-
 
 
 //-------------------------------------/
