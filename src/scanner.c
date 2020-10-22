@@ -11,15 +11,31 @@
 #include "scanner.h"
 
 lex_token get_token(){
+  lex_token token;
 
-  lex_token token; // structure of token in scanner.h
-  char c; // curent char from stdin
 
-  while(1){
-    c = getchar();
-    token.value = c;
-    return(token);
+  // mock scanner just for testing //
+
+  for(int i = 0; i < 10; i++){
+    switch (i) {
+      case 0:
+        token.value = "package";
+        token.line = 0;
+        token.coll = 0;
+        token.type = t_id;
+      case 1:
+        token.value = 99;
+      }
+    return token;
   }
+/*
+  package main
+
+  func main(){
+    print("Hello from IFJ@)", "\n")
+  }
+*/
+
 
 
    return(token);

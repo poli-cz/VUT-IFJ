@@ -1,19 +1,36 @@
 #include "scanner.c"
 #include <stdbool.h>
 
+// Main parsing function
 int parser(){
-
   lex_token token;
-  //bool pars_flag = 0;
 
-  while(1){
+  while(token.value!=EOF){
+    token = get_token(token);
+    printf("printing token values\n");
+    printf("%s", token.value);
 
-     token = get_token();
-     printf("%c", token.value);
-     if(token.value==-1){
-       return(0);
-     }
+
+    if(token.value == 99){
+      printf("\n\nwow, such an EOF..\n\n");
+      return 0;
+    }
+    printf("%s", token.value);
   }
 
-return(0);
+
+
+
+
+return 0;
+}
+
+
+// mock functions for now
+int code_gen(){
+  return 0;
+}
+
+int optimalization(){
+  return 0;
 }

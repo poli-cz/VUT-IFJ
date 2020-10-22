@@ -2,30 +2,36 @@
 #include <unistd.h>
 #include <stdlib.h>
 
+// Include user defined files //
+
 #include "parser.c"
 #include "basic.c"
 
-// Initializing of main variables //
-
-  lex_token token;
-
-
-//-------------------------------------/
 int main(){
+  int error_flag; // Main flag for catching errors
 
-  int error_flag = parser();
+  error_flag = parser();
 
-  if(error_flag==0){
-    printf("File parsed sucessfully\n");
+  if(error_flag != 0){
+    printf("Error while parsing\n");
+    return (error_handler(error_flag));
+  }
+
+  error_flag = code_gen();
+
+  if(error_flag != 0){
+    printf("Error while generating code\n");
+    return (error_handler(error_flag));
+  }
+
+  error_flag = optimalization();
+
+  if(error_flag == 0){
+    printf("\n============================\n");
+    printf("All compiled without error\n");
+    return 0;
   }
   else{
-    return(error_handler(error_flag));
+    return (error_handler(error_flag));
   }
-
-
-
-  token = get_token();
-  printf("%d\n", token.value);
-
-
 }

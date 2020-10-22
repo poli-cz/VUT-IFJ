@@ -1,16 +1,23 @@
 #include<stdio.h>
 
 // file for common functions and error handling
+/*
+---some ideas for usefull stuff--
 
-void *mem_alloc(int size){
-	void *val = malloc(size);
-	if(val == NULL){
-    fprintf(stderr, "chyba alokace alokace paměti\n");
-		error_handler(99);
-    exit(99);
-	}
-	return val;
+lex_token *token;
+int error_flag;
+
+
+token = (lex_token *) malloc (sizeof(lex_token));
+if(token == 0){
+	exit(99);
 }
+
+
+
+
+*/
+
 
 int error_handler(int code){
   switch (code) {
