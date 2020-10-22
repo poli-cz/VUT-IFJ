@@ -1,9 +1,18 @@
+/**
+ * @file symtable.c
+ *
+ * Implemntace hash-table
+ *
+ * IFJ Projekt 2020, Tým 2
+ *
+ * @author <xpolis04> Jan Polišenský
+ */
+
 #include "symtable.h"
 #include<stdlib.h>
 #include<string.h>
 #include<stdio.h>
 #include<stdbool.h>
-
 
 
 /*
@@ -15,6 +24,7 @@ hash and adding the current byte followed by moving the high bits:
 int table_error_handler(int err_code, char* function){
   printf("Something in hash_table went teribly wrong\n");
   printf("%s exited with err_code %d", function, err_code);
+  exit(99);
 }
 
 
@@ -30,7 +40,6 @@ unsigned long Hash_function(const unsigned char *s){
     return h % SYMTABLE_SIZE;
 }
 
-
 // Table init
 // all items to NULL
 void table_init(Symtable *table){
@@ -42,9 +51,7 @@ void table_init(Symtable *table){
 Take structure  table_data as param, allocate memory for it,
 calculate hash acording to key and insert to position in table
 
-return position in table
-
-
+return true or false
 
 */
 bool table_insert(Symtable *table, table_data data){
@@ -53,7 +60,7 @@ bool table_insert(Symtable *table, table_data data){
 
   // if there is already some item than move to next and make same tes..
   while((*table)[hash] != NULL){
-    printf("shifting...\n");
+    //printf("shifting...\n");
     hash++;
   }
 
@@ -68,10 +75,15 @@ bool table_insert(Symtable *table, table_data data){
   t_data->identifier = data.identifier;
   t_data->data = data;
   (*table)[hash] = t_data ;
-  printf("hash %d\n", hash);
   return true;
 }
+/*
+Take structure  table_data as param, allocate memory for it,
+calculate hash acording to key and insert to position in table
 
+return position in table
+
+*/
 table_data *search_in_table(Symtable *table, char* identifier){
 
   unsigned long hash = Hash_function(identifier);
@@ -80,14 +92,18 @@ table_data *search_in_table(Symtable *table, char* identifier){
     table_error_handler(2, "search_in_table");
   }
 
-
   while((*table)[hash]->identifier != identifier){
     hash++;
   }
     return &(*table)[hash]->data;
   }
 
+  /*
+  Vyhledá v tabulce konkrétní prvek a vymaže ho..
+  TODO: mazání zřetězených prvků je mega broken
+  nebo spíš není
 
+  */
 bool table_remove(Symtable *table, char *identifier){
 
     unsigned long hash = Hash_function(identifier);
@@ -102,6 +118,11 @@ bool table_remove(Symtable *table, char *identifier){
     free((*table)[hash]);
 }
 
+
+/*
+Function to destroy all elements in table and free all memory
+
+*/
 void destroy_table(Symtable *table){
     for(int i = 0; i < SYMTABLE_SIZE; i++){
       if((*table)[i] != NULL ){
@@ -110,30 +131,22 @@ void destroy_table(Symtable *table){
       }
     }
 }
-
-
-
-
+/*
 // just function for testing table
 int main(){
-
 
 Symtable table; //
 table_init(&table); // init symtable
 
 
 table_data test;
-test.test = 100;
+test.data = 100;
 test.identifier = "int";
+table_insert(&table, test);
 
-bool position = table_insert(&table, test);
+table_data *data2 = search_in_table(&table, "int");
 
+printf("%d\n", data2->data);
 table_remove(&table, "int");
-
-
-
-
-
-
-
+*/
 }

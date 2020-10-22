@@ -1,36 +1,81 @@
+/**
+ * @file parser.c
+ *
+ * Hlavní tělo celého překladače
+ *
+ * IFJ Projekt 2020, Tým 2
+ *
+ * @author <xpolis04> Jan Polišenský
+ */
+
+
 #include "scanner.c"
 #include <stdbool.h>
+#include "symtable.c"
+#include "parser.h"
+#include "stdbool.h"
 
 // Main parsing function
 int parser(){
+  int err_code;
   lex_token token;
 
-  while(token.value!=EOF){
-    token = get_token(token);
-    printf("printing token values\n");
-    printf("%s", token.value);
+  symtable global_table;  // initializing of symtables
+  symtable local_table;
+  symtable local_func_table;
 
+  table_init(&global_table);
+  table_init(&local_table);
+  table_init(&local_func_table);
 
-    if(token.value == 99){
-      printf("\n\nwow, such an EOF..\n\n");
-      return 0;
-    }
-    printf("%s", token.value);
-  }
+  synt_stack stack; // Stack pro rekurzivní sestup
 
-
-
-
+  stack_init(&stack);
 
 return 0;
 }
 
 
-// mock functions for now
-int code_gen(){
-  return 0;
+
+
+//  ------------------- Functions for work with synt_stack  ------------------- //
+
+
+
+void stack_init(synt_stack *stack, int err_code){
+  *stack = malloc(sizeof(synt_stack));
+
+
+  (*stack)->top = 1;
+  (*stack)->last = 0
+
 }
 
-int optimalization(){
-  return 0;
+// TODO //
+
+// Stuctures for work with stack
+
+
+
+
+bool stack_pop(synt_stack *stack, int err_code){
+
+
+  // TODO //
 }
+
+
+bool stack_push(synt_stack *stack, int err_code){
+
+// TODO //
+
+}
+
+void stack_remove(synt_stack *stack, int err_code){
+
+// TODO //
+
+}
+
+
+//  -------------------------------------------------------------- //
