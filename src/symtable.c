@@ -25,15 +25,18 @@ int table_error_handler(int err_code, char* function){
   printf("Something in hash_table went teribly wrong\n");
   printf("%s exited with err_code %d", function, err_code);
   exit(99);
+  // 1 fatal errors like malloc error
+  // 2 not so fatal error like search fault
+  // 3 just warnings, like table is nearly allocated
 }
 
 
-unsigned long Hash_function(const unsigned char *s){
+unsigned long Hash_function(const char *s){
     unsigned long   h = 0, high;
     while (*s)
     {
         h = (h << 4) + *s++;
-        if (high = h & 0xF0000000)
+        if ((high = h) & 0xF0000000)
             h ^= high >> 24;
         h &= ~high;
     }
@@ -116,6 +119,8 @@ bool table_remove(Symtable *table, char *identifier){
       hash++;
     }
     free((*table)[hash]);
+    (*table)[hash] = NULL;
+    return true;
 }
 
 
@@ -132,7 +137,26 @@ void destroy_table(Symtable *table){
     }
 }
 /*
-// just function for testing table
+Function return symtable allocation percentage
+try to keep it under 75%
+
+*/
+
+float table_allocation_percentage(Symtable *table){
+  int free_position;
+  for(int i = 0; i<SYMTABLE_SIZE; i++){
+    if((*table)[i] == NULL){
+      free_position++;
+    }
+  }
+  float percentage = (free_position/SYMTABLE_SIZE)*100;
+
+  if(percentage > 75.00){
+    table_error_handler(3, "table_allocation_percentage");
+  }
+return percentage;
+}
+
 int main(){
 
 Symtable table; //
@@ -146,7 +170,11 @@ table_insert(&table, test);
 
 table_data *data2 = search_in_table(&table, "int");
 
+float alloc = table_allocation_percentage(&table);
+
+printf("%f\n", alloc);
+
 printf("%d\n", data2->data);
 table_remove(&table, "int");
-*/
+
 }

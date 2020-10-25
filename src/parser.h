@@ -13,9 +13,24 @@
 /**
  * Pomocný zásobník k rekurzivnímu sestupu, probíhá na něm rozklad neterminálů na terminály
  */
+typedef struct teminal{
+
+}T_term;
+
+
+// structure of syntax_stact
 typedef struct SyntaxStack{
-    tType *a;   // Pole neterminálů/terminálů
+    T_term t;   // Pole neterminálů/terminálů
     int size;
     int top;    // Index prvního volného místa
 	int last;   // Index naposledy vloženého prvku
 }synt_stack;
+
+
+
+// structure for holding list of tokens
+typedef struct Token_list{
+  Token t;
+  Token_list *next;
+  Token_list *first;
+}Tlist;
