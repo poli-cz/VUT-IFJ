@@ -51,6 +51,7 @@ int add_char(char c, dynamic_string* string) {
         }
         string->alloc += SIZE_ARR;
     }
+
     string->str[string->len] = c;
     string->str[string->len + 1] = '\0';
     string->len++;

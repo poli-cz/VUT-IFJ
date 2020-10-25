@@ -34,3 +34,4 @@ int init_dynamic_string(dynamic_string** string);
 * Adds char at the end of array
 */
 int add_char(char c,dynamic_string* string);
+
