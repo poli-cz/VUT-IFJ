@@ -33,7 +33,7 @@ int init_dynamc_string(dynamic_string** string) {
 
     (*string)->len = 0;
     (*string)->alloc = SIZE_ARR;
-    (*string)->str[(*string)->length] = '\0';
+    (*string)->str[(*string)->len] = '\0';
     return 0;
 }
 
@@ -51,7 +51,8 @@ int add_char(char c, dynamic_string* string) {
         }
         string->alloc += SIZE_ARR;
     }
-    string->str[string->len] = symbol;
+
+    string->str[string->len] = c;
     string->str[string->len + 1] = '\0';
     string->len++;
 
