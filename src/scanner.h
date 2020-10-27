@@ -85,13 +85,16 @@ typedef enum{
 // definice struktury tokenu posílaného z lexikálního analyzátoru
 typedef struct{
     dynamic_string* value; // value of token
-    int line;   // position of token
-    int coll;
     token_type type;
 }tToken;
+
+// structure for holding list of tokens
+typedef struct Token_list{
+  tToken t;
+  struct Token_list *next;
+  struct Token_list *first;
+}Tlist;
 
 
 // definition of used functions
 token_type get_token();
-
-int parser();

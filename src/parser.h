@@ -8,15 +8,16 @@
  * @author <xpolis04> Jan Polišenský
  */
 
+
 #define STACK_CHUNK_SIZE 1000                      // Velikost alokační jednotky zásobníku
 
 /**
  * Pomocný zásobník k rekurzivnímu sestupu, probíhá na něm rozklad neterminálů na terminály
  */
 typedef struct teminal{
+  int test;
 
 }T_term;
-
 
 // structure of syntax_stact
 typedef struct SyntaxStack{
@@ -26,11 +27,8 @@ typedef struct SyntaxStack{
 	int last;   // Index naposledy vloženého prvku
 }synt_stack;
 
+// function prototypes
 
-
-// structure for holding list of tokens
-typedef struct Token_list{
-  Token t;
-  Token_list *next;
-  Token_list *first;
-}Tlist;
+int       parser          ();
+int       parser_debug    ();
+void      stack_init      (synt_stack *stack, int err_code);

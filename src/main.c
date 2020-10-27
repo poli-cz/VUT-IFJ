@@ -4,34 +4,73 @@
 
 // Include user defined files //
 
-#include "parser.c"
-#include "basic.c"
+#include "scanner.h"
+#include "parser.h"
+#include "symtable.h"
+
 
 int main(){
-  int error_flag; // Main flag for catching errors
 
-  error_flag = parser();
 
-  if(error_flag != 0){
-    printf("Error while parsing\n");
-    return (error_handler(error_flag));
+
+
+
+
+return parser_debug();
+
+}
+
+
+
+int scanner_debug(){
+  // Dejte si sem funkce na debug scanneru
+
+
+  return 0;
+}
+
+
+int parser_debug(){
+
+
+/*_____BEGIN SYMTABLE TESTS_____*/
+
+  Symtable table; //
+  table_init(&table); // init symtable
+
+  table_data test;
+  test.data = 100;
+  test.identifier = "int";
+  table_insert(&table, test);
+
+  table_data *data2 = search_in_table(&table, "int");
+
+  float alloc = table_allocation_percentage(&table);
+
+  if(data2->data == test.data){
+    printf("Sucess\n");
   }
 
-  error_flag = code_gen();
+  table_remove(&table, "int");
 
-  if(error_flag != 0){
-    printf("Error while generating code\n");
-    return (error_handler(error_flag));
-  }
+  /*_____________________________*/
 
-  error_flag = optimalization();
+  //          TODO
 
-  if(error_flag == 0){
-    printf("\n============================\n");
-    printf("All compiled without error\n");
-    return 0;
-  }
-  else{
-    return (error_handler(error_flag));
-  }
+  /*_____BEGIN STACK TESTS_____*/
+
+  parser();
+
+
+
+
+
+
+
+
+
+
+
+
+  return 0;
 }

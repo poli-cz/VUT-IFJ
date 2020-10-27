@@ -9,28 +9,17 @@
  */
 
 
-#include "scanner.c"
 #include <stdbool.h>
-#include "symtable.c"
 #include "parser.h"
-#include "stdbool.h"
+#include "symtable.h"
+
 
 // Main parsing function
 int parser(){
-  int err_code;
-  lex_token token;
+  
+  Symtable g_table;
+  syntactic_prerun(&g_table);
 
-  symtable global_table;  // initializing of symtables
-  symtable local_table;
-  symtable local_func_table;
-
-  table_init(&global_table);
-  table_init(&local_table);
-  table_init(&local_func_table);
-
-  synt_stack stack; // Stack pro rekurzivní sestup
-
-  stack_init(&stack);
 
 return 0;
 }
@@ -43,11 +32,7 @@ return 0;
 
 
 void stack_init(synt_stack *stack, int err_code){
-  *stack = malloc(sizeof(synt_stack));
 
-
-  (*stack)->top = 1;
-  (*stack)->last = 0
 
 }
 
@@ -62,6 +47,7 @@ bool stack_pop(synt_stack *stack, int err_code){
 
 
   // TODO //
+  return true;
 }
 
 
@@ -69,6 +55,7 @@ bool stack_push(synt_stack *stack, int err_code){
 
 // TODO //
 
+  return false;
 }
 
 void stack_remove(synt_stack *stack, int err_code){

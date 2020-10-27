@@ -10,14 +10,13 @@
 #include <stdio.h>
 #include <ctype.h>
 #include "scanner.h"
-#include "basic.h"
-#include "dynamic_string.h"
 
 #define ERROR_FALSE 0
 #define ERROR_TRUE 2
 
 FILE *source_file;
- 
+
+
 const char* KEYWORDS[] = {"if","else", "for", "float64","func","int","return","string","inputs","inputi","inputf","print","int2float","float2int","len","substr","ord",
 "chr"
 };
@@ -53,7 +52,7 @@ token_type get_token(){
         else if (sym==';'){state=s_semico;}
         else if (sym==','){state=s_comma;}
         else if (sym=='>'){state=s_grt;}
-        else if (sym=='<'){state=s_lst;} 
+        else if (sym=='<'){state=s_lst;}
         else if (sym=='('){state=s_lbra;}
         else if (sym==')'){state=s_rbra;}
         else if (sym=='{'){state=s_curll;}
@@ -80,9 +79,9 @@ token_type get_token(){
     break;
     case s_plus:
         return t_plus;
-      ungetc(sym,source_file);      
+      ungetc(sym,source_file);
     case s_minus:
-          
+
     case s_div:
       if(sym == '/')
         state = s_linecom;
@@ -106,12 +105,12 @@ token_type get_token(){
                     return s_error;
                 else if(sym == '/'){
                     state = s_start;
-                    resetToken();
+                    //resetToken();
                 }
                 else
                     state = s_blockcom;
                 break;
-          
+
 
     case s_lbra:
           return t_lbra;
@@ -128,7 +127,7 @@ token_type get_token(){
 
     case s_number:
       if(isdigit(sym)){
-        pushToken(sym);
+      //  pushToken(sym);
        break;
       }
       else if (sym == '.') {
@@ -141,7 +140,7 @@ token_type get_token(){
        }
     case s_float:
         if(isdigit(sym)){
-           pushToken(sym);
+          // pushToken(sym);
            break;
         }
         else if (sym == 'e' || sym == 'E') {
@@ -159,19 +158,19 @@ token_type get_token(){
     case s_semico:
         ungetc(sym,source_file);
         return t_semico;
-        
+
     case s_comma:
         ungetc(sym,source_file);
         return t_comma;
 
     case s_id:
     if(isdigit(sym) || isalpha(sym) || sym == '_'){
-         pushToken(sym);
+        // pushToken(sym);
          break;
      }
 
     case s_error:
-      printf("error");   
+      printf("error");
     break;
     default:
       break;
