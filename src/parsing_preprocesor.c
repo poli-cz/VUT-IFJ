@@ -13,14 +13,11 @@
 #include "symtable.h"
 #include "scanner.h"
 
-
-
 int syntactic_prerun(Symtable *table){
   Tlist prerun;
 
   token_type test;
 
-  test = get_token();
 
 
 

@@ -1,25 +1,9 @@
 #include<stdio.h>
-
-// file for common functions and error handling
-/*
----some ideas for usefull stuff--
-
-lex_token *token;
-int error_flag;
-
-
-token = (lex_token *) malloc (sizeof(lex_token));
-if(token == 0){
-	exit(99);
-}
-
-
-
-
-*/
+#include "basic.h"
 
 
 int error_handler(int code){
+
   switch (code) {
     case 1:
       fprintf(stderr, "chybná struktura aktuálního lexému\n");

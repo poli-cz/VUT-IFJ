@@ -12,10 +12,6 @@
 int main(){
 
 
-
-
-
-
 return parser_debug();
 
 }
@@ -24,7 +20,6 @@ return parser_debug();
 
 int scanner_debug(){
   // Dejte si sem funkce na debug scanneru
-
 
   return 0;
 }
@@ -53,13 +48,53 @@ int parser_debug(){
 
   table_remove(&table, "int");
 
+  destroy_table(&table);
+  printf("---SYMTABLE DONE---\n");
+
   /*_____________________________*/
 
-  //          TODO
+
 
   /*_____BEGIN STACK TESTS_____*/
 
-  parser();
+  int stack_err;
+  synt_stack stack;
+
+  stack_init(&stack, stack_err);
+
+  printf("%d\n", stack->top);
+  printf("%d\n", stack->size);
+
+  T_term terminal;
+  terminal.test = 100;
+  stack_push(stack, terminal, stack_err);
+  printf("size of stack shoul differ\n");
+
+  printf("%d\n", stack->top);
+  printf("%d\n", stack->size);
+
+
+
+  T_term term = stack->t[stack->top];
+  if(term.test == terminal.test){
+    printf("Ok\n");
+  }
+
+  stack_pop(stack, stack_err);
+
+  term = stack->t[stack->top];
+  if(term.test == 0){
+    printf("Ok\n");
+  }
+  stack_remove(&stack);
+  printf("--STACK DONE---\n");
+
+  /*_____________________________*/
+
+
+
+
+
 
 
 
