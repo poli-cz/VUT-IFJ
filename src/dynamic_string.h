@@ -6,8 +6,12 @@
  * Varianta :
  * Autor    : 
  */
+<<<<<<< HEAD
 #ifndef DYNAMIC_STRING_H
 #define DYNAMIC_STRING_H
+=======
+
+>>>>>>> 5073c44e4a2d66e2e6c0ff54dfe905a1978b8336
 #include <stdio.h>
 #include <stdlib.h>
 /**
@@ -29,11 +33,20 @@ typedef struct {
 /**
   *Initialise memory
 */
+<<<<<<< HEAD
 int init_dynamic_string(dynamic_string **string);
+=======
+int init_dynamic_string(dynamic_string** string);
+>>>>>>> 5073c44e4a2d66e2e6c0ff54dfe905a1978b8336
 
 /**
 * Adds char at the end of array
 */
+<<<<<<< HEAD
 int add_char(char c,dynamic_string *string);
 
 #endif
+=======
+int add_char(char c,dynamic_string* string);
+
+>>>>>>> 5073c44e4a2d66e2e6c0ff54dfe905a1978b8336
