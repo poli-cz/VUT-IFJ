@@ -20,6 +20,8 @@ int parser(){
   Symtable g_table;
   synt_stack stack;
 
+  table_init(&g_table);
+
   stack_init(&stack, pars_err);
 
   T_term term;
@@ -43,10 +45,12 @@ int parser(){
 
   stack_pop(stack, pars_err);
 
-
-
   printf("%d TRUE \n", stack_compare(stack, test));
 
+
+
+
+int ups =  syntactic_prerun(&g_table);
 
 
 if(pars_err == 1){
