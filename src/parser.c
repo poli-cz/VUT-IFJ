@@ -11,62 +11,110 @@
 
 #include <stdbool.h>
 #include "parser.h"
-#include "symtable.h"
+
 
 
 // Main parsing function
 int parser(){
-
+  int pars_err;
   Symtable g_table;
-  syntactic_prerun(&g_table);
+  synt_stack stack;
 
+  stack_init(&stack, pars_err);
+
+  T_term term;
+  term.type = t_lbra;
+
+  tToken test;
+  test.type = t_lbra;
+
+
+
+  stack_push(stack, term, pars_err);
+
+  printf("%d TRUE\n", stack_compare(stack, test));
+
+  T_term term2;
+  term2.type = t_id;
+
+  stack_push(stack, term2, pars_err);
+
+  printf("%d FALSE\n", stack_compare(stack, test));
+
+  stack_pop(stack, pars_err);
+
+
+
+  printf("%d TRUE \n", stack_compare(stack, test));
+
+
+
+if(pars_err == 1){
+  printf("there was error\n");
+}
 return 0;
 }
-
-
-
 
 
 
 //  ------------------- Functions for work with synt_stack  ------------------- //
 
 
+
+bool stack_compare(synt_stack stack, tToken token){
+//  printf("%d on  STACK\n", (stack->t[stack->top]).type);
+//  printf("%d is TOKEN\n", (token.type));
+  if((token.type)==(stack->t[stack->top]).type){
+    return true;
+  }
+  else{
+    return false;
+  }
+
+
+}
+
 void stack_init(synt_stack *stack, int err_code){
   *stack = malloc(sizeof(struct SyntaxStack));
 
   if(!(*stack)){
-    printf("malloc error\n");
+    err_code = 1;
     return;
   }
-  (*stack)->top = 0;
+  (*stack)->top = 1;
+  (*stack)->last = 0;
 
 
-  (*stack)->t = malloc(STACK_CHUNK_SIZE * sizeof(T_term));
+  (*stack)->t = malloc(STACK_DEFAULT * sizeof(T_term));
   if(!(*stack)->t){
-    printf("malloc error\n");
+    err_code = 1;
     return;
   }
 
-  (*stack)->size = STACK_CHUNK_SIZE;
-  //(*S)->a[0] = N_PROG; 				default non-terminal
+  (*stack)->size = STACK_DEFAULT;
 }
 
 
 bool stack_pop(synt_stack stack, int err_code){
   if((stack->top) == 0){
     printf("empty stack\n");
+    err_code = 1;
     return false;
   }
+
   stack->top--;
+  stack->last--;
   return true;
 }
 
-
 bool stack_push(synt_stack stack, T_term term, int err_code){
-  stack->size = stack->size + STACK_CHUNK_SIZE;
-  stack->t = realloc(stack->t, stack->size * sizeof(T_term));
+  if((stack->top)==(stack->size)){
+    stack->size = stack->size + STACK_DEFAULT;
+    stack->t = realloc(stack->t, stack->size * sizeof(T_term));
+  }
   stack->top++;
 	stack->t[stack->top] = term;
+  stack->last++;
   return true;
 }
 
@@ -75,6 +123,5 @@ void stack_remove(synt_stack *stack){
   free(*stack);
   *stack = NULL;
 }
-
 
 //  -------------------------------------------------------------- //

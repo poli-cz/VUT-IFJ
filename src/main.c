@@ -4,9 +4,9 @@
 
 // Include user defined files //
 
-#include "scanner.h"
+
 #include "parser.h"
-#include "symtable.h"
+
 
 
 int main(){
@@ -91,16 +91,8 @@ int parser_debug(){
 
   /*_____________________________*/
 
-
-
-
-
-
-
-
-
-
-
+  printf("---TESTS DONE---\n");
+  parser();
 
 
 

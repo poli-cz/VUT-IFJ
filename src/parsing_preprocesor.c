@@ -10,8 +10,7 @@
 
 
 #include "parser.h"
-#include "symtable.h"
-#include "scanner.h"
+
 
 int syntactic_prerun(Symtable *table){
   Tlist prerun;
