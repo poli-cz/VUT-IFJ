@@ -15,11 +15,9 @@
  * Initialise memory for array
  * If succesfull return 0, else return 1 
 */
-<<<<<<< HEAD
+
 int init_dynamc_string(dynamic_string **string) {
-=======
-int init_dynamc_string(dynamic_string** string) {
->>>>>>> 5073c44e4a2d66e2e6c0ff54dfe905a1978b8336
+
     *string = (dynamic_string *)malloc(sizeof(dynamic_string));
     
     if (*string == NULL){
@@ -45,11 +43,8 @@ int init_dynamc_string(dynamic_string** string) {
 * Add char at the end of array. Realocate memory if necessary
 * If successfull return 0, else return 1
 */
-<<<<<<< HEAD
-int add_char(char c, dynamic_string *string) {
-=======
+
 int add_char(char c, dynamic_string* string) {
->>>>>>> 5073c44e4a2d66e2e6c0ff54dfe905a1978b8336
     
     if (string->len + 1 >= string->alloc) {
         string->str = (char*)realloc(string->str, string->alloc + SIZE_ARR * (sizeof(char)));
@@ -59,10 +54,6 @@ int add_char(char c, dynamic_string* string) {
         }
         string->alloc += SIZE_ARR;
     }
-<<<<<<< HEAD
-=======
-
->>>>>>> 5073c44e4a2d66e2e6c0ff54dfe905a1978b8336
     string->str[string->len] = c;
     string->str[string->len + 1] = '\0';
     string->len++;
