@@ -10,14 +10,13 @@
 #include <stdio.h>
 #include <ctype.h>
 #include "scanner.h"
-#include "basic.h"
-#include "dynamic_string.h"
 
 #define ERROR_FALSE 0
 #define ERROR_TRUE 2
 
 FILE *source_file;
- 
+
+
 const char* KEYWORDS[] = {"if","else", "for", "float64","func","int","return","string","inputs","inputi","inputf","print","int2float","float2int","len","substr","ord",
 "chr"
 };
@@ -46,6 +45,7 @@ tToken get_token(){
     case s_start:
         if(sym==EOF){state=s_eof;}
         else if(sym=='\n' || sym=='\t' || sym=='\\'){state=s_eol;}
+        
         else if(isspace(sym)){
           add_char(sym,&token.value);
           state=s_start;
@@ -180,6 +180,7 @@ tToken get_token(){
     break;
 
     case s_plus:
+
         add_char(sym,&token.value);
         token.type=t_plus;
         ungetc(sym,stdin); 
@@ -192,7 +193,7 @@ tToken get_token(){
           ungetc(sym,stdin);
           return token;
     break;
- 
+
     case s_div:
     add_char(sym,&token.value);
       if(sym == '/')
@@ -218,6 +219,7 @@ tToken get_token(){
     break;
 
     case s_endcom:
+
       if(sym == EOF){
         token.type=t_error;
         return token;
@@ -322,6 +324,7 @@ tToken get_token(){
     }
     break;
 
+
     case s_lslash:
 
     case s_mul:
@@ -366,5 +369,6 @@ tToken get_token(){
         break;
   
     }  
+
   }
 }
