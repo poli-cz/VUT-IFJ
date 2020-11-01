@@ -16,6 +16,7 @@
 
 typedef enum{
   t_id,
+  t_error,
   t_def,
   t_if,
   t_and,
@@ -28,6 +29,7 @@ typedef enum{
   t_comma,
   t_semico,
   t_eq,
+  t_float,
   t_assign,
   t_grt,
   t_lesst,
@@ -38,9 +40,12 @@ typedef enum{
   t_curlr,
   t_exclam,
   t_neq,
+  t_lst,
   t_grteq,
   t_lste,
-  t_undefined
+  t_undefined,
+  t_number,
+  t_string
   // atd...
 
 }token_type;
@@ -52,10 +57,13 @@ typedef enum{
   s_id,
   s_key_word,
   s_number,
+  s_floatpoint,
   s_float,
   s_exp,
   s_endcom,
   s_blockcom,
+  s_meq,
+  s_leq,
   s_string,
   s_eof,
   s_eol,
@@ -77,6 +85,7 @@ typedef enum{
   s_curlr,
   s_exclam,
   s_fact,
+  s_neq,
   s_linecom
 
   // TODO add more states
@@ -97,4 +106,7 @@ typedef struct Token_list{
 
 
 // definition of used functions
-token_type get_token();
+tToken get_token();
+
+int parser();
+
