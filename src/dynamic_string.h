@@ -29,7 +29,7 @@ typedef struct {
 /**
   *Initialise memory
 */
-int init_dynamic_string(dynamic_string **string);
+int init_dynamc_string(dynamic_string **string);
 
 /**
 * Adds char at the end of array
