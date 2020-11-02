@@ -104,9 +104,7 @@ typedef struct Token_list{
   struct Token_list *first;
 }Tlist;
 
-
 // definition of used functions
-tToken get_token();
-
-int parser();
-
+tToken  get_token       ();
+int     parser          ();
+void    print_token     (tToken token);

@@ -14,6 +14,12 @@
 
 int syntactic_prerun(Symtable *g_table){
 
+  for(int i = 0; i < 20 ; i++){
+      print_token(get_token());
+
+  }
+
+
 
   table_data id;
   id.identifier = "inputs";
