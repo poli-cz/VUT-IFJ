@@ -4,7 +4,7 @@
  * Projekt  :   Implementace překladače imperativního jazyka IFJ20
  * Tým č    :
  * Varianta :
- * Autor    : 
+ * Autor    :
  * Inspired by functions in "jednoduchy_interpret"
  */
 #include <stdio.h>
@@ -13,13 +13,13 @@
 
 /**
  * Initialise memory for array
- * If succesfull return 0, else return 1 
+ * If succesfull return 0, else return 1
 */
 
 int init_dynamc_string(dynamic_string **string) {
 
     *string = (dynamic_string *)malloc(sizeof(dynamic_string));
-    
+
     if (*string == NULL){
         fprintf(stderr, "Error allocating dynamic string\n");
         return 1;
@@ -44,19 +44,19 @@ int init_dynamc_string(dynamic_string **string) {
 * If successfull return 0, else return 1
 */
 
-int add_char(char c, dynamic_string* string) {
-    
-    if (string->len + 1 >= string->alloc) {
-        string->str = (char*)realloc(string->str, string->alloc + SIZE_ARR * (sizeof(char)));
-        if (string->str == NULL) {
+int add_char(char c, dynamic_string** string) {
+
+    if ((*string)->len + 1 >= (*string)->alloc) {
+        (*string)->str = (char*)realloc((*string)->str, (*string)->alloc + SIZE_ARR * (sizeof(char)));
+        if ((*string)->str == NULL) {
             fprintf(stderr, "Error reallocating dynamic string\n");
             return 1;
         }
-        string->alloc += SIZE_ARR;
+        (*string)->alloc += SIZE_ARR;
     }
-    string->str[string->len] = c;
-    string->str[string->len + 1] = '\0';
-    string->len++;
+    (*string)->str[(*string)->len] = c;
+    (*string)->str[(*string)->len + 1] = '\0';
+    (*string)->len++;
 
     return 0;
 }

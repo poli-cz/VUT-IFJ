@@ -10,14 +10,13 @@
 #include <stdio.h>
 #include <ctype.h>
 #include "scanner.h"
-#include "basic.h"
-#include "dynamic_string.h"
 
 #define ERROR_FALSE 0
 #define ERROR_TRUE 2
 
 FILE *source_file;
- 
+
+
 const char* KEYWORDS[] = {"if","else", "for", "float64","func","int","return","string","inputs","inputi","inputf","print","int2float","float2int","len","substr","ord",
 "chr"
 };
@@ -35,20 +34,20 @@ tToken get_token(){
   tToken token; // structure of token in scanner.h
   char sym; // curent char from stdin
   lex_state state = s_start;
-   init_dynamc_string(&token.value); // inicializace attributu tokenu
-   token.type = s_start; // inicializace typu tokenu: pocatecni stav
+  init_dynamc_string(&token.value); // inicializace attributu tokenu
+  token.type = s_start; // inicializace typu tokenu: pocatecni stav
 
   while(1){
      sym = getchar();
 
-    switch (state)
-    {
+    switch (state){
     case s_start:
         if(sym==EOF){state=s_eof;}
+
         else if(sym=='\n' || sym=='\t' || sym=='\\'){state=s_eol;}
+
         else if(isspace(sym)){
-          add_char(sym,&token.value);
-          state=s_start;
+          state=s_start; // mezeru ignorujeme
         }
         else if(isdigit(sym)){
           add_char(sym,&token.value);
@@ -84,7 +83,7 @@ tToken get_token(){
         else if (sym=='<'){
           add_char(sym,&token.value);
           state=s_lst;
-        } 
+        }
         else if (sym=='('){
           add_char(sym,&token.value);
           state=s_lbra;
@@ -120,20 +119,20 @@ tToken get_token(){
         else if(sym=='"'){
           add_char(sym,&token.value);
           state=s_string;
-        }        
+        }
         else {
         add_char(sym,&token.value);
         state=s_error;
         }
         break;
-    
+
     case s_grt:
       if(sym=='='){
         add_char(sym,&token.value);
         state = s_meq;
       }
       else
-      {  
+      {
         ungetc(sym,stdin);
         token.type = t_grt;
         return token;
@@ -146,7 +145,7 @@ tToken get_token(){
         state = s_lst;
       }
       else
-      {  
+      {
         ungetc(sym,stdin);
         token.type = t_lst;
         return token;
@@ -154,17 +153,17 @@ tToken get_token(){
     break;
 
     case s_string:
-     if (sym='"'){
+     if (sym=='"'){
        token.type=t_string;
        return token;
      }
      else if(sym == EOF ||sym == '\n'){
       token.type=t_error;
       return token;
-     } 
+     }
      else
-      add_char(sym,token.value);
-    break;  
+      add_char(sym, &token.value);
+    break;
 
     case s_fact:
       if(sym=='=')
@@ -180,8 +179,13 @@ tToken get_token(){
     break;
 
     case s_plus:
+<<<<<<< HEAD
+=======
+
+        add_char(sym,&token.value);
+>>>>>>> upstream/master
         token.type=t_plus;
-        ungetc(sym,stdin); 
+        ungetc(sym,stdin);
         return token;
     break;
 
@@ -191,7 +195,7 @@ tToken get_token(){
           ungetc(sym,stdin);
           return token;
     break;
- 
+
     case s_div:
       if(sym == '/')
         state = s_linecom;
@@ -203,7 +207,7 @@ tToken get_token(){
         return token;
       }  
     break;
-    
+
     case s_linecom:
     if (sym == '\n') {
       ungetc(sym,stdin);
@@ -221,6 +225,7 @@ tToken get_token(){
     break;
 
     case s_endcom:
+
       if(sym == EOF){
         token.type=t_error;
         return token;
@@ -231,41 +236,41 @@ tToken get_token(){
         else
         state = s_blockcom;
       break;
-          
+
 
     case s_lbra:
-      add_char(sym,&token.value);
+      //add_char(sym,&token.value); // tady by nemelo byt add char, uz je výš
       token.type=t_lbra;
       ungetc(sym,stdin);
       return token;
     break;
 
     case s_rbra:
-      add_char(sym,&token.value);
+      //add_char(sym,&token.value);
       token.type=t_rbra;
       ungetc(sym,stdin);
       return token;
     break;
 
     case s_curll:
-      add_char(sym,&token.value);
+      //add_char(sym,&token.value);
       token.type=t_curll;
       ungetc(sym,stdin);
       return token;
     break;
 
     case s_curlr:
-      add_char(sym,&token.value);
+      //add_char(sym,&token.value);
       token.type=t_curlr;
       ungetc(sym,stdin);
-      return token;      
+      return token;
     break;
 
 
     //integer
     case s_number:
       if(isdigit(sym)){
-       add_char(sym,&token.value);
+       //add_char(sym,&token.value);
        state=s_number;
       }
       else if (sym == '.'){
@@ -292,7 +297,7 @@ tToken get_token(){
         ungetc(sym,stdin);
         state=s_error;
        }
-    break;    
+    break;
 
     case s_float:
       if(isdigit(sym)){
@@ -307,7 +312,7 @@ tToken get_token(){
         ungetc(sym,stdin);
         token.type=t_float;
         return token;
-      }     
+      }
     break;
 
     /*
@@ -324,6 +329,7 @@ tToken get_token(){
       return t_number;
     }
     break;
+
 
     case s_lslash:
 
@@ -361,28 +367,60 @@ tToken get_token(){
       token.type=t_semico;
       return token;
     break;
-  
-  
-   case s_comma:
+   case s_eol:
+      add_char(sym,&token.value);
+      token.value = NULL;
+      token.type = t_eol;
+      ungetc(sym,stdin);
+      return token;
+    break;
+
+    case s_comma:
       add_char(sym,&token.value);
       ungetc(sym,stdin);
       token.type=t_comma;
       return token;
     break;
-  
+
     case s_id:
     if(isdigit(sym) || isalpha(sym) || sym == '_'){
       add_char(sym,&token.value);
-      state=s_id;   
+      token.type = t_id;
     }
+    else{  // konci identifier
+      ungetc(sym,stdin); // vrátíme minulý znak a končíme
+      return token;
+    }
+
     //else if(sym == EOF)
     //                return s_error;
     break;
 
+
     case s_error:
+<<<<<<< HEAD
     case s_eol:
+=======
+        printf("error");
+        state = s_eof;
+>>>>>>> upstream/master
         break;
-  
-    }  
+    case s_eof:
+      exit(0);
+      break;
+    }
   }
+}
+
+
+
+
+void print_token(tToken token){
+  if(token.value==NULL){
+      printf("%d TOKEN TYPE WITH VALUE: NULL\n",token.type);
+  }
+  else{
+      printf("%d TOKEN TYPE WITH VALUE: %s\n",token.type, token.value->str);
+  }
+
 }

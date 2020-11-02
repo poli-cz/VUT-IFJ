@@ -9,11 +9,6 @@
  */
 
 #include "symtable.h"
-#include<stdlib.h>
-#include<string.h>
-#include<stdio.h>
-#include<stdbool.h>
-
 
 /*
 Implementation of PJW hash function
@@ -155,26 +150,4 @@ float table_allocation_percentage(Symtable *table){
     table_error_handler(3, "table_allocation_percentage");
   }
 return percentage;
-}
-
-int main(){
-
-Symtable table; //
-table_init(&table); // init symtable
-
-
-table_data test;
-test.data = 100;
-test.identifier = "int";
-table_insert(&table, test);
-
-table_data *data2 = search_in_table(&table, "int");
-
-float alloc = table_allocation_percentage(&table);
-
-printf("%f\n", alloc);
-
-printf("%d\n", data2->data);
-table_remove(&table, "int");
-
 }

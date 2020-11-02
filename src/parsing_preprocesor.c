@@ -1,5 +1,5 @@
 /**
- * @file parsing_preprocessor.c
+ * @file parsing_preprocessor.cS
  *
  * Funkce pro syntaktický prerun
  * Vytváření zřetězeného seznamu tokenů pro analýzu
@@ -9,36 +9,23 @@
  */
 
 
-
 #include "parser.h"
-#include "symtable.h"
-// #include "scanner.c"
+
+
+int syntactic_prerun(Symtable *g_table){
+
+  for(int i = 0; i < 20 ; i++){
+      print_token(get_token());
+
+  }
 
 
 
+  table_data id;
+  id.identifier = "inputs";
+  table_insert(g_table, id);
 
-int syntactic_prerun(Symtable *table, Token_list Tlist){
-  Tlist prerun = load_input();
+  table_data *data2 = search_in_table(g_table, "inputs");
 
-  while(prerun.next != NULL)
-
-
-
-
-
-
-
-
-  prerun = prerun.next; // Go to next token
-}
-
-
-
-
-
-
-
-Tlist load_input(){
-// TODO load tokens and make from them linear list.
-// Cause we need to store them...
+  printf("%s\n", (*data2).identifier);
 }

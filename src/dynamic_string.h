@@ -4,7 +4,7 @@
  * Projekt  :   Implementace překladače imperativního jazyka IFJ20
  * Tým č    :
  * Varianta :
- * Autor    : 
+ * Autor    :
  */
 #ifndef DYNAMIC_STRING_H
 #define DYNAMIC_STRING_H
@@ -34,6 +34,6 @@ int init_dynamc_string(dynamic_string **string);
 /**
 * Adds char at the end of array
 */
-int add_char(char c,dynamic_string *string);
+int add_char(char c,dynamic_string **string);
 
 #endif
