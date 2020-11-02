@@ -22,6 +22,7 @@ typedef enum{
   t_and,
   t_or,
   t_eol,
+  t_eof,
   t_mul,
   t_div,
   t_plus,
@@ -45,6 +46,7 @@ typedef enum{
   t_lste,
   t_undefined,
   t_number,
+  t_keyword,
   t_string
   // atd...
 
@@ -86,6 +88,7 @@ typedef enum{
   s_exclam,
   s_fact,
   s_neq,
+  s_key_word_id,
   s_linecom
 
   // TODO add more states
@@ -106,5 +109,6 @@ typedef struct Token_list{
 
 // definition of used functions
 tToken  get_token       ();
+int  is_key_word     (dynamic_string* string);
 int     parser          ();
 void    print_token     (tToken token);

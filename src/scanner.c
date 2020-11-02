@@ -44,7 +44,7 @@ tToken get_token(){
     case s_start:
         if(sym==EOF){state=s_eof;}
 
-        else if(sym=='\n' || sym=='\t' || sym=='\\'){state=s_eol;}
+        else if(sym=='\n'){state=s_eol;}
 
         else if(isspace(sym)){
           state=s_start; // mezeru ignorujeme
@@ -104,26 +104,30 @@ tToken get_token(){
           add_char(sym,&token.value);
           state=s_div;
         }
-        else if (sym== '\"'){
-          add_char(sym,&token.value);
-          state=s_lslash;
-        }
+  
         else if (sym== '!'){
           state=s_fact;
           add_char(sym,&token.value);
           }
-        else if (sym=='_'|| isalpha(sym)){
+        else if (sym=='_' || isalpha(sym)){
           add_char(sym,&token.value);
           state=s_id;
-        }
+        }  
+
         else if(sym=='"'){
           add_char(sym,&token.value);
           state=s_string;
         }
+        else if (sym== '\"'){
+          add_char(sym,&token.value);
+          state=s_lslash;
+        }
+
         else {
         add_char(sym,&token.value);
         state=s_error;
         }
+        
         break;
 
     case s_grt:
@@ -157,8 +161,12 @@ tToken get_token(){
        token.type=t_string;
        return token;
      }
-     else if(sym == EOF ||sym == '\n'){
-      token.type=t_error;
+     else if(sym == EOF){
+      token.type=t_eof;
+      return token;
+     }
+     else if(sym == '\n'){
+      token.type=t_eol;
       return token;
      }
      else
@@ -179,18 +187,13 @@ tToken get_token(){
     break;
 
     case s_plus:
-<<<<<<< HEAD
-=======
-
-        add_char(sym,&token.value);
->>>>>>> upstream/master
         token.type=t_plus;
         ungetc(sym,stdin);
         return token;
     break;
 
     case s_minus:
-          add_char(sym,&token.value);
+         //add_char(sym,&token.value);
           token.type=t_minus;
           ungetc(sym,stdin);
           return token;
@@ -369,7 +372,6 @@ tToken get_token(){
     break;
    case s_eol:
       add_char(sym,&token.value);
-      token.value = NULL;
       token.type = t_eol;
       ungetc(sym,stdin);
       return token;
@@ -385,28 +387,31 @@ tToken get_token(){
     case s_id:
     if(isdigit(sym) || isalpha(sym) || sym == '_'){
       add_char(sym,&token.value);
-      token.type = t_id;
+      break;
     }
-    else{  // konci identifier
-      ungetc(sym,stdin); // vrátíme minulý znak a končíme
-      return token;
+    else{ 
+      ungetc(sym,stdin);// prevod atributu tokenu na lowercase
+      
+      if(is_key_word(token.value)){
+        token.type =t_keyword;
+        return token;
+      }
+      else
+      {
+        token.type =t_id;
+        return token;
+      }
+      
     }
-
-    //else if(sym == EOF)
-    //                return s_error;
     break;
 
 
     case s_error:
-<<<<<<< HEAD
-    case s_eol:
-=======
-        printf("error");
         state = s_eof;
->>>>>>> upstream/master
         break;
     case s_eof:
-      exit(0);
+      token.type=t_eof;
+      return token;
       break;
     }
   }
