@@ -80,6 +80,10 @@ tToken get_token(){
           add_char(sym,&token.value);
           state=s_grt;
         }
+        else if (sym=='='){
+          add_char(sym,&token.value);
+          state=s_grt;
+        }
         else if (sym=='<'){
           add_char(sym,&token.value);
           state=s_lst;
@@ -104,7 +108,7 @@ tToken get_token(){
           add_char(sym,&token.value);
           state=s_div;
         }
-  
+
         else if (sym== '!'){
           state=s_fact;
           add_char(sym,&token.value);
@@ -112,7 +116,7 @@ tToken get_token(){
         else if (sym=='_' || isalpha(sym)){
           add_char(sym,&token.value);
           state=s_id;
-        }  
+        }
 
         else if(sym=='"'){
           add_char(sym,&token.value);
@@ -127,7 +131,7 @@ tToken get_token(){
         add_char(sym,&token.value);
         state=s_error;
         }
-        
+
         break;
 
     case s_grt:
@@ -166,6 +170,7 @@ tToken get_token(){
       return token;
      }
      else if(sym == '\n'){
+       token.value = NULL;
       token.type=t_eol;
       return token;
      }
@@ -208,7 +213,7 @@ tToken get_token(){
         token.type=t_div;
         ungetc(sym,stdin);
         return token;
-      }  
+      }
     break;
 
     case s_linecom:
@@ -273,8 +278,9 @@ tToken get_token(){
     //integer
     case s_number:
       if(isdigit(sym)){
-       //add_char(sym,&token.value);
+       add_char(sym,&token.value);
        state=s_number;
+       return token; // musel jsem to sem pridat, nacitani cisel bylo nejak broken
       }
       else if (sym == '.'){
          add_char(sym,&token.value);
@@ -349,7 +355,7 @@ tToken get_token(){
         state=s_assign;
       }
       else
-      {  
+      {
         add_char(sym,&token.value);
         ungetc(sym,stdin);
         token.type=t_colon;
@@ -372,6 +378,7 @@ tToken get_token(){
     break;
    case s_eol:
       add_char(sym,&token.value);
+      token.value = NULL;
       token.type = t_eol;
       ungetc(sym,stdin);
       return token;
@@ -389,9 +396,9 @@ tToken get_token(){
       add_char(sym,&token.value);
       break;
     }
-    else{ 
+    else{
       ungetc(sym,stdin);// prevod atributu tokenu na lowercase
-      
+
       if(is_key_word(token.value)){
         token.type =t_keyword;
         return token;
@@ -401,7 +408,7 @@ tToken get_token(){
         token.type =t_id;
         return token;
       }
-      
+
     }
     break;
 

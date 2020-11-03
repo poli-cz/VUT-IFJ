@@ -30,8 +30,6 @@ int parser(){
   tToken test;
   test.type = t_lbra;
 
-
-
   stack_push(stack, term, pars_err);
 
   printf("%d TRUE\n", stack_compare(stack, test));
@@ -47,10 +45,11 @@ int parser(){
 
   printf("%d TRUE \n", stack_compare(stack, test));
 
-
-
-
-int ups =  syntactic_prerun(&g_table);
+  printf("---SYMTABLE DONE---\n\n");
+  tList pre = syntactic_prerun(&g_table);
+  if((pre.last == NULL)&&(pre.first == NULL)){
+    return 1;
+  }
 
 
 if(pars_err == 1){

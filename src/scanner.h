@@ -95,19 +95,20 @@ typedef enum{
 }lex_state;
 
 // definice struktury tokenu posílaného z lexikálního analyzátoru
-typedef struct{
+// definice struktury tokenu posílaného z lexikálního analyzátoru
+typedef struct uh{
     dynamic_string* value; // value of token
     token_type type;
+    struct uh *next;
+    struct uh *prev;
 }tToken;
 
 // structure for holding list of tokens
 typedef struct Token_list{
-  tToken t;
-  struct Token_list *next;
-  struct Token_list *first;
-}Tlist;
+  tToken *first;
+  tToken *last;
+}tList;
 
-// definition of used functions
 tToken  get_token       ();
 int  is_key_word     (dynamic_string* string);
 int     parser          ();

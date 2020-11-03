@@ -41,9 +41,11 @@ typedef struct SyntaxStack{
 
 int       parser          ();
 int       parser_debug    ();
+int       scanner_debug   ();
 
 void      stack_init      (synt_stack *stack, int err_code);
 bool      stack_pop       (synt_stack stack, int err_code);
 bool      stack_push      (synt_stack stack, T_term term, int err_code);
 void      stack_remove    (synt_stack *stack);
 bool      stack_compare   (synt_stack stack, tToken token);
+tList     syntactic_prerun (Symtable *table);

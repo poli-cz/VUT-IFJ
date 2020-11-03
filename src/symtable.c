@@ -18,7 +18,7 @@ hash and adding the current byte followed by moving the high bits:
 
 int table_error_handler(int err_code, char* function){
   printf("Something in hash_table went teribly wrong\n");
-  printf("%s exited with err_code %d", function, err_code);
+  printf("%s exited with err_code %d\n", function, err_code);
   exit(99);
   // 1 fatal errors like malloc error
   // 2 not so fatal error like search fault
@@ -31,7 +31,7 @@ unsigned long Hash_function(const char *s){
     while (*s)
     {
         h = (h << 4) + *s++;
-        if ((high = h) & 0xF0000000)
+        if (high = (h & 0xF0000000))
             h ^= high >> 24;
         h &= ~high;
     }
@@ -52,27 +52,44 @@ calculate hash acording to key and insert to position in table
 return true or false
 
 */
-bool table_insert(Symtable *table, table_data data){
+bool table_insert(Symtable *table, table_data data, char *key){
 
-  unsigned long hash = Hash_function(data.identifier); // calculate hash of item
+  if((*table)==NULL){return 0;}
+  else{
+    Sym_table_item *temp = NULL;
+    unsigned long hash = Hash_function(key);
 
-  // if there is already some item than move to next and make same tes..
-  while((*table)[hash] != NULL){
-    //printf("shifting...\n");
-    hash++;
+    if((temp = search_in_table(table, key))==NULL){
+      if((*table)[hash] == NULL){
+        (*table)[hash] = malloc(sizeof(Sym_table_item));
+        (*table)[hash]->identifier = key;
+        (*table)[hash]->data = data;
+        (*table)[hash]->next = NULL;
+      }
+      else{
+        temp = malloc(sizeof(Sym_table_item));
+        temp->identifier = key;
+        temp->data = data;
+        temp->next = (*table)[hash];
+        (*table)[hash] = temp;
+      }
+    }
+    else{
+
+      if((temp = search_in_table(table, key))!=NULL){
+        Sym_table_item *temp2;
+        temp2 = (*table)[hash];
+        while(!temp){
+          if(temp2->identifier==key){
+            temp2->data=data;
+            return 1;
+          }
+          temp2=temp2->next;
+        }
+      }
+
+    }
   }
-
-  // allocating memmory for inserted element
-  Sym_table_item *t_data = (Sym_table_item*)malloc(sizeof(table_data));
-
-  if(t_data == NULL) {
-    table_error_handler(1, "table_insert");
-    return false;
-  }
-
-  t_data->identifier = data.identifier;
-  t_data->data = data;
-  (*table)[hash] = t_data ;
   return true;
 }
 /*
@@ -82,19 +99,39 @@ calculate hash acording to key and insert to position in table
 return position in table
 
 */
-table_data *search_in_table(Symtable *table, char* identifier){
+Sym_table_item *search_in_table(Symtable *table, char* identifier){
 
   unsigned long hash = Hash_function(identifier);
 
   if((*table)[hash] == NULL){
-    table_error_handler(2, "search_in_table");
+    return NULL;
+  }
+  else{
+    Sym_table_item *temp = (*table)[hash];
+
+    while(temp != NULL){
+      if((strcmp(temp->identifier, identifier))==0){
+        return (*table)[hash];
+      }
+      else{
+        temp = temp->next;
+      }
+    }
+  }
+}
+
+
+bool is_in_table(Symtable *table, char* identifier){
+  Sym_table_item *test;
+  test = search_in_table(table, identifier);
+  if(test == NULL ){
+    return false;
+  }
+  else{
+    return true;
   }
 
-  while((*table)[hash]->identifier != identifier){
-    hash++;
-  }
-    return &(*table)[hash]->data;
-  }
+}
 
   /*
   Vyhledá v tabulce konkrétní prvek a vymaže ho..
@@ -150,4 +187,29 @@ float table_allocation_percentage(Symtable *table){
     table_error_handler(3, "table_allocation_percentage");
   }
 return percentage;
+}
+
+void print_table(Symtable *table){
+  char *t;
+  printf("------printing symtable-----\n\n");
+  for(int i = 0; i<SYMTABLE_SIZE; i++){
+    if((*table)[i] != NULL){
+      if((*table)[i]->data.type == 0){
+         t = "Variable";
+      }
+      else if((*table)[i]->data.type == 1){
+         t = "Function";
+      }
+      else{
+         t = "other";
+    }
+
+
+
+
+
+      printf("%s with ID \"%s\" \n", t, (*table)[i]->identifier);
+    }
+  }
+  printf("\n--------end symtable-------\n");
 }

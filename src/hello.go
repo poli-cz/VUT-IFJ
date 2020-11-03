@@ -1,5 +1,10 @@
 package main
 
 func main(){
-  print("hell world")
+  print("HELL WORLD")
+  float64 variable = 80
+}
+
+func ifj_je_pain(){
+
 }
