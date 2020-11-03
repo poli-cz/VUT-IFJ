@@ -20,7 +20,7 @@ tList syntactic_prerun(Symtable *g_table){
   while(1){
     tToken *token = (tToken*)(malloc(sizeof(tToken)));
     *token = get_token();
-        print_token(*token);
+    // print_token(*token); // printing tokens for debug
     if(tokens.last == NULL){
       tokens.last = token;
       tokens.first = token;
@@ -32,7 +32,7 @@ tList syntactic_prerun(Symtable *g_table){
 
   // check for lex-error aka. token_type == 1 //
 
-    if(token->type == 99  ){  //1// // IGNORE FOR NOW // CHECKING FOR RIGHT TOKENS
+    if(token->type == 1  ){  // CHECKING FOR RIGHT TOKENS
       printf("Token error\n" );
       print_token(*token);
       tokens.last = NULL;
@@ -51,23 +51,24 @@ tList syntactic_prerun(Symtable *g_table){
 
 
 
-// Prohledávání kvůli klíčovým slovům a id a nahrávání do Sytable
+// Prohledávání kvůli klíčovým slovům a id a nahrávání do Sytable //
+
+
+//----------FIRST PRERUN - loading functions----------//
 
   tToken test = (*tokens.first);
-  bool func_flag;
-  int f_count;
   bool pkg_main = 0;
   int func_count = 0;
 
   while(test.type != 7){
 
-
-
     // Check for package main //
     if((test.type == 0) && (strcmp(test.value->str, "package")==0)){
-      tToken main = *test.next;
-      if((main.type == 0)&&(strcmp(main.value->str, "main")==0)){
+      tToken test2 = *test.next;
+      if((test2.type == 0)&&(strcmp(test2.value->str, "main")==0)){
         pkg_main = 1;
+        test = *test.next;
+        continue;
       }
     }
     //--------------------//
@@ -84,16 +85,36 @@ tList syntactic_prerun(Symtable *g_table){
         table_insert(g_table, id, test.value->str);
         func_count++;
       }
+
     }
     else{
-      test = *test.next;
-    }
-  //--------------------//
 
+      test = *test.next;
   }
-  /*
-  // --- LOAD INBUILT FCE IN SYMTABLE --- //
+//----------END FIRST PRERUN----------//
+
+}
+//----------SECOND PRERUN - loading variables----------//
+
+  tToken run2 = (*tokens.first);
+  while(run2.type != 7){
+      if((run2.type == 0)&&(!is_in_table(g_table, run2.value->str))&&(strcmp(run2.value->str, "package"))){
+        table_data iD;
+        iD.type = id;
+        iD.defined = true;
+        table_insert(g_table, iD, run2.value->str);
+
+      }
+
+
+    run2 = *run2.next;
+  }
+
+//----------END SECOND PRERUN----------//
+
+// --- LOAD INBUILT FCE IN SYMTABLE --- //
     table_data inbuilt_fce;
+    inbuilt_fce.type = func;
     table_insert(g_table, inbuilt_fce, "inputs");
     table_insert(g_table, inbuilt_fce, "inputi");
     table_insert(g_table, inbuilt_fce, "inputf");
@@ -105,34 +126,17 @@ tList syntactic_prerun(Symtable *g_table){
     table_insert(g_table, inbuilt_fce, "ord");
     table_insert(g_table, inbuilt_fce, "chr");
 
-  // --- JUST TESTS FOR PRESENCE IN TABLE --- //
-    int is_there = 0;
-
-    is_there += is_in_table(g_table, "inputs");
-    is_there += is_in_table(g_table, "inputi");
-    is_there += is_in_table(g_table, "inputf");
-    is_there += is_in_table(g_table, "print");
-    is_there += is_in_table(g_table, "int2float");
-    is_there += is_in_table(g_table, "float2int");
-    is_there += is_in_table(g_table, "len");
-    is_there += is_in_table(g_table, "substr");
-    is_there += is_in_table(g_table, "ord");
-    is_there += is_in_table(g_table, "chr");
-
-    if(is_there != 10){
-      printf("some functions missing\n");
-    }
-
-*/
-
+// --- LOAD INBUILT FCE IN SYMTABLE --- //
 
     print_table(g_table);
 
     if(pkg_main == 0){
       printf("Missing prolog--ERROR 6--\n");
+      // shoul return 6
     }
     if(is_in_table(g_table, "main")==0){
       printf("Missing main--ERROR 3--\n");
+      // should return 3
     }
 
 

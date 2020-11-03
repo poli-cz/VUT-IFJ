@@ -48,4 +48,8 @@ bool      stack_pop       (synt_stack stack, int err_code);
 bool      stack_push      (synt_stack stack, T_term term, int err_code);
 void      stack_remove    (synt_stack *stack);
 bool      stack_compare   (synt_stack stack, tToken token);
-tList     syntactic_prerun (Symtable *table);
+tList     syntactic_prerun(Symtable *table);
+
+void      stack_expand    (synt_stack stack, tToken token, int err_code ,Symtable *table);
+void      senor_clean_fist(Symtable *table, synt_stack stack);
+//int       parse_semantic  ()

@@ -39,6 +39,7 @@ tToken get_token(){
 
   while(1){
      sym = getchar();
+     //printf("%d\n", state);
 
     switch (state){
     case s_start:
@@ -280,7 +281,7 @@ tToken get_token(){
       if(isdigit(sym)){
        add_char(sym,&token.value);
        state=s_number;
-       return token; // musel jsem to sem pridat, nacitani cisel bylo nejak broken
+
       }
       else if (sym == '.'){
          add_char(sym,&token.value);
@@ -294,7 +295,8 @@ tToken get_token(){
         ungetc(sym,stdin);
         token.type=t_number;
       }
-      break;
+      return token; // musel jsem to sem pridat, nacitani cisel bylo nejak broken
+      break;        // chyběl tu return, ale jinak to podle mě funguje dobře...
 
     //cislo desatina cast
     case s_floatpoint:
@@ -341,25 +343,27 @@ tToken get_token(){
 
 
     case s_lslash:
-
-    case s_mul:
+*/
+    case s_mul: // jsem si tu přidal a nějak to funguje, pls koukni na to.
     {
-      ungetc(sym,source_file);
-      return t_mul;
+      token.type = t_mul;
+      return token;
     }
     break;
-*/
+
     case s_colon:
       if(sym == '=')
       {
+        add_char(sym,&token.value);
         state=s_assign;
+
       }
       else
       {
         add_char(sym,&token.value);
         ungetc(sym,stdin);
         token.type=t_colon;
-        return token;
+
       }
     break;
 

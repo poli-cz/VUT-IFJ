@@ -16,45 +16,60 @@
 
 // Main parsing function
 int parser(){
-  int pars_err;
+
+  int pars_err = 0;
   Symtable g_table;
   synt_stack stack;
 
   table_init(&g_table);
-
   stack_init(&stack, pars_err);
 
-  T_term term;
-  term.type = t_lbra;
-
-  tToken test;
-  test.type = t_lbra;
-
-  stack_push(stack, term, pars_err);
-
-  printf("%d TRUE\n", stack_compare(stack, test));
-
-  T_term term2;
-  term2.type = t_id;
-
-  stack_push(stack, term2, pars_err);
-
-  printf("%d FALSE\n", stack_compare(stack, test));
-
-  stack_pop(stack, pars_err);
-
-  printf("%d TRUE \n", stack_compare(stack, test));
-
-  printf("---SYMTABLE DONE---\n\n");
   tList pre = syntactic_prerun(&g_table);
-  if((pre.last == NULL)&&(pre.first == NULL)){
+
+  if((pre.last == NULL) && (pre.first == NULL)){
+    printf("PRERUN ERR\n");
     return 1;
   }
+    printf("\n--------SYNTAX CHECK-------\n");
+
+    tToken s_tok = (*pre.first); // Token for syntax check
+    T_term p_term;
+    p_term.type = n_prog;  // Default non terminal
+
+    stack_push(stack, p_term, pars_err);
+
+    while(s_tok.type != 7){ // until EOF
+
+      if((stack->t[stack->top].type) > t_string){ // Non terminal on stack
+      //  stack_expand(); TODO
 
 
-if(pars_err == 1){
-  printf("there was error\n");
-}
+      }
+      else{
+        //if(stack_compare() == true){
+        //  stack_pop();
+          // TODO semantic check //
+      //  }
+      //  else{
+          // TODO place for raise syntax_err
+      //  }
+
+      }
+
+
+
+
+
+      s_tok = *s_tok.next;
+    }
+
+
+
+
+
+
+
+
 return 0;
 }
 
@@ -65,8 +80,8 @@ return 0;
 
 
 bool stack_compare(synt_stack stack, tToken token){
-//  printf("%d on  STACK\n", (stack->t[stack->top]).type);
-//  printf("%d is TOKEN\n", (token.type));
+  printf("%d on  STACK\n", (stack->t[stack->top]).type);
+  printf("%d is TOKEN\n", (token.type));
   if((token.type)==(stack->t[stack->top]).type){
     return true;
   }
@@ -127,4 +142,58 @@ void stack_remove(synt_stack *stack){
   *stack = NULL;
 }
 
+//  -----------------------SYNTAX STUFF--------------------------------------- //
+
+
+
+void stack_expand(synt_stack stack, tToken token, int err_code ,Symtable *table){
+
+
+// TODO
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+
+// Dealocation of everything //
+
+void senor_clean_fist(Symtable *table, synt_stack stack){
+  destroy_table(table);
+  stack_remove(&stack);
+}
+
+
 //  -------------------------------------------------------------- //
+
+
+
+//  -----------------------SEMANTIC STUFF-------------------------------------- //
+
+
+// int parse_semantic(){
+
+
+
+
+
+//}

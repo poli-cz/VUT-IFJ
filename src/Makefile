@@ -5,7 +5,7 @@ PROJ=proj
 # sem pridejte .c soubory
 FILES=main.c scanner.c dynamic_string.c symtable.c parsing_preprocesor.c parser.c
 									# az se budou delat legit testy tohle oddelejte
-CFLAGS=-std=gnu99 #-Wall -Wextra -Werror -pedantic -pthread
+CFLAGS=-std=gnu99 #-Wall# -Wextra -Werror -pedantic -pthread
 CC=gcc
 RM=rm -f
 

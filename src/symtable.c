@@ -31,7 +31,7 @@ unsigned long Hash_function(const char *s){
     while (*s)
     {
         h = (h << 4) + *s++;
-        if (high = (h & 0xF0000000))
+        if ((high) = (h & 0xF0000000))
             h ^= high >> 24;
         h &= ~high;
     }
@@ -118,6 +118,7 @@ Sym_table_item *search_in_table(Symtable *table, char* identifier){
       }
     }
   }
+  return NULL;
 }
 
 

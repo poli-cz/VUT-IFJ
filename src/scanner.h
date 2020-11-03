@@ -15,40 +15,44 @@
 
 
 typedef enum{
-  t_id,
-  t_error,
-  t_def,
-  t_if,
-  t_and,
-  t_or,
-  t_eol,
-  t_eof,
-  t_mul,
-  t_div,
-  t_plus,
-  t_minus,
-  t_comma,
-  t_semico,
-  t_eq,
-  t_float,
-  t_assign,
-  t_grt,
-  t_lesst,
-  t_lbra,
-  t_rbra,
-  t_colon,
-  t_curll,
-  t_curlr,
-  t_exclam,
-  t_neq,
-  t_lst,
-  t_grteq,
-  t_lste,
-  t_undefined,
-  t_number,
-  t_keyword,
-  t_string
-  // atd...
+  t_id, //1
+  t_error, //2
+  t_def, //3
+  t_if, //4
+  t_and, //5
+  t_or, //6
+  t_eol, //7
+  t_eof, //8
+  t_mul, //9
+  t_div, //10
+  t_plus, //11
+  t_minus, //12
+  t_comma, //13
+  t_semico, //14
+  t_eq, //15
+  t_float, //16
+  t_assign, //17
+  t_grt, //18
+  t_lesst, //19
+  t_lbra, //20
+  t_rbra, //21
+  t_colon, //22
+  t_curll, //23
+  t_curlr, //24
+  t_exclam, //25
+  t_neq, //26
+  t_lst, //27
+  t_grteq, //28
+  t_lste, //29
+  t_undefined, //30
+  t_number, //31
+  t_keyword, //32
+  t_string, //33
+  // NON TERMINALS
+  n_prog,
+  n_func,
+  n_pkgmain,
+  //atd..
 
 }token_type;
 
