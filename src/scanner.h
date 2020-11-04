@@ -66,6 +66,13 @@ typedef enum{
   n_body, //38
   n_fretvals, //39
   n_retval, // 40
+  n_expr,   // 41
+  n_body_id, // 42
+  n_if,     //43
+  n_for,    //44
+  n_body_id_var, //45
+  n_func_call,
+  n_fretval,
 
  // tady nic, dojebal by se mi parser, ale fakt ošklivým způsobem
 

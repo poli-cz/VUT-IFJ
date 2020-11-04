@@ -13,6 +13,7 @@
 
 tList syntactic_prerun(Symtable *g_table){
 
+    printf("\n--------ENTERING PRERUN-------\n");
  // Loading tokens into linear list //
   tList tokens;
   tokens.last = NULL;
@@ -144,6 +145,6 @@ tList syntactic_prerun(Symtable *g_table){
       error_handler(3);
     }
 
-    //exit(2);
+    printf("\n--------PRERUN Ok-------\n");
     return tokens;
 }

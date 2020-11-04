@@ -39,35 +39,36 @@ int parser(){
     stack_push(stack, p_term, pars_err);
 
 
-    for(int i = 0; i < 30; i++){ // only for debug
-    //while(s_tok.type != 7){ // until EOF
+  //  for(int i = 0; i < 40; i++){ // only for debug
+    while(1){ // until EOF
+
       printf("-----------------\n");
       print_token(s_tok);
-      printf("-----------------\n");
+     printf("-----------------\n");
       print_stack(stack);
 
       if((stack->t[stack->top].type) > t_string){ // Non terminal on stack
         printf("EXPAND\n");
         stack_expand(&g_table, stack, s_tok, pars_err);
-
-
-
-
       }
       else{
-// ------------------- TODO EOL PARSER ----------------------------//
-        if(s_tok.type == 6){ // for handling EOLS, TODO later, now its ok everywhere..
-          p_term.k_check = false;
-          p_term.type = t_eol;
-          stack_push(stack, p_term, pars_err);
-        }
-// --------------------------------------------------------------//
-
 
         if(stack_compare(stack, s_tok) == true){
-          printf("COMPARING OK, now some pop\n");
+        //  printf("COMPARING OK\n");
           stack_pop(stack, pars_err);
 
+// --------EMPTY STACK--- ANALYSIS--DONE-----------//
+          if((stack->top==1)&&(s_tok.type == 7)){
+            printf("\n-------------SYNTAX OK-------------\n");
+            break;
+          }
+          else if((stack->top!=1)&&(s_tok.type == 7)){
+            printf("unexpected EOF\n Returning error 3\n");
+            senor_clean_fist(&g_table, stack);
+            error_handler(3);
+          }
+
+//------------------------------------------------//
 
           semantic_check(&g_table, stack, s_tok, pars_err);
           s_tok = *s_tok.next;
@@ -183,9 +184,17 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
   T_term ex_term;
   ex_term.k_check = false;
 
-
   if((stack->t[stack->top].type) == n_prog){ // non terminal N_PROG
-    printf("N_PROG on top\n");
+    if(token.type == t_eol){
+
+    stack_pop(stack, err_code); // Destroy current non terminal
+    ex_term.type = n_prog;
+    stack_push(stack, ex_term, err_code);
+    ex_term.type = t_eol;
+    stack_push(stack, ex_term, err_code);
+
+    }
+    else{
     stack_pop(stack, err_code); // Destroy current non terminal
 
     ex_term.type = n_func;
@@ -194,11 +203,24 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
     stack_push(stack, ex_term, err_code);
     ex_term.type = t_keyword;
     stack_push(stack, ex_term, err_code);
-
+    }
   }
   else if((stack->t[stack->top].type) == n_func){ // non terminal N_FUNC
+    if(token.type == t_eol){
 
-    printf("N_FUNC on top\n");
+    stack_pop(stack, err_code); // Destroy current non terminal
+    ex_term.type = n_func;
+    stack_push(stack, ex_term, err_code);
+    ex_term.type = t_eol;
+    stack_push(stack, ex_term, err_code);
+
+    }
+    else if(token.type == t_eof){
+    stack_pop(stack, err_code); // Destroy current non terminal
+    ex_term.type = t_eof;
+    stack_push(stack, ex_term, err_code);
+    }
+    else{
     stack_pop(stack, err_code); // Destroy current non terminal
 
     ex_term.type = n_func;
@@ -228,6 +250,7 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
     ex_term.used = 1;
     stack_push(stack, ex_term, err_code);
     ex_term.k_check = false;
+      }
   }
   // ---------------------------PARSING FUNCTION PARAMETERS------------------//
   else if((stack->t[stack->top].type) == n_param_n){
@@ -329,15 +352,153 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
       stack_push(stack, ex_term, err_code);
     }
   }
+  else if((stack->t[stack->top].type) == n_fretval){
+    if(token.type == t_comma){
+      ex_term.type = n_fretval;
+      stack_push(stack, ex_term, err_code);
+
+      ex_term.type = n_expr;
+      stack_push(stack, ex_term, err_code);
+
+      ex_term.type = t_comma;
+      stack_push(stack, ex_term, err_code);
+    }
+    else if(token.type == t_curll){
+      stack_pop(stack, err_code);// Destroy
+    }
+  }
+
+
+
+
   else if((stack->t[stack->top].type) == n_body){
-    if(token.type == t_id){
+    if(token.type == t_eol){
+      stack_pop(stack, err_code); // Destroy
+
+      ex_term.type = n_body;
+      stack_push(stack, ex_term, err_code);
+
+      ex_term.type = t_eol;
+      stack_push(stack, ex_term, err_code);
+      }
+    else if(token.type == t_keyword){
+      stack_pop(stack, err_code); // Destroy
+    }
+    else if(token.type == t_curlr){
+      stack_pop(stack, err_code); // Destroy
+      }
+    else if(token.type == t_number){
+      stack_pop(stack, err_code); // Destroy
+
+      ex_term.type = n_expr; // cal precedent analysis
+      stack_push(stack, ex_term, err_code);
+
+      ex_term.type = n_body;
+      stack_push(stack, ex_term, err_code);
+
+      ex_term.type = t_eol;
+      stack_push(stack, ex_term, err_code);
+    }
+    else if(token.type == t_id){
+      stack_pop(stack, err_code); // Destroy
+
+      ex_term.type = n_body;
+      stack_push(stack, ex_term, err_code);
+
+      ex_term.type = t_eol;
+      stack_push(stack, ex_term, err_code);
+
+      ex_term.type = n_body_id;
+      stack_push(stack, ex_term, err_code);
+
+      ex_term.type = t_id;
+      stack_push(stack, ex_term, err_code);
+    }
+    else if(strcmp("if", token.value->str)==0){
+      stack_pop(stack, err_code); // Destroy
+
+      ex_term.type = n_body;
+      stack_push(stack, ex_term, err_code);
+
+      ex_term.type = t_eol;
+      stack_push(stack, ex_term, err_code);
+
+      ex_term.type = n_if;
+      stack_push(stack, ex_term, err_code);
+    }
+    else if(strcmp("for", token.value->str)==0){
+      stack_pop(stack, err_code);
+
+      ex_term.type = n_body;
+      stack_push(stack, ex_term, err_code);
+
+      ex_term.type = t_eol;
+      stack_push(stack, ex_term, err_code);
+
+      ex_term.type =n_for;
+      stack_push(stack, ex_term, err_code);
+    }
+  }
+  else if((stack->t[stack->top].type) == n_body_id){
+      if(token.type == t_eq){
+        stack_pop(stack, err_code);
+
+        ex_term.type = n_body_id_var;
+        stack_push(stack, ex_term, err_code);
+
+        ex_term.type = t_eq;
+        stack_push(stack, ex_term, err_code);
+      }
+      else if(token.type == t_assign){
+        stack_pop(stack, err_code);
+
+        ex_term.type = n_body_id_var;
+        stack_push(stack, ex_term, err_code);
+
+        ex_term.type = t_assign;
+        stack_push(stack, ex_term, err_code);
+      }
+  }
+  else if((stack->t[stack->top].type) == n_body_id_var){
+      if(is_fce(token.value->str, table)==1){
+        stack_pop(stack, err_code);
+
+        ex_term.type = n_func_call;
+        stack_push(stack, ex_term, err_code);
+      }
+      else{
+        stack_pop(stack, err_code); // Destroy
+
+        ex_term.type = n_expr; // cal precedent analysis
+        stack_push(stack, ex_term, err_code);
+      }
+  }
+  else if((stack->t[stack->top].type) == n_fretvals){
+    if(token.type == t_curlr){
+      stack_pop(stack, err_code);// Destroy
+    }
+    else if(token.type == t_keyword){
+      stack_pop(stack, err_code);// Destroy
+
+      ex_term.type = n_fretval;
+      stack_push(stack, ex_term, err_code);
+
+      ex_term.type = n_expr;
+      stack_push(stack, ex_term, err_code);
+
+      ex_term.type = t_keyword;
+      ex_term.k_w[0] = 8;
+      ex_term.k_check = true;
+      ex_term.used = 1;
+      stack_push(stack, ex_term, err_code);
+      ex_term.k_check = false;
+    }
+  else if((stack->t[stack->top].type) == n_expr){
+
 
     }
-
-
   }
 }
-
 // Dealocation of everything //
 
 void senor_clean_fist(Symtable *table, synt_stack stack){
@@ -413,6 +574,18 @@ bool is_correct_kword(char* id, int which[20], int used){
       if(strcmp(id, K[which[i]])==0){
         return true;
     }
+  }
+  return false;
+}
+
+bool is_fce(char *id, Symtable *table){
+  if(is_in_table(table, id)==1){
+    Sym_table_item *temp;
+    temp = search_in_table(table, id);
+    if(temp->data.type == 1){
+      return true;
+    }
+
   }
   return false;
 }

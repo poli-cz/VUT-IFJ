@@ -135,14 +135,14 @@ tToken get_token(){
         break;
 
     case s_grt:
-      if(sym=='='){
+      if(sym =='='){
         add_char(sym,&token.value);
         state = s_meq;
       }
       else
       {
         ungetc(sym,stdin);
-        token.type = t_grt;
+        token.type = t_eq;
         return token;
       }
     break;

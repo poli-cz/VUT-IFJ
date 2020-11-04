@@ -21,19 +21,23 @@ int table_error_handler(int err_code, char* function){
   printf("Something in hash_table went teribly wrong\n");
   printf("%s exited with err_code %d\n", function, err_code);
   error_handler(99);
+  return 0;
 }
 
 
-unsigned long Hash_function(const char *s){
-    unsigned long   h = 0, high;
-    while (*s)
-    {
-        h = (h << 4) + *s++;
-        if ((high) = (h & 0xF0000000))
-            h ^= high >> 24;
-        h &= ~high;
-    }
-    return h % SYMTABLE_SIZE;
+unsigned long Hash_function(const char *str){
+  unsigned long hash = 0, x = 0;
+
+for (char c = *str; c != '\0'; c = *(++str))
+{
+  hash = (hash << 4) + c;
+  if ((x = hash & 0xF0000000L) != 0)
+  {
+    hash ^= (x >> 24);
+  }
+  hash &= ~x;
+}
+    return hash % SYMTABLE_SIZE;
 }
 
 // Table init
