@@ -2,4 +2,4 @@
 #include <string.h>
 
 
-int error_handler(int error);
+void error_handler(int error);

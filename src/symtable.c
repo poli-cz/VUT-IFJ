@@ -9,6 +9,7 @@
  */
 
 #include "symtable.h"
+#include "basic.h"
 
 /*
 Implementation of PJW hash function
@@ -19,10 +20,7 @@ hash and adding the current byte followed by moving the high bits:
 int table_error_handler(int err_code, char* function){
   printf("Something in hash_table went teribly wrong\n");
   printf("%s exited with err_code %d\n", function, err_code);
-  exit(99);
-  // 1 fatal errors like malloc error
-  // 2 not so fatal error like search fault
-  // 3 just warnings, like table is nearly allocated
+  error_handler(99);
 }
 
 
@@ -209,7 +207,7 @@ void print_table(Symtable *table){
 
 
 
-      printf("%s with ID \"%s\" \n", t, (*table)[i]->identifier);
+      printf("%s with ID \"%s\" defined-> %d \n", t, (*table)[i]->identifier, (*table)[i]->data.defined);
     }
   }
   printf("\n--------end symtable-------\n");

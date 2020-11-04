@@ -15,44 +15,59 @@
 
 
 typedef enum{
-  t_id, //1
-  t_error, //2
-  t_def, //3
-  t_if, //4
-  t_and, //5
-  t_or, //6
-  t_eol, //7
-  t_eof, //8
-  t_mul, //9
-  t_div, //10
-  t_plus, //11
-  t_minus, //12
-  t_comma, //13
-  t_semico, //14
-  t_eq, //15
-  t_float, //16
-  t_assign, //17
-  t_grt, //18
-  t_lesst, //19
-  t_lbra, //20
-  t_rbra, //21
-  t_colon, //22
-  t_curll, //23
-  t_curlr, //24
-  t_exclam, //25
-  t_neq, //26
-  t_lst, //27
-  t_grteq, //28
-  t_lste, //29
-  t_undefined, //30
-  t_number, //31
-  t_keyword, //32
+  t_id, //0
+  t_error, //1
+  t_def, //2
+  t_if, //3
+  t_and, //4
+  t_or, //5
+  t_eol, //6
+  t_eof, //7
+  t_mul, //8
+  t_div, //9
+  t_plus, //10
+  t_minus, //11
+  t_comma, //12
+  t_semico, //13
+  t_eq, //14
+  t_float, //15
+  t_assign, //16
+  t_grt, //17
+  t_lesst, //18
+  t_lbra, //19
+  t_rbra, //20
+  t_colon, //21
+  t_curll, //22
+  t_curlr, //23
+  t_exclam, //24
+  t_neq, //25
+  t_lst, //26
+  t_grteq, //27
+  t_lste, //28
+  t_undefined, //29
+  t_number, //30
+  t_keyword, //31
+  t_pkgmain, //32
   t_string, //33
+  // sem si můžeš přidávat další typy
+  // ale jenom opravdu na konec
+  // NIC NEVKLADAT DOPROSTRED !!!
+
+
+
+
+
+
   // NON TERMINALS
-  n_prog,
-  n_func,
-  n_pkgmain,
-  //atd..
+  n_prog, //34
+  n_func, //35
+  n_param_n, //36
+  n_retvals, //37
+  n_body, //38
+  n_fretvals, //39
+  n_retval, // 40
+
+ // tady nic, dojebal by se mi parser, ale fakt ošklivým způsobem
 
 }token_type;
 
@@ -114,6 +129,6 @@ typedef struct Token_list{
 }tList;
 
 tToken  get_token       ();
-int  is_key_word     (dynamic_string* string);
+int     is_key_word     (dynamic_string* string);
 int     parser          ();
 void    print_token     (tToken token);

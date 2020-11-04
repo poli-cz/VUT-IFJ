@@ -33,11 +33,9 @@ tList syntactic_prerun(Symtable *g_table){
   // check for lex-error aka. token_type == 1 //
 
     if(token->type == 1  ){  // CHECKING FOR RIGHT TOKENS
-      printf("Token error\n" );
+      printf("Token error\n");
       print_token(*token);
-      tokens.last = NULL;
-      tokens.first = NULL;
-      return tokens;
+      error_handler(1);
     }
   //--------------------//
 
@@ -63,7 +61,7 @@ tList syntactic_prerun(Symtable *g_table){
   while(test.type != 7){
 
     // Check for package main //
-    if((test.type == 0) && (strcmp(test.value->str, "package")==0)){
+    if((test.type == 31) && (strcmp(test.value->str, "package")==0)){
       tToken test2 = *test.next;
       if((test2.type == 0)&&(strcmp(test2.value->str, "main")==0)){
         pkg_main = 1;
@@ -98,14 +96,17 @@ tList syntactic_prerun(Symtable *g_table){
 
   tToken run2 = (*tokens.first);
   while(run2.type != 7){
-      if((run2.type == 0)&&(!is_in_table(g_table, run2.value->str))&&(strcmp(run2.value->str, "package"))){
+      if((run2.type == 0)&&(!is_in_table(g_table, run2.value->str))&&(strcmp(run2.value->str, "package")&&(strcmp(run2.value->str, "main")))){
+        if(is_key_word(run2.value)==2){
+          printf("Keyword as identifier\n"); // second check, I dont belive scanner..
+          free(g_table);
+          error_handler(3);
+        }
         table_data iD;
         iD.type = id;
-        iD.defined = true;
+        iD.defined = false;
         table_insert(g_table, iD, run2.value->str);
-
       }
-
 
     run2 = *run2.next;
   }
@@ -115,6 +116,7 @@ tList syntactic_prerun(Symtable *g_table){
 // --- LOAD INBUILT FCE IN SYMTABLE --- //
     table_data inbuilt_fce;
     inbuilt_fce.type = func;
+    inbuilt_fce.defined = true;
     table_insert(g_table, inbuilt_fce, "inputs");
     table_insert(g_table, inbuilt_fce, "inputi");
     table_insert(g_table, inbuilt_fce, "inputf");
@@ -131,14 +133,17 @@ tList syntactic_prerun(Symtable *g_table){
     print_table(g_table);
 
     if(pkg_main == 0){
-      printf("Missing prolog--ERROR 6--\n");
-      // shoul return 6
+      printf("Missing prolog--ERROR--\n");
+      destroy_table(g_table);
+      error_handler(6);
+
     }
     if(is_in_table(g_table, "main")==0){
-      printf("Missing main--ERROR 3--\n");
-      // should return 3
+      printf("Missing main--ERROR--\n");
+      destroy_table(g_table);
+      error_handler(3);
     }
 
-
+    //exit(2);
     return tokens;
 }

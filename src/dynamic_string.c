@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "dynamic_string.h"
+#include "basic.h"
 
 /**
  * Initialise memory for array
@@ -21,16 +22,14 @@ int init_dynamc_string(dynamic_string **string) {
     *string = (dynamic_string *)malloc(sizeof(dynamic_string));
 
     if (*string == NULL){
-        fprintf(stderr, "Error allocating dynamic string\n");
-        return 1;
+        error_handler(99);
     }
 
     (*string)->str = (char *)malloc(SIZE_ARR * sizeof(char));
 
     if ((*string)->str == NULL) {
-        fprintf(stderr, "Error allocating dynamic string\n");
         free(*string);
-        return 1;
+        error_handler(99);
     }
 
     (*string)->len = 0;
@@ -49,8 +48,7 @@ int add_char(char c, dynamic_string** string) {
     if ((*string)->len + 1 >= (*string)->alloc) {
         (*string)->str = (char*)realloc((*string)->str, (*string)->alloc + SIZE_ARR * (sizeof(char)));
         if ((*string)->str == NULL) {
-            fprintf(stderr, "Error reallocating dynamic string\n");
-            return 1;
+            error_handler(99);
         }
         (*string)->alloc += SIZE_ARR;
     }

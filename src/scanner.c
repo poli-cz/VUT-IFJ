@@ -16,8 +16,7 @@
 
 FILE *source_file;
 
-
-const char* KEYWORDS[] = {"if","else", "for", "float64","func","int","return","string","inputs","inputi","inputf","print","int2float","float2int","len","substr","ord",
+const char* KEYWORDS[] = {"package", "if","else", "for", "float64","func","int","return","string","inputs","inputi","inputf","print","int2float","float2int","len","substr","ord",
 "chr"
 };
 
@@ -281,7 +280,7 @@ tToken get_token(){
       if(isdigit(sym)){
        add_char(sym,&token.value);
        state=s_number;
-
+       break;
       }
       else if (sym == '.'){
          add_char(sym,&token.value);

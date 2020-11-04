@@ -1,36 +1,38 @@
 #include<stdio.h>
+#include<stdlib.h>
 #include "basic.h"
 
 
-int error_handler(int code){
+
+void error_handler(int code){
 
   switch (code) {
     case 1:
-      fprintf(stderr, "chybná struktura aktuálního lexému\n");
-      return(1);
+      fprintf(stderr, "Exited with code 1\n");
+      exit(1);
     case 2:
-      fprintf(stderr, "chybná syntaxe programu\n");
-      return(2);
+      fprintf(stderr, "Exited with code 2\n");
+      exit(2);
     case 3:
-      fprintf(stderr, "chybná syntaxe programu\n");
-      return(3);
+      fprintf(stderr, "Exited with code 3\n");
+      exit(3);
     case 4:
-      fprintf(stderr, "sémantická chyba\n");
-      return(4);
+      fprintf(stderr, "Exited with code 4\n");
+      exit(4);
     case 5:
-      fprintf(stderr, "sémantická chyba typové kompatibility\n");
-      return(5);
+      fprintf(stderr, "Exited with code 5\n");
+      exit(5);
     case 6:
-      fprintf(stderr, "špatný počet/typ parametrů či návratových hodnotu volání funkce či návratu z funkce.\n");
-      return(6);
+      fprintf(stderr, "Exited with code 6\n");
+      exit(6);
     case 7:
-      fprintf(stderr, "ostatní sémantické chyby\n");
-      return(7);
+      fprintf(stderr, "Exited with code 7\n");
+      exit(7);
     case 9:
-      fprintf(stderr, "sémantická chyba dělení nulovou konstantou.\n");
-      return(9);
+      fprintf(stderr, "Exited with code 9\n");
+      exit(9);
     default:
-      fprintf(stderr, "interní chyba překladače\n");
-      return(99);
+      fprintf(stderr, "Exited with code 99\n");
+      exit(99);
     };
 }
