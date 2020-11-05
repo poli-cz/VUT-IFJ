@@ -21,6 +21,7 @@ tList syntactic_prerun(Symtable *g_table){
   while(1){
     tToken *token = (tToken*)(malloc(sizeof(tToken)));
     *token = get_token();
+
     // print_token(*token); // printing tokens for debug
     if(tokens.last == NULL){
       tokens.last = token;
@@ -44,6 +45,7 @@ tList syntactic_prerun(Symtable *g_table){
       break;
     }
   }
+
 
 // --------loading and listing tokens done--------------//
 
@@ -103,10 +105,21 @@ tList syntactic_prerun(Symtable *g_table){
           free(g_table);
           error_handler(3);
         }
-        table_data iD;
-        iD.type = id;
-        iD.defined = false;
-        table_insert(g_table, iD, run2.value->str);
+        tToken toktok;
+        toktok = *run2.next;
+
+        if(toktok.type == t_lbra){
+          table_data iD;
+          iD.type = func;
+          iD.defined = false;
+          table_insert(g_table, iD, run2.value->str);
+        }else{
+          table_data iD;
+          iD.type = id;
+          iD.defined = false;
+          table_insert(g_table, iD, run2.value->str);
+        }
+
       }
 
     run2 = *run2.next;
@@ -131,7 +144,8 @@ tList syntactic_prerun(Symtable *g_table){
 
 // --- LOAD INBUILT FCE IN SYMTABLE --- //
 
-    print_table(g_table);
+  print_table(g_table);
+
 
     if(pkg_main == 0){
       printf("Missing prolog--ERROR--\n");

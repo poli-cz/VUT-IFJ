@@ -49,30 +49,29 @@ typedef enum{
   t_keyword, //31
   t_pkgmain, //32
   t_string, //33
+  t_check_for_def_function, //34
   // sem si můžeš přidávat další typy
   // ale jenom opravdu na konec
   // NIC NEVKLADAT DOPROSTRED !!!
 
 
 
-
-
-
   // NON TERMINALS
-  n_prog, //34
-  n_func, //35
-  n_param_n, //36
-  n_retvals, //37
-  n_body, //38
-  n_fretvals, //39
-  n_retval, // 40
-  n_expr,   // 41
-  n_body_id, // 42
-  n_if,     //43
-  n_for,    //44
-  n_body_id_var, //45
-  n_func_call,
-  n_fretval,
+  n_prog, //35
+  n_func, //36
+  n_param_n, //37
+  n_retvals, //38
+  n_body, //39
+  n_fretvals, //40
+  n_retval, // 41
+  n_expr,   // 42
+  n_body_id, // 43
+  n_if,     //44
+  n_for,    //45
+  n_body_id_var, //46
+  n_func_call, //47
+  n_fretval, //48
+  n_call_param, //49
 
  // tady nic, dojebal by se mi parser, ale fakt ošklivým způsobem
 

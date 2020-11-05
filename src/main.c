@@ -10,10 +10,9 @@
 
 
 int main(){
-
   int error = 0;
-
   error = parser_debug();
+
 
 
 return error;
@@ -22,7 +21,6 @@ return error;
 
 
 int scanner_debug(){
-
   return 0;
 }
 
@@ -31,12 +29,12 @@ int parser_debug(){
 
 
 
-  /*_____________________________*/
 
 
 
 
-  
+
+
 
 
 

@@ -2,7 +2,8 @@ package main
 
 func main(){
   print("HELL WORLD")
-  float64 variable := 10
+   a = 2+2
+
 }
 
 func ifj_je_pain(){

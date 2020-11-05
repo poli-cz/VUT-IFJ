@@ -13,7 +13,6 @@
 #include "parser.h"
 
 
-
 // Main parsing function
 int parser(){
 
@@ -24,11 +23,8 @@ int parser(){
   table_init(&g_table);
   stack_init(&stack, pars_err);
 
-
-
 // semantic prerun, only check for some basic semantic actions
   tList pre = syntactic_prerun(&g_table);
-
 
     printf("\n--------SYNTAX CHECK-------\n");
 
@@ -39,55 +35,54 @@ int parser(){
     stack_push(stack, p_term, pars_err);
 
 
-  //  for(int i = 0; i < 40; i++){ // only for debug
     while(1){ // until EOF
 
       printf("-----------------\n");
       print_token(s_tok);
-     printf("-----------------\n");
+      printf("-----------------\n");
       print_stack(stack);
 
-      if((stack->t[stack->top].type) > t_string){ // Non terminal on stack
+      if((stack->t[stack->top].type) > t_check_for_def_function){ // Non terminal on stack
         printf("EXPAND\n");
         stack_expand(&g_table, stack, s_tok, pars_err);
       }
       else{
-
-        if(stack_compare(stack, s_tok) == true){
-        //  printf("COMPARING OK\n");
+        if(stack_compare(stack, s_tok, &g_table) == true){
           stack_pop(stack, pars_err);
+          semantic_check(&g_table, stack, s_tok, pars_err);
 
-// --------EMPTY STACK--- ANALYSIS--DONE-----------//
+
+// --------EMPTY STACK--- ANALYSIS--DONE--------------------//
           if((stack->top==1)&&(s_tok.type == 7)){
             printf("\n-------------SYNTAX OK-------------\n");
             break;
           }
           else if((stack->top!=1)&&(s_tok.type == 7)){
             printf("unexpected EOF\n Returning error 3\n");
-            senor_clean_fist(&g_table, stack);
+            senor_clean_fist(&g_table, stack, pre);
             error_handler(3);
           }
-
-//------------------------------------------------//
-
-          semantic_check(&g_table, stack, s_tok, pars_err);
-          s_tok = *s_tok.next;
         }
+
+//----------------------------------------------------------//
+
         else{
           printf("Syntax check failed\n");
-          senor_clean_fist(&g_table, stack);
+          senor_clean_fist(&g_table, stack, pre);
           error_handler(3);
         }
+        s_tok = *s_tok.next;
       }
     }
 
+//----------------------------------------------------------------------//
     printf("\n--------SEMANTIC CHECK-------\n");
 
 /*  Some semantic checks are done in preprocesor and also in syntax
     Mainly checking for undefined functions and that kind of stuff
 
 */
-
+  senor_clean_fist(&g_table, stack, pre);
 
 
 
@@ -97,12 +92,18 @@ return 0;
 }
 
 
+
+
+
+
+
+
 //------------------------------------------------------------------------------//
 //  ------------------- Functions for work with synt_stack  ------------------- //
 
 
 
-bool stack_compare(synt_stack stack, tToken token){
+bool stack_compare(synt_stack stack, tToken token, Symtable *table){
   printf("%d on  STACK\n", (stack->t[stack->top]).type);
   printf("%d is TOKEN\n", (token.type));
 
@@ -115,6 +116,21 @@ bool stack_compare(synt_stack stack, tToken token){
       return false;
     }
   }
+
+// ---------------------------------------------//
+
+//-------check for defined function -------------//
+  if((stack->t[stack->top]).type == t_check_for_def_function){ // semantic check for defined function
+    if(is_fce(token.value->str, table)==1){
+      return true;
+    }
+    else{
+      printf("function used before definition\n");
+      error_handler(6);
+      return false;
+    }
+  }
+// ---------------------------------------------//
 
   if((token.type)==(stack->t[stack->top]).type){
     return true;
@@ -264,9 +280,6 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
       ex_term.type = n_param_n;
       stack_push(stack, ex_term, err_code);
 
-      ex_term.type = t_id;
-      stack_push(stack, ex_term, err_code);
-
       ex_term.type = t_keyword;
       ex_term.k_w[0] = 5; // check for double
       ex_term.k_w[1] = 7; // check for int
@@ -275,6 +288,9 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
       ex_term.used = 3;
       stack_push(stack, ex_term, err_code);
       ex_term.k_check = false;
+
+      ex_term.type = t_id;
+      stack_push(stack, ex_term, err_code);
 
       ex_term.type = t_comma;
       stack_push(stack, ex_term, err_code);
@@ -286,9 +302,6 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
       ex_term.type = n_param_n;
       stack_push(stack, ex_term, err_code);
 
-      ex_term.type = t_id;
-      stack_push(stack, ex_term, err_code);
-
       ex_term.type = t_keyword;
       ex_term.k_w[0] = 5; // check for double
       ex_term.k_w[1] = 7; // check for int
@@ -297,6 +310,9 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
       ex_term.used = 3;
       stack_push(stack, ex_term, err_code);
       ex_term.k_check = false;
+
+      ex_term.type = t_id;
+      stack_push(stack, ex_term, err_code);
 
   // --------------------------------------------------------------------//
 
@@ -363,12 +379,26 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
       ex_term.type = t_comma;
       stack_push(stack, ex_term, err_code);
     }
-    else if(token.type == t_curll){
+    else if(token.type == t_eol){
       stack_pop(stack, err_code);// Destroy
+
+      ex_term.type = n_fretval;
+      stack_push(stack, ex_term, err_code);
+
+      ex_term.type = t_eol;
+      stack_push(stack, ex_term, err_code);
+    }
+    else if(token.type = t_curlr){
+      stack_pop(stack, err_code);// Destroy
+
+    //  ex_term.type = t_curlr;
+    //  stack_push(stack, ex_term, err_code);
+    }
+    else{
+      printf("UNEXPECTED IN n_fretval\n");
+      exit(3);
     }
   }
-
-
 
 
   else if((stack->t[stack->top].type) == n_body){
@@ -381,11 +411,24 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
       ex_term.type = t_eol;
       stack_push(stack, ex_term, err_code);
       }
-    else if(token.type == t_keyword){
-      stack_pop(stack, err_code); // Destroy
-    }
+    else if(is_fce(token.value->str, table)==1){
+      stack_pop(stack, err_code);
+
+      ex_term.type = n_body;
+      stack_push(stack, ex_term, err_code);
+
+      ex_term.type = t_eol;
+      stack_push(stack, ex_term, err_code);
+
+      ex_term.type = n_func_call;
+      stack_push(stack, ex_term, err_code);
+
+      }
     else if(token.type == t_curlr){
       stack_pop(stack, err_code); // Destroy
+
+    //  ex_term.type = n_func_call;
+    //  stack_push(stack, ex_term, err_code);
       }
     else if(token.type == t_number){
       stack_pop(stack, err_code); // Destroy
@@ -393,11 +436,13 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
       ex_term.type = n_expr; // cal precedent analysis
       stack_push(stack, ex_term, err_code);
 
+      ex_term.type = t_eol;
+      stack_push(stack, ex_term, err_code);
+
       ex_term.type = n_body;
       stack_push(stack, ex_term, err_code);
 
-      ex_term.type = t_eol;
-      stack_push(stack, ex_term, err_code);
+
     }
     else if(token.type == t_id){
       stack_pop(stack, err_code); // Destroy
@@ -438,6 +483,14 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
       ex_term.type =n_for;
       stack_push(stack, ex_term, err_code);
     }
+    else if(strcmp("return", token.value->str)==0){
+      stack_pop(stack, err_code);
+    }
+    else{
+      printf("UNEXPECTED token in BODY\n");
+      exit(3);
+    }
+
   }
   else if((stack->t[stack->top].type) == n_body_id){
       if(token.type == t_eq){
@@ -458,6 +511,27 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
         ex_term.type = t_assign;
         stack_push(stack, ex_term, err_code);
       }
+      else if(token.type == t_comma){ // assigning multiple variables
+        stack_pop(stack, err_code);
+
+        ex_term.type = n_body_id;
+        stack_push(stack, ex_term, err_code);
+
+        ex_term.type = t_id;
+        stack_push(stack, ex_term, err_code);
+
+        ex_term.type = t_comma;
+        stack_push(stack, ex_term, err_code);
+      }
+
+
+
+
+      else{   // AM I supposed to give error?
+        printf("Unexpected token after ID \n");
+        //senor_clean_fist(table, stack, err_code);
+        error_handler(6);
+      }
   }
   else if((stack->t[stack->top].type) == n_body_id_var){
       if(is_fce(token.value->str, table)==1){
@@ -466,16 +540,20 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
         ex_term.type = n_func_call;
         stack_push(stack, ex_term, err_code);
       }
+
       else{
         stack_pop(stack, err_code); // Destroy
-
         ex_term.type = n_expr; // cal precedent analysis
         stack_push(stack, ex_term, err_code);
       }
   }
   else if((stack->t[stack->top].type) == n_fretvals){
-    if(token.type == t_curlr){
+    if(token.type == t_eol){
       stack_pop(stack, err_code);// Destroy
+
+      ex_term.type = t_eol; // no nevim
+      stack_push(stack, ex_term, err_code);
+
     }
     else if(token.type == t_keyword){
       stack_pop(stack, err_code);// Destroy
@@ -493,19 +571,122 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
       stack_push(stack, ex_term, err_code);
       ex_term.k_check = false;
     }
-  else if((stack->t[stack->top].type) == n_expr){
+    else if(token.type == t_curlr){
+      stack_pop(stack, err_code);// Destroy
+    }
+    else{
+      printf("UNEXPECTED token in return values of function\n");
+      exit(3);
+    }
+  }
+  // -------------------------------WRITE EXTERN FUNCTION-------------------//
 
+
+  else if((stack->t[stack->top].type) == n_expr){
+    if(token.type == t_string){
+      stack_pop(stack, err_code);// Destroy
+
+      ex_term.type = t_string;
+      stack_push(stack, ex_term, err_code);
+    }
+    else if(token.type == t_number){
+      stack_pop(stack, err_code);// Destroy
+
+      ex_term.type = t_number;
+      stack_push(stack, ex_term, err_code);
+    }
+    else if(token.type == t_float){
+      stack_pop(stack, err_code);// Destroy
+
+      ex_term.type = t_float;
+      stack_push(stack, ex_term, err_code);
+    }
+    else if(token.type == t_id){
+      stack_pop(stack, err_code);// Destroy
+
+      ex_term.type = t_id;
+      stack_push(stack, ex_term, err_code);
+    }
+    else{
+      printf("CALIING PRECEDENT ANALYSIS FOR EXPRESION..\n");
+      printf("TODO later...\n\n");
+      exit(3);
 
     }
   }
-}
-// Dealocation of everything //
 
-void senor_clean_fist(Symtable *table, synt_stack stack){
-  destroy_table(table);
-  stack_remove(&stack);
-}
 
+// -----------------------------------------------------------------------//
+
+
+  else if((stack->t[stack->top].type) == n_func_call){
+      stack_pop(stack, err_code);
+
+      //ex_term.type = n_body; body already generated
+      //stack_push(stack, ex_term, err_code);
+
+      ex_term.type = t_rbra;
+      stack_push(stack, ex_term, err_code);
+
+      ex_term.type = n_call_param;
+      stack_push(stack, ex_term, err_code);
+
+      ex_term.type = t_lbra;
+      stack_push(stack, ex_term, err_code);
+
+      ex_term.type = t_check_for_def_function;
+      stack_push(stack, ex_term, err_code);
+  }
+
+  else if((stack->t[stack->top].type) == n_call_param){
+    if(token.type == t_rbra){
+      stack_pop(stack, err_code);
+    }
+    else if(token.type == t_comma){
+      stack_pop(stack, err_code);
+
+      ex_term.type = n_call_param;
+      stack_push(stack, ex_term, err_code);
+
+      ex_term.type = n_expr;
+      stack_push(stack, ex_term, err_code);
+
+      ex_term.type = t_comma;
+      stack_push(stack, ex_term, err_code);
+    }
+    else{
+      stack_pop(stack, err_code);
+
+      ex_term.type = n_call_param;
+      stack_push(stack, ex_term, err_code);
+
+      ex_term.type = n_expr;
+      stack_push(stack, ex_term, err_code);
+    }
+  }
+  else if((stack->t[stack->top].type) == n_if){
+
+  }
+  else if((stack->t[stack->top].type) == n_for){
+
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+  else{
+    printf("UNEXPECTED NON_TERMINAL\n");
+    exit(3);
+  }
+}
 
 //  -------------------------------------------------------------- //
 
@@ -546,19 +727,41 @@ void semantic_check(Symtable *table, synt_stack stack, tToken token, int err_cod
 
 
 //  -----------------------OTHER SUPPORT STUFF-------------------------------------- //
+
+// Dealocation of everything //
+
+void senor_clean_fist(Symtable *table, synt_stack stack, tList token_list){
+
+  tToken *temp = token_list.first;
+  tToken *point;
+
+  while(temp->type != 7){
+    point = temp->next;
+    dynamic_string *string = temp->value;
+    free(string);
+    free(temp);
+    temp = point;
+  }
+  destroy_table(table);
+  stack_remove(&stack);
+}
+
+
+
+
+
+
+
 void print_stack(synt_stack stack){
 
-printf("PRINTING STACK\n");
+    printf("PRINTING STACK\n");
 
-      printf("%d\n", (stack->t[(stack->top)].type));
-      printf("%d\n", (stack->t[stack->top-1].type));
-      printf("%d\n", (stack->t[(stack->top)-2].type));
-      printf("%d\n", (stack->t[(stack->top)-3].type));
-      printf("%d\n", (stack->t[(stack->top)-4].type));
-      printf("%d\n", (stack->t[(stack->top)-5].type));
+    for(int i = 0; i < 10; i++){
+      printf("%d\n", (stack->t[(stack->top)-i].type));
+    }
 
-printf("----------------\n\n");
 
+      printf("----------------\n\n");
 
 }
 
@@ -585,7 +788,18 @@ bool is_fce(char *id, Symtable *table){
     if(temp->data.type == 1){
       return true;
     }
-
   }
   return false;
+}
+
+bool is_defined(char *id, Symtable *table){
+  if(is_in_table(table, id)==1){
+    Sym_table_item *temp;
+    temp = search_in_table(table, id);
+    if(temp->data.defined == true){
+      return true;
+    }
+  }
+  return false;
+
 }
