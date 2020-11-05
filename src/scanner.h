@@ -6,6 +6,7 @@
  * Varianta :
  * Autor    : Jan Polišenský (xpolis04)
  */
+ #pragma once
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -49,7 +50,8 @@ typedef enum{
   t_keyword, //31
   t_pkgmain, //32
   t_string, //33
-  t_check_for_def_function, //34
+  t_ultime_skip, //34
+  t_check_for_def_function, //35
   // sem si můžeš přidávat další typy
   // ale jenom opravdu na konec
   // NIC NEVKLADAT DOPROSTRED !!!
@@ -57,21 +59,25 @@ typedef enum{
 
 
   // NON TERMINALS
-  n_prog, //35
-  n_func, //36
-  n_param_n, //37
-  n_retvals, //38
-  n_body, //39
-  n_fretvals, //40
-  n_retval, // 41
-  n_expr,   // 42
-  n_body_id, // 43
-  n_if,     //44
-  n_for,    //45
-  n_body_id_var, //46
-  n_func_call, //47
-  n_fretval, //48
-  n_call_param, //49
+  n_prog, //36
+  n_func, //37
+  n_param_n, //38
+  n_retvals, //39
+  n_body, //40
+  n_fretvals, //41
+  n_retval, // 42
+  n_expr,   // 43
+  n_body_id, // 44
+  n_if,     //45
+  n_for,    //46
+  n_body_id_var, //47
+  n_func_call, //48
+  n_fretval, //49
+  n_call_param, //50
+  n_body_comma, //51
+  n_def,        //52
+  n_assign,     //53
+
 
  // tady nic, dojebal by se mi parser, ale fakt ošklivým způsobem
 

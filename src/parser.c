@@ -11,6 +11,7 @@
 
 #include <stdbool.h>
 #include "parser.h"
+#include "PSA.h"
 
 
 // Main parsing function
@@ -37,13 +38,12 @@ int parser(){
 
     while(1){ // until EOF
 
-      printf("-----------------\n");
-      print_token(s_tok);
-      printf("-----------------\n");
-      print_stack(stack);
+  //    printf("-----------------\n");
+  //    print_token(s_tok);
+  //    printf("-----------------\n");
+  //    print_stack(stack);
 
       if((stack->t[stack->top].type) > t_check_for_def_function){ // Non terminal on stack
-        printf("EXPAND\n");
         stack_expand(&g_table, stack, s_tok, pars_err);
       }
       else{
@@ -104,8 +104,8 @@ return 0;
 
 
 bool stack_compare(synt_stack stack, tToken token, Symtable *table){
-  printf("%d on  STACK\n", (stack->t[stack->top]).type);
-  printf("%d is TOKEN\n", (token.type));
+//  printf("%d on  STACK\n", (stack->t[stack->top]).type);
+//  printf("%d is TOKEN\n", (token.type));
 
 
 // ----- aditional check for Kword name -------//
@@ -122,7 +122,7 @@ bool stack_compare(synt_stack stack, tToken token, Symtable *table){
 //-------check for defined function -------------//
   if((stack->t[stack->top]).type == t_check_for_def_function){ // semantic check for defined function
     if(is_fce(token.value->str, table)==1){
-      return true;
+      return true;            // we dont need to do pop, only check is there is defined function in token
     }
     else{
       printf("function used before definition\n");
@@ -131,6 +131,11 @@ bool stack_compare(synt_stack stack, tToken token, Symtable *table){
     }
   }
 // ---------------------------------------------//
+
+if((stack->t[stack->top]).type == t_ultime_skip){
+  return true;
+}
+
 
   if((token.type)==(stack->t[stack->top]).type){
     return true;
@@ -221,6 +226,8 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
     stack_push(stack, ex_term, err_code);
     }
   }
+
+  //---------------------FUNC----------------------------------//
   else if((stack->t[stack->top].type) == n_func){ // non terminal N_FUNC
     if(token.type == t_eol){
 
@@ -318,6 +325,7 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
 
     }
   }
+    //---------------------RETURN VALUES FROM FUNCTION----------------------------------//
   else if((stack->t[stack->top].type) == n_retvals){
     if(token.type == t_curll){ // there are no other parameters
       stack_pop(stack, err_code); // Destroy n_retvals
@@ -368,6 +376,7 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
       stack_push(stack, ex_term, err_code);
     }
   }
+    //---------------------RETURN VALUES INSIDE FUNCTION----------------------------------//
   else if((stack->t[stack->top].type) == n_fretval){
     if(token.type == t_comma){
       ex_term.type = n_fretval;
@@ -400,7 +409,7 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
     }
   }
 
-
+  //---------------------MAIN FUNCTION BODY----------------------------------//
   else if((stack->t[stack->top].type) == n_body){
     if(token.type == t_eol){
       stack_pop(stack, err_code); // Destroy
@@ -492,6 +501,7 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
     }
 
   }
+    //---------------------IF THERE IS ID----------------------------------//
   else if((stack->t[stack->top].type) == n_body_id){
       if(token.type == t_eq){
         stack_pop(stack, err_code);
@@ -524,14 +534,22 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
         stack_push(stack, ex_term, err_code);
       }
 
-
-
-
       else{   // AM I supposed to give error?
         printf("Unexpected token after ID \n");
         //senor_clean_fist(table, stack, err_code);
         error_handler(6);
       }
+  }
+    //---------------------ASSIGNING MORE THAN ONE VARIABLE----------------------------------//
+  else if((stack->t[stack->top].type) == n_body_comma){
+
+    ex_term.type = n_body_id_var;
+    stack_push(stack, ex_term, err_code);
+
+    ex_term.type = t_assign;
+    stack_push(stack, ex_term, err_code);
+
+
   }
   else if((stack->t[stack->top].type) == n_body_id_var){
       if(is_fce(token.value->str, table)==1){
@@ -540,9 +558,29 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
         ex_term.type = n_func_call;
         stack_push(stack, ex_term, err_code);
       }
+      else if(token.type == t_comma){
+        stack_pop(stack, err_code);
+
+        ex_term.type = t_comma; // cal precedent analysis
+        stack_push(stack, ex_term, err_code);
+
+        ex_term.type = n_expr; // cal precedent analysis
+        stack_push(stack, ex_term, err_code);
+
+      }
+      else if(token.type == t_eol){
+        stack_pop(stack, err_code);
+
+        ex_term.type = t_eol; // cal precedent analysis
+        stack_push(stack, ex_term, err_code);
+      }
 
       else{
         stack_pop(stack, err_code); // Destroy
+
+        //ex_term.type = n_body_id_var;
+        //stack_push(stack, ex_term, err_code);
+
         ex_term.type = n_expr; // cal precedent analysis
         stack_push(stack, ex_term, err_code);
       }
@@ -581,44 +619,36 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
   }
   // -------------------------------WRITE EXTERN FUNCTION-------------------//
 
-
+/*
+* Calling extern function to parse expresions
+* this piece of code will generate n-universal tokens for stack pop
+* this depence on <expr> lenght
+* This is kind tricky, so be aware to touch this
+*/
   else if((stack->t[stack->top].type) == n_expr){
-    if(token.type == t_string){
-      stack_pop(stack, err_code);// Destroy
 
-      ex_term.type = t_string;
-      stack_push(stack, ex_term, err_code);
-    }
-    else if(token.type == t_number){
-      stack_pop(stack, err_code);// Destroy
+  // from PSA we know how many token we should skip or pop
 
-      ex_term.type = t_number;
-      stack_push(stack, ex_term, err_code);
-    }
-    else if(token.type == t_float){
-      stack_pop(stack, err_code);// Destroy
+      int skip = expr_parse(table, stack, token, err_code);
 
-      ex_term.type = t_float;
-      stack_push(stack, ex_term, err_code);
-    }
-    else if(token.type == t_id){
-      stack_pop(stack, err_code);// Destroy
+      stack_pop(stack, err_code); // Destroy <n_expr>
 
-      ex_term.type = t_id;
-      stack_push(stack, ex_term, err_code);
-    }
-    else{
-      printf("CALIING PRECEDENT ANALYSIS FOR EXPRESION..\n");
-      printf("TODO later...\n\n");
-      exit(3);
 
-    }
+      for(int i = 0; i < skip; i++){ // push universal tokens
+
+        ex_term.type = t_ultime_skip;
+        stack_push(stack, ex_term, err_code);
+      }
+
+
   }
 
-
+// -----------------------------------------------------------------------//
 // -----------------------------------------------------------------------//
 
 
+
+    //---------------------CALLING FUNCTION IN BODY----------------------------------//
   else if((stack->t[stack->top].type) == n_func_call){
       stack_pop(stack, err_code);
 
@@ -638,6 +668,7 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
       stack_push(stack, ex_term, err_code);
   }
 
+    //---------------------PARSING PARAMETERS OF FUNCTION CALL ----------------------------------//
   else if((stack->t[stack->top].type) == n_call_param){
     if(token.type == t_rbra){
       stack_pop(stack, err_code);
@@ -664,27 +695,121 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
       stack_push(stack, ex_term, err_code);
     }
   }
+      //---------------------PARSING IF----------------------------------//
   else if((stack->t[stack->top].type) == n_if){
+    stack_pop(stack, err_code);
 
+    ex_term.type = t_curlr;
+    stack_push(stack, ex_term, err_code);
+
+    ex_term.type = n_body;
+    stack_push(stack, ex_term, err_code);
+
+    ex_term.type = t_curll;
+    stack_push(stack, ex_term, err_code);
+
+    ex_term.type = t_keyword;
+    ex_term.k_w[0] = 3;
+    ex_term.k_check = true;
+    ex_term.used = 1;
+    stack_push(stack, ex_term, err_code);
+    ex_term.k_check = false;
+
+    ex_term.type = t_curlr;
+    stack_push(stack, ex_term, err_code);
+
+    ex_term.type = n_body;
+    stack_push(stack, ex_term, err_code);
+
+    ex_term.type = t_curll;
+    stack_push(stack, ex_term, err_code);
+
+    ex_term.type = n_expr;
+    stack_push(stack, ex_term, err_code);
+
+    ex_term.type = t_keyword;
+    ex_term.k_w[0] = 2;
+    ex_term.k_check = true;
+    ex_term.used = 1;
+    stack_push(stack, ex_term, err_code);
+    ex_term.k_check = false;
   }
+        //---------------------PARSING FOR----------------------------------//
   else if((stack->t[stack->top].type) == n_for){
+    stack_pop(stack, err_code);
 
+    ex_term.type = t_curlr;
+    stack_push(stack, ex_term, err_code);
+
+    ex_term.type = n_body;
+    stack_push(stack, ex_term, err_code);
+
+    ex_term.type = t_curll;
+    stack_push(stack, ex_term, err_code);
+
+    ex_term.type = n_assign;
+    stack_push(stack, ex_term, err_code);
+
+    ex_term.type = t_semico;
+    stack_push(stack, ex_term, err_code);
+
+    ex_term.type = n_expr;
+    stack_push(stack, ex_term, err_code);
+
+    ex_term.type = t_semico;
+    stack_push(stack, ex_term, err_code);
+
+    ex_term.type = n_def;
+    stack_push(stack, ex_term, err_code);
+
+    ex_term.type = t_keyword;
+    ex_term.k_w[0] = 4;
+    ex_term.k_check = true;
+    ex_term.used = 1;
+    stack_push(stack, ex_term, err_code);
+    ex_term.k_check = false;
+  }
+        //---------------------DEFINITION INSIDE FOR----------------------------------//
+  else if((stack->t[stack->top].type) == n_def){
+    if(token.type == t_semico){
+      stack_pop(stack, err_code);
+    }
+    else{
+      stack_pop(stack, err_code);
+
+      ex_term.type = n_expr;
+      stack_push(stack, ex_term, err_code);
+
+      ex_term.type = t_assign;
+      stack_push(stack, ex_term, err_code);
+
+      ex_term.type = t_id;
+      stack_push(stack, ex_term, err_code);
+    }
+  }
+        //---------------------ASSIGN INSIDE FOR----------------------------------//
+  else if((stack->t[stack->top].type) == n_assign){
+    if(token.type == t_curll){
+      stack_pop(stack, err_code);
+    }
+    else{
+      stack_pop(stack, err_code);
+
+      ex_term.type = n_expr;
+      stack_push(stack, ex_term, err_code);
+
+      ex_term.type = t_eq;
+      stack_push(stack, ex_term, err_code);
+
+      ex_term.type = t_id;
+      stack_push(stack, ex_term, err_code);
+    }
   }
 
-
-
-
-
-
-
-
-
-
-
-
+// This should NEVER happen, if so... we are all DOOMED :)
   else{
-    printf("UNEXPECTED NON_TERMINAL\n");
-    exit(3);
+    printf("UNEXPECTED NON_TERMINAL ON STACK \n");
+    exit(99);
   }
 }
 
@@ -698,26 +823,29 @@ void semantic_check(Symtable *table, synt_stack stack, tToken token, int err_cod
 
 
 
+//print_token(token);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// TODO SEMANTIC //
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

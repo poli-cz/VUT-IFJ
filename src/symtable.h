@@ -7,6 +7,7 @@
  *
  * @author <xpolis04> Jan Polišenský
  */
+ #pragma once
 #include<stdlib.h>
 #include<string.h>
 #include<stdio.h>

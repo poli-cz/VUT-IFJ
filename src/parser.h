@@ -7,7 +7,7 @@
  *
  * @author <xpolis04> Jan Polišenský
  */
-
+#pragma once
 #include<stdbool.h>
 #include "symtable.h"
 #include "scanner.h"
@@ -23,7 +23,6 @@
 
 
 typedef struct teminal{
-  int test;
   int k_w[20]; // keywords for check
   int used; // how many items are used
   bool k_check;
@@ -38,7 +37,6 @@ typedef struct SyntaxStack{
     int top;    // Index prvního volného místa
 	int last;   // Index naposledy vloženého prvku
 }*synt_stack;
-
 
 
 // function prototypes
