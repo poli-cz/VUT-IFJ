@@ -161,7 +161,8 @@ tToken get_token(){
     break;
 
     case s_string:
-     if (sym=='"'){
+     if (sym == '"'){
+       add_char(sym,&token.value);
        token.type=t_string;
        return token;
      }
@@ -170,7 +171,8 @@ tToken get_token(){
       return token;
      }
      else if(sym == '\n'){
-       token.value = NULL;
+      add_char(sym,&token.value);
+      token.value = NULL;
       token.type=t_eol;
       return token;
      }
@@ -417,7 +419,8 @@ tToken get_token(){
 
 
     case s_error:
-        state = s_eof;
+    token.type=t_error;
+      return token;
         break;
     case s_eof:
       token.type=t_eof;

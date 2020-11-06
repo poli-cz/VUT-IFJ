@@ -199,19 +199,22 @@ void print_table(Symtable *table){
     if((*table)[i] != NULL){
       if((*table)[i]->data.type == 0){
          t = "Variable";
+         printf("%s with ID \"%s\" defined-> %d \n", t, (*table)[i]->identifier, (*table)[i]->data.defined);
       }
       else if((*table)[i]->data.type == 1){
          t = "Function";
+         printf("%s with ID \"%s\" defined-> %d \n", t, (*table)[i]->identifier, (*table)[i]->data.defined);
       }
       else{
          t = "other";
+         printf("%s with ID \"%s\" value-> %d \n", t, (*table)[i]->identifier, (*table)[i]->data.data);
     }
 
 
 
 
 
-      printf("%s with ID \"%s\" defined-> %d \n", t, (*table)[i]->identifier, (*table)[i]->data.defined);
+
     }
   }
   printf("\n--------end symtable-------\n");

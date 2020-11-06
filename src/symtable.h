@@ -25,6 +25,7 @@ typedef struct Data_item{
   iType type;
   char* params;
   bool defined;
+  struct hash_table_item *local_table;
 }table_data;
 
 typedef struct hash_table_item{ // structure of hash table

@@ -49,7 +49,7 @@ int parser(){
       else{
         if(stack_compare(stack, s_tok, &g_table) == true){
           stack_pop(stack, pars_err);
-          semantic_check(&g_table, stack, s_tok, pars_err);
+
 
 
 // --------EMPTY STACK--- ANALYSIS--DONE--------------------//
@@ -76,16 +76,25 @@ int parser(){
     }
 
 //----------------------------------------------------------------------//
-    printf("\n--------SEMANTIC CHECK-------\n");
+
+
+
+//----------------------------------------------------------------------//
+//---------------------------SEMANTIC-CHECK-----------------------------//
+//----------------------------------------------------------------------//
 
 /*  Some semantic checks are done in preprocesor and also in syntax
     Mainly checking for undefined functions and that kind of stuff
 
 */
-  senor_clean_fist(&g_table, stack, pre);
 
+ int err = semantic_check(&g_table, stack, pre, pars_err);
+ senor_clean_fist(&g_table, stack, pre);
 
-
+ if(err != 0){
+   senor_clean_fist(&g_table, stack, pre);
+   error_handler(err);
+ }
 
 
 return 0;
@@ -126,7 +135,7 @@ bool stack_compare(synt_stack stack, tToken token, Symtable *table){
     }
     else{
       printf("function used before definition\n");
-      error_handler(6);
+      error_handler(3);
       return false;
     }
   }
@@ -195,6 +204,20 @@ void stack_remove(synt_stack *stack){
   free((*stack)->t);
   free(*stack);
   *stack = NULL;
+}
+
+
+
+bool is_in_stack(synt_stack stack, token_type type){
+
+
+
+  for(int i = 0; i < stack->top; i++){
+    if((stack->t[(stack->top)-i].type)==type){
+      return true;
+    }
+  }
+return false;
 }
 
 //  -----------------------SYNTAX STUFF--------------------------------------- //
@@ -819,13 +842,38 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
 
 //  -----------------------SEMANTIC STUFF-------------------------------------- //
 
-void semantic_check(Symtable *table, synt_stack stack, tToken token, int err_code){
+int semantic_check(Symtable *table, synt_stack stack, tList list, int err_code){
+  printf("\n-----------SEMANTIC CHECK----------\n" );
 
 
 
-//print_token(token);
 
-// TODO SEMANTIC //
+
+
+
+  tToken token = (*list.first);
+  while(token.type != 7){
+    // 1) Call without definition
+    if((token.type == t_id)&&((*token.next).type == t_lbra)){
+      if(is_fce(token.value->str ,table)){
+        if(is_defined(token.value->str ,table)==0){
+          fprintf(stderr, "FUNCTION %s NOT DEFINED\n", token.value->str);
+          return 3;
+        }
+      }
+    }
+
+    // 2) Creating local frame for each function
+
+
+
+  token = *token.next;
+}
+
+
+
+
+return 0;
 }
 
 
@@ -866,7 +914,8 @@ void senor_clean_fist(Symtable *table, synt_stack stack, tList token_list){
   while(temp->type != 7){
     point = temp->next;
     dynamic_string *string = temp->value;
-    free(string);
+  //  free(string);
+  //free(point);
     free(temp);
     temp = point;
   }

@@ -54,8 +54,9 @@ tList     syntactic_prerun  (Symtable *table);
 
 void      stack_expand      (Symtable *table, synt_stack stack, tToken token ,int err_code);
 void      senor_clean_fist  (Symtable *table, synt_stack stack, tList token_list);
-void      semantic_check    (Symtable *table, synt_stack stack, tToken token, int err_code);
+int       semantic_check    (Symtable *table, synt_stack stack, tList list, int err_code);
 void      print_stack       (synt_stack stack);
 bool      is_correct_kword  (char* id, int which[20], int used);
 bool      is_fce            (char* id, Symtable *table);
 bool      is_defined        (char* id, Symtable *table);
+bool      is_in_stack       (synt_stack stack, token_type type);

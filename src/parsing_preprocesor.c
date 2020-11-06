@@ -22,7 +22,7 @@ tList syntactic_prerun(Symtable *g_table){
     tToken *token = (tToken*)(malloc(sizeof(tToken)));
     *token = get_token();
 
-    // print_token(*token); // printing tokens for debug
+     //print_token(*token); // printing tokens for debug
     if(tokens.last == NULL){
       tokens.last = token;
       tokens.first = token;
@@ -60,6 +60,7 @@ tList syntactic_prerun(Symtable *g_table){
   tToken test = (*tokens.first);
   bool pkg_main = 0;
   int func_count = 0;
+  char *local_frame;
 
   while(test.type != 7){
 
@@ -81,10 +82,23 @@ tList syntactic_prerun(Symtable *g_table){
 
       if(!is_in_table(g_table, test.value->str) && !is_key_word(test.value)){
         table_data id;
+        Symtable table;
+        table_init(&table);
+
+        id.local_table = *table;
         id.type = func;
         id.defined = true;
+
+
         table_insert(g_table, id, test.value->str);
+        local_frame = test.value->str;
+        printf("BUILDED LOCAL FRAME for %s\n", test.value->str);
         func_count++;
+      }
+      else{
+        printf("FUNCTION %s REDEFINED\n", test.value->str);
+        destroy_table(g_table);
+        error_handler(7);
       }
 
     }
@@ -97,8 +111,10 @@ tList syntactic_prerun(Symtable *g_table){
 }
 //----------SECOND PRERUN - loading variables----------//
 
+
   tToken run2 = (*tokens.first);
   while(run2.type != 7){
+
       if((run2.type == 0)&&(!is_in_table(g_table, run2.value->str))&&(strcmp(run2.value->str, "package")&&(strcmp(run2.value->str, "main")))){
         if(is_key_word(run2.value)==2){
           printf("Keyword as identifier\n"); // second check, I dont belive scanner..
@@ -127,6 +143,12 @@ tList syntactic_prerun(Symtable *g_table){
 
 //----------END SECOND PRERUN----------//
 
+
+
+
+
+
+
 // --- LOAD INBUILT FCE IN SYMTABLE --- //
     table_data inbuilt_fce;
     inbuilt_fce.type = func;
@@ -142,6 +164,14 @@ tList syntactic_prerun(Symtable *g_table){
     table_insert(g_table, inbuilt_fce, "ord");
     table_insert(g_table, inbuilt_fce, "chr");
 
+
+    table_data f_count;
+    f_count.type = other;
+    f_count.data = func_count;
+    f_count.defined = true;
+
+    table_insert(g_table, f_count, "function_count");
+
 // --- LOAD INBUILT FCE IN SYMTABLE --- //
 
   print_table(g_table);
@@ -150,13 +180,13 @@ tList syntactic_prerun(Symtable *g_table){
     if(pkg_main == 0){
       printf("Missing prolog--ERROR--\n");
       destroy_table(g_table);
-      error_handler(6);
+      error_handler(7);
 
     }
     if(is_in_table(g_table, "main")==0){
       printf("Missing main--ERROR--\n");
       destroy_table(g_table);
-      error_handler(3);
+      error_handler(6);
     }
 
     printf("\n--------PRERUN Ok-------\n");
