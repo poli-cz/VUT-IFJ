@@ -91,7 +91,7 @@ tToken get_token(){
         }
         else if (sym=='='){
           add_char(sym,&token.value);
-          state=s_grt;
+          state=s_eq;
         }
         else if (sym=='<'){
           add_char(sym,&token.value);
@@ -132,11 +132,6 @@ tToken get_token(){
         else if (sym== '\\'){
           state=s_lslash;
         }
-
-        else if(sym =='=') {
-          add_char(sym,&token.value);
-            state=s_eq;
-        }
         
         else {
         add_char(sym,&token.value);
@@ -168,6 +163,12 @@ tToken get_token(){
         token.type=t_eq;
         return token;
       }
+      else
+      {
+        ungetc(sym,stdin);
+        token.type=t_assign;
+        return token;
+      }  
     }
     break;
     
@@ -320,7 +321,7 @@ tToken get_token(){
       }
       else if (sym == '.'){
          add_char(sym,&token.value);
-         state = s_float;
+         state = s_floatpoint;
       }
       else if (sym == 'e' || sym == 'E'){
         add_char(sym,&token.value);
@@ -331,7 +332,7 @@ tToken get_token(){
         token.type=t_number;
         return token;
       }
-      return token; // musel jsem to sem pridat, nacitani cisel bylo nejak broken
+     // return token; // musel jsem to sem pridat, nacitani cisel bylo nejak broken
       break;        // chyběl tu return, ale jinak to podle mě funguje dobře...
 
     //cislo desatina cast
@@ -425,7 +426,7 @@ tToken get_token(){
       if(sym == '=')
       {
         add_char(sym,&token.value); 
-        state=s_assign;
+        state=s_def;
       }
       else
       {
@@ -436,8 +437,8 @@ tToken get_token(){
       }
     break;
 
-    case s_assign:
-      token.type=t_assign;
+    case s_def:
+      token.type=t_def;
       ungetc(sym,stdin);
       return token;
     break;
@@ -483,10 +484,11 @@ tToken get_token(){
     break;
 
     case s_error:
-      token.type=t_error;
-      return token;
-     break;
-      
+        token.type= t_error;
+        return token;
+        break;
+
+     
     case s_eof:
       token.type=t_eof;
       return token;

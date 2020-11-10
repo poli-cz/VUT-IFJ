@@ -78,6 +78,7 @@ typedef enum{
   n_assign,     //53
 
 
+
 }token_type;
 
 // definice stavů lexikálního analyzátoru
@@ -112,7 +113,8 @@ typedef enum{
   s_curlr,
   s_fact,
   s_neq,
-  s_linecom
+  s_linecom,
+  s_def
 
   // TODO add more states
 }lex_state;
