@@ -15,23 +15,23 @@
 
 
 typedef enum{
-  t_id,
-  t_error,
-  t_def,
+  t_id,//0
+  t_error,//1
+  t_def,//2
   t_if,
-  t_and,
+  t_and,//4
   t_or,
-  t_eol,
+  t_eol,//6
   t_eof,
-  t_mul,
+  t_mul,//8
   t_div,
-  t_plus,
+  t_plus,//10
   t_minus,
-  t_comma,
+  t_comma,//12
   t_semico,
-  t_eq,
+  t_eq,//14
   t_float,
-  t_assign,
+  t_assign,//16
   t_grt,
   t_lesst,
   t_lbra,
@@ -57,15 +57,12 @@ typedef enum{
   s_error,
   s_start,
   s_id,
-  s_key_word,
   s_number,
   s_floatpoint,
   s_float,
   s_exp,
   s_endcom,
   s_blockcom,
-  s_meq,
-  s_leq,
   s_string,
   s_eof,
   s_eol,
@@ -85,10 +82,8 @@ typedef enum{
   s_colon,
   s_curll,
   s_curlr,
-  s_exclam,
   s_fact,
   s_neq,
-  s_key_word_id,
   s_linecom
 
   // TODO add more states
@@ -112,3 +107,4 @@ tToken  get_token       ();
 int  is_key_word     (dynamic_string* string);
 int     parser          ();
 void    print_token     (tToken token);
+char    is_hexa         ();

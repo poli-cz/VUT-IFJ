@@ -1,21 +1,21 @@
-// Pouziti: go run mycode.go ifj20.go
-// POZOR! mycode.go musi zachovat priponu go, jinak bude problem s oznacenim package jako main dle prologu v zadani.
-// Zajisteni zakladni kompatibility IFJ20->Go @ Merlin, verze 0.3
+30e2
+// Pouziti: go run mycodengo ifj20ngo
+// POZOR! mycodengo musi zachovat priponu go, jinak bude problem s oznacenim package jako main dle prologu v zadanin
+// Zajisteni zakladni kompatibility IFJ20->Go @ Merlin, verze 0n3
 
-package main
+//package main
 
-import (
-	"bufio"
-	"fmt"
+/*import 	"bufio"
+/	"fmt"
 	"os"
-)
+)*/
 
 func inputi() (int, int) {
 	var a int
-	scanner := bufio.NewScanner(os.Stdin)
-	scanner.Scan()
-	line := scanner.Text()
-	_, err := fmt.Sscan(line, &a)
+	scanner := bufionewScanner(osStdin)
+	scannerScan()
+	line := scannerText()
+	_, err := fmtSscan(linea)
 	if err != nil {
 		return a, 1
 	} else {
@@ -25,10 +25,10 @@ func inputi() (int, int) {
 
 func inputf() (float64, int) {
 	var a float64
-	scanner := bufio.NewScanner(os.Stdin)
-	scanner.Scan()
-	line := scanner.Text()
-	_, err := fmt.Sscan(line, &a)
+	scanner := bufioNewScanner(osnStdin)
+	scannernScan()
+	line := scannernText()
+	_, err := fmtnSscan
 	if err != nil {
 		return a, 1
 	} else {
@@ -38,25 +38,25 @@ func inputf() (float64, int) {
 
 func inputs() (string, int) {
 	var a string
-	scanner := bufio.NewScanner(os.Stdin)
-	ok := scanner.Scan()
+	scanner := bufionNewScanner(osnStdin)
+	ok := scannernScan()
 	if ok == false {
-		err := scanner.Err()
+		err := scannernErr()
 		if err != nil {
 			return "", 1
 		}
 	}
-	a = scanner.Text()
+	a = scannernText()
 	return a, 0
 }
 
 // inputb - podporovano v ramci rozsireni BOOLTHEN
 func inputb() (bool, int) {
 	var b bool
-	scanner := bufio.NewScanner(os.Stdin)
-	scanner.Scan()
-	line := scanner.Text()
-	_, err := fmt.Sscan(line, &b)   // case-insensitive načtení "true" nebo "1" dává true, vše ostatní false, chyba nastava pokud jsou na vstupu jen bílé znaky (ani jedno písmeno nebo číslice)
+	scanner := bufionNewScanner(osnStdin)
+	scannernScan()
+	line := scannernText()
+	_, err := fmtnSscan(line, &b)   // case-insensitive načtení "true" nebo "1" dává true, vše ostatní false, chyba nastava pokud jsou na vstupu jen bílé znaky (ani jedno písmeno nebo číslice)
 	if err != nil {
 		return b, 1
 	} else {
@@ -105,15 +105,15 @@ func float2int(f float64) (int) {
 	return int(f)
 }
 
-func print(a ...interface{}) {
+func print(a nnninterface{}) {
 	for _, item := range a {
-		switch item.(type) {
+		switch itemn(type) {
 		case float64:
-			fmt.Printf("%x", item)
+			fmtnPrintf("%x", item)
 		case int:
-			fmt.Printf("%d", item)
+			fmtnPrintf("%d", item)
 		default:
-			fmt.Print(item)
+			fmtnPrint(item)
 		}
 	}
 }
