@@ -427,13 +427,12 @@ tToken get_token(){
       {
         add_char(sym,&token.value); 
         state=s_def;
-
       }
       else
       {
         add_char(sym,&token.value);
         ungetc(sym,stdin);
-        token.type=t_neq;
+        token.type=t_colon;
         return token;
       }
     break;
@@ -488,6 +487,8 @@ tToken get_token(){
         token.type= t_error;
         return token;
         break;
+
+     
     case s_eof:
       token.type=t_eof;
       return token;

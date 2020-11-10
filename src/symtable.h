@@ -24,8 +24,9 @@ typedef struct Data_item{
   int data;
   iType type;
   char* params;
+  char* retvals;
   bool defined;
-  struct hash_table_item *local_table;
+  bool redef_flag;
 }table_data;
 
 typedef struct hash_table_item{ // structure of hash table
@@ -49,3 +50,6 @@ void                destroy_table                 (Symtable *table);
 float               table_allocation_percentage   (Symtable *table);
 bool                is_in_table                   (Symtable *table, char *identifier);
 void                print_table                   (Symtable *table);
+void                copy_table                    (Symtable *source, Symtable*dest);
+void                set_redef_flag                (Symtable *table, bool flag);
+void                set_redef_flag_by_id          (Symtable *table,char *id, bool flag);

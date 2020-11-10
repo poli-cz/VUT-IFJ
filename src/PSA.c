@@ -20,8 +20,6 @@ int expr_parse(Symtable *table, synt_stack stack, tToken token ,int err_code){
 
   printf("----Entering PSA----\n");
 
-
-
   while(1){
     // Counting correct number of brackets //
     if(token.type == t_lbra){
@@ -46,6 +44,20 @@ int expr_parse(Symtable *table, synt_stack stack, tToken token ,int err_code){
 
 
 
+    if(token.type == t_number){
+      tToken div;
+      div = *token.next;
+      if(div.type == t_div){
+        div = *div.next;
+        if((div.type == t_number)&&(strcmp(div.value->str, "0")==0)){
+          printf("ZERO IN DIV\n" );
+          exit(9);
+        }
+      }
+    }
+
+
+
 
     /**
      *  If we are in function, by detecking n_call_param on stack we let one t_rbra ) because it needs to match
@@ -67,22 +79,13 @@ int expr_parse(Symtable *table, synt_stack stack, tToken token ,int err_code){
       }
       else{
         if(bracket_counter!=0){
-          printf("bracket missmatch in function call()\n");
+          printf("bracket missmatch in expr\n");
           printf("%d\n", bracket_counter);
           stack_remove(&stack);
           exit(3);
         }
       }
-
-
-
-
-
-
-
-
-
-
+      printf("----Exiting PSA----\n");
       return skip_counter;
     }
     skip_counter++;

@@ -6,7 +6,7 @@
  * Varianta :
  * Autor    : Jan Polišenský (xpolis04)
  */
- #pragma once
+#pragma once
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -16,40 +16,39 @@
 
 
 typedef enum{
-  t_id, //0
-  t_error, //1
-  t_def, //2
-  t_if, //3
-  t_and, //4
-  t_or, //5
-  t_eol, //6
-  t_eof, //7
-  t_mul, //8
-  t_div, //9
-  t_plus, //10
-  t_minus, //11
-  t_comma, //12
-  t_semico, //13
-  t_eq, //14
-  t_float, //15
-  t_assign, //16
-  t_grt, //17
-  t_lesst, //18
-  t_lbra, //19
-  t_rbra, //20
-  t_colon, //21
-  t_curll, //22
-  t_curlr, //23
-  t_exclam, //24
-  t_neq, //25
-  t_lst, //26
-  t_grteq, //27
-  t_lste, //28
-  t_undefined, //29
-  t_number, //30
-  t_keyword, //31
-  t_pkgmain, //32
-  t_string, //33
+  t_id,//0
+  t_error,//1
+  t_def,//2
+  t_if,
+  t_and,//4
+  t_or,
+  t_eol,//6
+  t_eof,
+  t_mul,//8
+  t_div,
+  t_plus,//10
+  t_minus,
+  t_comma,//12
+  t_semico,
+  t_eq,//14
+  t_float,
+  t_assign,//16
+  t_grt,
+  t_lesst,
+  t_lbra,
+  t_rbra,
+  t_colon,
+  t_curll,
+  t_curlr,
+  t_exclam,
+  t_neq,
+  t_lst,
+  t_grteq,
+  t_lste,
+  t_undefined,
+  t_number,
+  t_keyword,
+  t_string,
   t_ultime_skip, //34
   t_check_for_def_function, //35
   // sem si můžeš přidávat další typy
@@ -79,7 +78,6 @@ typedef enum{
   n_assign,     //53
 
 
- // tady nic, dojebal by se mi parser, ale fakt ošklivým způsobem
 
 }token_type;
 

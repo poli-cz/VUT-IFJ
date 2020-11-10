@@ -8,8 +8,9 @@
  * @author <xpolis04> Jan Polišenský
  */
 
-
+#define _GNU_SOURCE
 #include "parser.h"
+#include <stdio.h>
 
 tList syntactic_prerun(Symtable *g_table){
 
@@ -21,8 +22,9 @@ tList syntactic_prerun(Symtable *g_table){
   while(1){
     tToken *token = (tToken*)(malloc(sizeof(tToken)));
     *token = get_token();
+    print_token(*token);
 
-     //print_token(*token); // printing tokens for debug
+
     if(tokens.last == NULL){
       tokens.last = token;
       tokens.first = token;
@@ -35,8 +37,7 @@ tList syntactic_prerun(Symtable *g_table){
   // check for lex-error aka. token_type == 1 //
 
     if(token->type == 1  ){  // CHECKING FOR RIGHT TOKENS
-      printf("Token error\n");
-      print_token(*token);
+      fprintf(stderr, "Invalid token --> %s\n", (*token).value->str);
       error_handler(1);
     }
   //--------------------//
@@ -44,6 +45,7 @@ tList syntactic_prerun(Symtable *g_table){
     if(token->type == 7){
       break;
     }
+
   }
 
 
@@ -60,12 +62,11 @@ tList syntactic_prerun(Symtable *g_table){
   tToken test = (*tokens.first);
   bool pkg_main = 0;
   int func_count = 0;
-  char *local_frame;
 
   while(test.type != 7){
 
     // Check for package main //
-    if((test.type == 31) && (strcmp(test.value->str, "package")==0)){
+    if((test.type == t_keyword) && (strcmp(test.value->str, "package")==0)){
       tToken test2 = *test.next;
       if((test2.type == 0)&&(strcmp(test2.value->str, "main")==0)){
         pkg_main = 1;
@@ -77,26 +78,23 @@ tList syntactic_prerun(Symtable *g_table){
 
 
     // Loading functions into Global symtable //
-    if((test.type == 31) && (strcmp(test.value->str, "func")==0)){
+    if((test.type == t_keyword) && (strcmp(test.value->str, "func")==0)){
       test = *test.next;
 
       if(!is_in_table(g_table, test.value->str) && !is_key_word(test.value)){
         table_data id;
-        Symtable table;
-        table_init(&table);
 
-        id.local_table = *table;
+      //  id.params = get_params(test);
+      //  printf("%s\n", id.params);
         id.type = func;
         id.defined = true;
 
-
         table_insert(g_table, id, test.value->str);
-        local_frame = test.value->str;
-        printf("BUILDED LOCAL FRAME for %s\n", test.value->str);
+
         func_count++;
       }
       else{
-        printf("FUNCTION %s REDEFINED\n", test.value->str);
+        printf("PREFUN ERR, FUNCTION %s REDEFINED\n", test.value->str);
         destroy_table(g_table);
         error_handler(7);
       }
@@ -106,10 +104,18 @@ tList syntactic_prerun(Symtable *g_table){
 
       test = *test.next;
   }
+
+
+
+
 //----------END FIRST PRERUN----------//
 
 }
+
+
+
 //----------SECOND PRERUN - loading variables----------//
+
 
 
   tToken run2 = (*tokens.first);
@@ -144,11 +150,6 @@ tList syntactic_prerun(Symtable *g_table){
 //----------END SECOND PRERUN----------//
 
 
-
-
-
-
-
 // --- LOAD INBUILT FCE IN SYMTABLE --- //
     table_data inbuilt_fce;
     inbuilt_fce.type = func;
@@ -174,7 +175,6 @@ tList syntactic_prerun(Symtable *g_table){
 
 // --- LOAD INBUILT FCE IN SYMTABLE --- //
 
-  print_table(g_table);
 
 
     if(pkg_main == 0){
@@ -190,5 +190,29 @@ tList syntactic_prerun(Symtable *g_table){
     }
 
     printf("\n--------PRERUN Ok-------\n");
+
     return tokens;
+}
+
+
+
+char *get_params(tToken token){
+  token = *token.next; // skipp func name
+  token = *token.next; // skipp l_brac
+  char *params = NULL;
+
+  while(token.type != t_rbra){
+
+    if(token.type == t_keyword){
+
+      if(-1 == asprintf(&params,"%s %s",token.value->str, params)){
+        perror("asprintf()");
+      }
+    }
+
+
+    token = *token.next;
+  }
+
+  return params;
 }
