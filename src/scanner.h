@@ -16,6 +16,7 @@
 
 
 typedef enum{
+<<<<<<< HEAD
   t_id, //0
   t_error, //1
   t_def, //2
@@ -80,6 +81,42 @@ typedef enum{
 
 
  // tady nic, dojebal by se mi parser, ale fakt ošklivým způsobem
+=======
+  t_id,//0
+  t_error,//1
+  t_def,//2
+  t_if,
+  t_and,//4
+  t_or,
+  t_eol,//6
+  t_eof,
+  t_mul,//8
+  t_div,
+  t_plus,//10
+  t_minus,
+  t_comma,//12
+  t_semico,
+  t_eq,//14
+  t_float,
+  t_assign,//16
+  t_grt,
+  t_lesst,
+  t_lbra,
+  t_rbra,
+  t_colon,
+  t_curll,
+  t_curlr,
+  t_exclam,
+  t_neq,
+  t_lst,
+  t_grteq,
+  t_lste,
+  t_undefined,
+  t_number,
+  t_keyword,
+  t_string
+  // atd...
+>>>>>>> scanner
 
 }token_type;
 
@@ -88,15 +125,12 @@ typedef enum{
   s_error,
   s_start,
   s_id,
-  s_key_word,
   s_number,
   s_floatpoint,
   s_float,
   s_exp,
   s_endcom,
   s_blockcom,
-  s_meq,
-  s_leq,
   s_string,
   s_eof,
   s_eol,
@@ -116,10 +150,8 @@ typedef enum{
   s_colon,
   s_curll,
   s_curlr,
-  s_exclam,
   s_fact,
   s_neq,
-  s_key_word_id,
   s_linecom
 
   // TODO add more states
@@ -144,3 +176,4 @@ tToken  get_token       ();
 int     is_key_word     (dynamic_string* string);
 int     parser          ();
 void    print_token     (tToken token);
+char    is_hexa         ();
