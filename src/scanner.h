@@ -16,7 +16,6 @@
 
 
 typedef enum{
-<<<<<<< HEAD
   t_id, //0
   t_error, //1
   t_def, //2
@@ -81,42 +80,6 @@ typedef enum{
 
 
  // tady nic, dojebal by se mi parser, ale fakt ošklivým způsobem
-=======
-  t_id,//0
-  t_error,//1
-  t_def,//2
-  t_if,
-  t_and,//4
-  t_or,
-  t_eol,//6
-  t_eof,
-  t_mul,//8
-  t_div,
-  t_plus,//10
-  t_minus,
-  t_comma,//12
-  t_semico,
-  t_eq,//14
-  t_float,
-  t_assign,//16
-  t_grt,
-  t_lesst,
-  t_lbra,
-  t_rbra,
-  t_colon,
-  t_curll,
-  t_curlr,
-  t_exclam,
-  t_neq,
-  t_lst,
-  t_grteq,
-  t_lste,
-  t_undefined,
-  t_number,
-  t_keyword,
-  t_string
-  // atd...
->>>>>>> scanner
 
 }token_type;
 
@@ -152,7 +115,8 @@ typedef enum{
   s_curlr,
   s_fact,
   s_neq,
-  s_linecom
+  s_linecom,
+  s_def
 
   // TODO add more states
 }lex_state;

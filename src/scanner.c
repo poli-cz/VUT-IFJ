@@ -91,7 +91,7 @@ tToken get_token(){
         }
         else if (sym=='='){
           add_char(sym,&token.value);
-          state=s_grt;
+          state=s_eq;
         }
         else if (sym=='<'){
           add_char(sym,&token.value);
@@ -132,11 +132,6 @@ tToken get_token(){
         else if (sym== '\\'){
           state=s_lslash;
         }
-
-        else if(sym =='=') {
-          add_char(sym,&token.value);
-            state=s_eq;
-        }
         
         else {
         add_char(sym,&token.value);
@@ -146,12 +141,8 @@ tToken get_token(){
         break;
 
     case s_grt:
-<<<<<<< HEAD
-      if(sym =='='){
-=======
     // symbol >=
       if(sym=='='){
->>>>>>> scanner
         add_char(sym,&token.value);
         token.type = t_grteq;
         return token;
@@ -172,6 +163,12 @@ tToken get_token(){
         token.type=t_eq;
         return token;
       }
+      else
+      {
+        ungetc(sym,stdin);
+        token.type=t_assign;
+        return token;
+      }  
     }
     break;
     
@@ -324,7 +321,7 @@ tToken get_token(){
       }
       else if (sym == '.'){
          add_char(sym,&token.value);
-         state = s_float;
+         state = s_floatpoint;
       }
       else if (sym == 'e' || sym == 'E'){
         add_char(sym,&token.value);
@@ -335,7 +332,7 @@ tToken get_token(){
         token.type=t_number;
         return token;
       }
-      return token; // musel jsem to sem pridat, nacitani cisel bylo nejak broken
+     // return token; // musel jsem to sem pridat, nacitani cisel bylo nejak broken
       break;        // chyběl tu return, ale jinak to podle mě funguje dobře...
 
     //cislo desatina cast
@@ -384,12 +381,6 @@ tToken get_token(){
 
 
     case s_lslash:
-<<<<<<< HEAD
-*/
-    case s_mul: // jsem si tu přidal a nějak to funguje, pls koukni na to.
-    {
-      token.type = t_mul;
-=======
     {
       if(sym=='"'){
         add_char('"',&token.value);
@@ -427,7 +418,6 @@ tToken get_token(){
     {
       ungetc(sym,source_file);
       token.type=t_mul;
->>>>>>> scanner
       return token;
     }
     break;
@@ -435,30 +425,21 @@ tToken get_token(){
     case s_colon:
       if(sym == '=')
       {
-<<<<<<< HEAD
-        add_char(sym,&token.value);
-=======
         add_char(sym,&token.value); 
->>>>>>> scanner
-        state=s_assign;
+        state=s_def;
 
       }
       else
       {
         add_char(sym,&token.value);
         ungetc(sym,stdin);
-<<<<<<< HEAD
-        token.type=t_colon;
-
-=======
         token.type=t_neq;
         return token;
->>>>>>> scanner
       }
     break;
 
-    case s_assign:
-      token.type=t_assign;
+    case s_def:
+      token.type=t_def;
       ungetc(sym,stdin);
       return token;
     break;
@@ -470,11 +451,6 @@ tToken get_token(){
     break;
     
    case s_eol:
-<<<<<<< HEAD
-      add_char(sym,&token.value);
-      token.value = NULL;
-=======
->>>>>>> scanner
       token.type = t_eol;
       ungetc(sym,stdin);
       return token;
@@ -509,13 +485,8 @@ tToken get_token(){
     break;
 
     case s_error:
-<<<<<<< HEAD
-    token.type=t_error;
-      return token;
-=======
         token.type= t_error;
         return token;
->>>>>>> scanner
         break;
     case s_eof:
       token.type=t_eof;
