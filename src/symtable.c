@@ -199,11 +199,15 @@ void print_table(Symtable *table){
     if((*table)[i] != NULL){
       if((*table)[i]->data.type == 0){
          t = "Variable";
-         printf("%s with ID \"%s\" defined-> %d \n", t, (*table)[i]->identifier, (*table)[i]->data.defined);
+         printf("%s with ID \"%s\" defined-> %d redef_flag-> %d\n", t, (*table)[i]->identifier, (*table)[i]->data.defined, (*table)[i]->data.redef_flag);
       }
       else if((*table)[i]->data.type == 1){
+
+
+
+
          t = "Function";
-         printf("%s with ID \"%s\" defined-> %d \n", t, (*table)[i]->identifier, (*table)[i]->data.defined);
+         printf("%s with ID \"%s\" defined-> %d  \n", t, (*table)[i]->identifier, (*table)[i]->data.defined);
       }
       else{
          t = "other";
@@ -211,11 +215,47 @@ void print_table(Symtable *table){
     }
 
 
-
-
-
-
     }
   }
   printf("\n--------end symtable-------\n");
+}
+
+
+void copy_table(Symtable *source, Symtable*dest){
+  for(int i = 0; i<SYMTABLE_SIZE; i++){
+    if((*source)[i] != NULL){
+      table_insert(dest, (*source)[i]->data, (*source)[i]->identifier);
+    }
+  }
+}
+
+
+
+
+void set_redef_flag(Symtable *table, bool flag){
+  for(int i = 0; i<SYMTABLE_SIZE; i++){
+    if((*table)[i] != NULL){
+
+          (*table)[i]->data.redef_flag = flag;
+        }
+    }
+
+}
+
+void set_redef_flag_by_id (Symtable *table,char *id, bool flag){
+  for(int i = 0; i<SYMTABLE_SIZE; i++){
+    if((*table)[i] != NULL){
+
+        if(strcmp(id, (*table)[i]->identifier)==0){
+
+          (*table)[i]->data.redef_flag = flag;
+        }
+    }
+  }
+
+
+
+
+
+
 }

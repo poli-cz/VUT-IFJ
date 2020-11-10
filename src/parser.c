@@ -38,12 +38,13 @@ int parser(){
 
     while(1){ // until EOF
 
-  //    printf("-----------------\n");
-  //    print_token(s_tok);
-  //    printf("-----------------\n");
-  //    print_stack(stack);
+      printf("-----------------\n");
+      print_token(s_tok);
+      printf("-----------------\n");
+      print_stack(stack);
 
       if((stack->t[stack->top].type) > t_check_for_def_function){ // Non terminal on stack
+        printf("EXPAND\n");
         stack_expand(&g_table, stack, s_tok, pars_err);
       }
       else{
@@ -89,13 +90,17 @@ int parser(){
 */
 
  int err = semantic_check(&g_table, stack, pre, pars_err);
- senor_clean_fist(&g_table, stack, pre);
+
 
  if(err != 0){
    senor_clean_fist(&g_table, stack, pre);
    error_handler(err);
  }
 
+senor_clean_fist(&g_table, stack, pre);
+
+
+printf("\n----ALL GOOD----\n\n");
 
 return 0;
 }
@@ -113,12 +118,16 @@ return 0;
 
 
 bool stack_compare(synt_stack stack, tToken token, Symtable *table){
-//  printf("%d on  STACK\n", (stack->t[stack->top]).type);
-//  printf("%d is TOKEN\n", (token.type));
+  printf("%d on  STACK\n", (stack->t[stack->top]).type);
+  printf("%d is TOKEN\n", (token.type));
 
 
 // ----- aditional check for Kword name -------//
   if((stack->t[stack->top]).k_check == true){
+    if(token.type != t_keyword){
+      printf("Bad Keyword\n");
+      return false;
+    }
     bool ok = is_correct_kword(token.value->str, (stack->t[stack->top]).k_w, (stack->t[stack->top]).used);
     if(!ok){
       printf("Bad Keyword\n");
@@ -131,6 +140,7 @@ bool stack_compare(synt_stack stack, tToken token, Symtable *table){
 //-------check for defined function -------------//
   if((stack->t[stack->top]).type == t_check_for_def_function){ // semantic check for defined function
     if(is_fce(token.value->str, table)==1){
+
       return true;            // we dont need to do pop, only check is there is defined function in token
     }
     else{
@@ -465,13 +475,14 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
     else if(token.type == t_number){
       stack_pop(stack, err_code); // Destroy
 
-      ex_term.type = n_expr; // cal precedent analysis
+
+      ex_term.type = n_body;
       stack_push(stack, ex_term, err_code);
 
       ex_term.type = t_eol;
       stack_push(stack, ex_term, err_code);
 
-      ex_term.type = n_body;
+      ex_term.type = n_expr; // cal precedent analysis
       stack_push(stack, ex_term, err_code);
 
 
@@ -575,7 +586,13 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
 
   }
   else if((stack->t[stack->top].type) == n_body_id_var){
-      if(is_fce(token.value->str, table)==1){
+
+      if(token.type == t_eol){
+        printf("Expected ASSIGN\n"); // EOL here somehow causing SIGSEGV
+        error_handler(3);
+      }
+
+      else if(is_fce(token.value->str, table)==1){
         stack_pop(stack, err_code);
 
         ex_term.type = n_func_call;
@@ -845,14 +862,14 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
 int semantic_check(Symtable *table, synt_stack stack, tList list, int err_code){
   printf("\n-----------SEMANTIC CHECK----------\n" );
 
-
-
-
-
-
-
+  Symtable *local_table;
   tToken token = (*list.first);
+
+
+
+
   while(token.type != 7){
+
     // 1) Call without definition
     if((token.type == t_id)&&((*token.next).type == t_lbra)){
       if(is_fce(token.value->str ,table)){
@@ -862,8 +879,50 @@ int semantic_check(Symtable *table, synt_stack stack, tList list, int err_code){
         }
       }
     }
-
     // 2) Creating local frame for each function
+    // Check definition stuff with localframe
+
+    if((token.type == t_keyword) && (strcmp(token.value->str, "func") == 0)){
+      tToken func = *token.next;
+      Symtable local_table;
+      bool fce_end = 1;
+      table_init(&local_table);
+
+
+      char *func_name = func.value->str;
+      func = *func.next;
+
+      table_data def;
+      def.type = id;
+      def.defined = true;
+      table_insert(&local_table, def, "_");
+
+      printf("BUILDED LOCAL FRAME for %s\n", func_name);
+      printf("------------------------------\n");
+
+
+// TODO -- load parameters of function and correct return //
+
+// --------------------------------------------------------//
+
+      while(fce_end){
+
+        id_check(func, &local_table, table);
+        func = scope_check(func, table, &local_table);
+
+        if(func.type == t_keyword){
+          if(strcmp(func.value->str, "func") == 0){
+            fce_end = 0;
+          }
+        }
+        else if(func.type == t_eof){
+          fce_end = 0;
+        }
+        func = *func.next;
+      }
+      destroy_table(&local_table);
+    }
+//-----------------------END LOCAL FRAME----------------------//
 
 
 
@@ -881,22 +940,100 @@ return 0;
 
 
 
+// Function to check for right id definition or redefinition
+// TOTAL MESS, dont touch it until it works
+void id_check(tToken func, Symtable *local_table, Symtable *table){
+
+  if((func.type == t_id)&&(!is_fce(func.value->str ,table))){
+    if((*func.next).type == t_assign){
+
+      if(is_in_table(local_table, func.value->str)){
+        Sym_table_item *temp;
+        temp = search_in_table(local_table, func.value->str);
+
+      if(temp->data.redef_flag == 0){
+        set_redef_flag_by_id(local_table, func.value->str, 1);
+      }
+      else{
+        if(is_defined(func.value->str, local_table)){
+          fprintf(stderr, "Variable %s redefined\n", func.value->str);
+          error_handler(3);
+        }
+        else{
+          table_data iD;
+          iD.type = id;
+          iD.defined = true;
+          iD.redef_flag = 1;
+          table_insert(local_table, iD, func.value->str);
+
+        }
+      }
+    }
+    else{
+      table_data iD;
+      iD.type = id;
+      iD.defined = true;
+      iD.redef_flag = 1;
+      table_insert(local_table, iD, func.value->str);
+
+    }
+
+      tToken call = *func.next;
+      call = *call.next;
+
+      if(is_fce(call.value->str, table)){
+        fprintf(stderr, "Cant initialize variable with function ASSIGN\n" );
+        error_handler(6);
+      }
+    }
+    else if((*func.next).type == t_eq){
+      if(is_in_table(local_table, func.value->str)==0){
+        printf("Varianle \"%s\" used before definition\n", func.value->str);
+        error_handler(6);
+      }
+    }
+  }
+  else{
+  }
+}
 
 
+tToken scope_check(tToken scope, Symtable *global_table, Symtable *func_table){
+  if(scope.type == t_keyword){
+    if(((strcmp(scope.value->str, "for")==0)||(strcmp(scope.value->str, "if")==0)||(strcmp(scope.value->str, "else")==0))){
 
 
+        Symtable scope_table;
+        table_init(&scope_table);
+        copy_table(func_table, &scope_table);
+
+        set_redef_flag(&scope_table, 0);
+
+        table_data def;
+        def.type = id;
+        def.defined = true;
+        def.redef_flag = 0;
+        table_insert(&scope_table, def, "_");
+
+        while(scope.type != t_curlr){
 
 
+          id_check(scope, &scope_table, global_table);
+          //print_table(&scope_table);
 
+          scope = *scope.next;
+          scope = scope_check(scope, global_table, &scope_table);
+        }
+  //  print_table(&scope_table);
+  //      printf("exiting scope\n");
+    //    printf("-------------\n");
+        destroy_table(&scope_table);
+      }
 
+    }
 
-
-
-
-
-
-
-
+return scope;
+}
 
 //  -------------------------------------------------------------- //
 
@@ -905,6 +1042,7 @@ return 0;
 //  -----------------------OTHER SUPPORT STUFF-------------------------------------- //
 
 // Dealocation of everything //
+// Punch al filthy mallocs
 
 void senor_clean_fist(Symtable *table, synt_stack stack, tList token_list){
 
@@ -922,12 +1060,6 @@ void senor_clean_fist(Symtable *table, synt_stack stack, tList token_list){
   destroy_table(table);
   stack_remove(&stack);
 }
-
-
-
-
-
-
 
 void print_stack(synt_stack stack){
 
