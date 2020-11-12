@@ -16,22 +16,28 @@
 
 FILE *source_file;
 
-const char* KEYWORDS[] = {"package", "if","else", "for", "float64","func","int","return","string","inputs","inputi","inputf","print","int2float","float2int","len","substr","ord",
-"chr"
+const char* KEYWORDS[] = {"if","else","for","float64","func","int","return","string","inputs","inputi","inputf","print","int2float","float2int","len","substr","ord",
+"package"
 };
 
 int is_key_word(dynamic_string *string){
-  for(int i=0;i<KEYWORD_NUM;i++){
+  for(int i=0;(i<KEYWORD_NUM);i++){
      if(strcmp(KEYWORDS[i],string->str)==0)
         return ERROR_TRUE;
   };
  return ERROR_FALSE;
 }
 
-char is_hexa(){
-  char sym = getchar();
-    if(isxdigit(sym))
-      return sym;
+int is_hexa(){
+  char ha[3]={0};
+  ha[0]= getchar();
+    if(isxdigit(ha[0])){
+      ha[1]=getchar();
+      if(isxdigit(ha[1])){
+        return (int)strtol(ha, NULL, 16);
+      }
+      else return -1;
+    }
   else  return -1;
 }
 
@@ -114,6 +120,7 @@ tToken get_token(){
           state=s_curlr;
         }
         else if (sym=='/'){
+          add_char(sym,&token.value);
           state=s_div;
         }
 
@@ -188,7 +195,6 @@ tToken get_token(){
     //checking string
     case s_string:
      if (sym == '"'){
-       add_char(sym,&token.value);
        token.type=t_string;
        return token;
      }
@@ -356,9 +362,14 @@ tToken get_token(){
         add_char(sym,&token.value);
         state = s_exp;
       }
-      else{
+      else if (isspace(sym)){
         ungetc(sym,stdin);
         token.type=t_float;
+        return token;
+      }
+      else{
+        add_char(sym,&token.value);
+        token.type=t_error;
         return token;
       }
     break;
@@ -386,31 +397,48 @@ tToken get_token(){
         add_char('"',&token.value);
         state=s_string;
       }
-      if(sym=='n'){
+      else if(sym=='n'){
         add_char('\\',&token.value);
         add_char('0',&token.value);
         add_char('1',&token.value);
         add_char('0',&token.value);
         state=s_string;
       }
-      if(sym=='t'){
+      else if(sym=='t'){
         add_char('\\',&token.value);
         add_char('0',&token.value);
         add_char('1',&token.value);
         add_char('1',&token.value);
         state=s_string;
       } 
-     /* if(sym=='x'){   
-        char hexStr[3] = {0}; 
-        hexStr[0] = is_hexa();
-          if(hexStr[0]!= -1){ 
-            hexStr[1]=is_hexa();
-            if(hexStr[1]!= -1){
-              add_char(strtol(hexStr, NULL, 16),token.value);
-            }
-          }
-          
-      }*/
+      else if(sym=='x'){     
+       int hex=is_hexa();
+       if(hex==-1){
+         state=s_error;
+        }
+        else if(hex>32 && hex!=35 && hex!=92)
+        {
+          add_char(hex,&token.value);
+          state=s_string;
+        } 
+        else
+        {
+          add_char('\\',&token.value);
+          char str[5] = {0};
+          sprintf(str, "%03d", hex);
+          for (int i = 0; i<3;i++)
+          add_char(str[i],&token.value);
+          state=s_string;
+        }
+        
+      }
+     else
+     {
+       ungetc(sym,stdin);
+        state=s_error;
+       return token;
+     }
+        
     }
     break;
 

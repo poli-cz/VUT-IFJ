@@ -140,4 +140,4 @@ tToken  get_token       ();
 int     is_key_word     (dynamic_string* string);
 int     parser          ();
 void    print_token     (tToken token);
-char    is_hexa         ();
+int     is_hexa         ();
