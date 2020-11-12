@@ -14,7 +14,7 @@
 
 tList syntactic_prerun(Symtable *g_table){
 
-    printf("\n--------ENTERING PRERUN-------\n");
+  //  printf("\n--------ENTERING PRERUN-------\n");
  // Loading tokens into linear list //
   tList tokens;
   tokens.last = NULL;
@@ -22,8 +22,8 @@ tList syntactic_prerun(Symtable *g_table){
   while(1){
     tToken *token = (tToken*)(malloc(sizeof(tToken)));
     *token = get_token();
-    print_token(*token);
 
+    //print_token(*token);
 
     if(tokens.last == NULL){
       tokens.last = token;
@@ -45,8 +45,10 @@ tList syntactic_prerun(Symtable *g_table){
     if(token->type == 7){
       break;
     }
-
   }
+
+
+  //exit(3);
 
 
 // --------loading and listing tokens done--------------//
@@ -94,9 +96,9 @@ tList syntactic_prerun(Symtable *g_table){
         func_count++;
       }
       else{
-        printf("PREFUN ERR, FUNCTION %s REDEFINED\n", test.value->str);
+        fprintf(stderr, "PREFUN ERR, FUNCTION %s REDEFINED\n", test.value->str);
         destroy_table(g_table);
-        error_handler(7);
+        error_handler(3);
       }
 
     }
@@ -123,8 +125,8 @@ tList syntactic_prerun(Symtable *g_table){
 
       if((run2.type == 0)&&(!is_in_table(g_table, run2.value->str))&&(strcmp(run2.value->str, "package")&&(strcmp(run2.value->str, "main")))){
         if(is_key_word(run2.value)==2){
-          printf("Keyword as identifier\n"); // second check, I dont belive scanner..
-          free(g_table);
+          fprintf(stderr, "Keyword as identifier\n"); // second check, I dont belive scanner..
+          destroy_table(g_table);
           error_handler(3);
         }
         tToken toktok;
@@ -135,15 +137,11 @@ tList syntactic_prerun(Symtable *g_table){
           iD.type = func;
           iD.defined = false;
           table_insert(g_table, iD, run2.value->str);
-        }else{
-          table_data iD;
-          iD.type = id;
-          iD.defined = false;
-          table_insert(g_table, iD, run2.value->str);
         }
 
       }
 
+    id_add(run2, g_table);
     run2 = *run2.next;
   }
 
@@ -177,19 +175,20 @@ tList syntactic_prerun(Symtable *g_table){
 
 
 
+
     if(pkg_main == 0){
-      printf("Missing prolog--ERROR--\n");
+      fprintf(stderr, "Missing prolog--ERROR--\n");
       destroy_table(g_table);
       error_handler(7);
 
     }
     if(is_in_table(g_table, "main")==0){
-      printf("Missing main--ERROR--\n");
+      fprintf(stderr, "Missing main--ERROR--\n");
       destroy_table(g_table);
-      error_handler(6);
+      error_handler(3);
     }
 
-    printf("\n--------PRERUN Ok-------\n");
+    //printf("\n--------PRERUN Ok-------\n");
 
     return tokens;
 }
@@ -206,13 +205,62 @@ char *get_params(tToken token){
     if(token.type == t_keyword){
 
       if(-1 == asprintf(&params,"%s %s",token.value->str, params)){
-        perror("asprintf()");
+        fprintf(stderr, "internal\n");
       }
     }
-
-
     token = *token.next;
   }
 
   return params;
+}
+
+void  id_add(tToken token, Symtable *table){
+
+    if(token.type == t_id){
+      tToken next = *token.next;
+      if(next.type == t_def){
+
+        table_data iD;
+        iD.type = id;
+        iD.predefined = true;
+        iD.defined = false;
+        table_insert(table, iD, token.value->str);
+
+
+      }
+      else if(next.type == t_comma){
+        table_data iD;
+        iD.type = id;
+        iD.predefined = true;
+        iD.defined = false;
+        table_insert(table, iD, token.value->str);
+        next = *next.next;
+        id_add(next, table);
+      }
+      else if(next.type == t_keyword){
+        if((strcmp(next.value->str, "int")==0)||(strcmp(next.value->str, "float64")==0)||(strcmp(next.value->str, "string")==0)){
+          table_data iD;
+          iD.type = id;
+          iD.predefined = true;
+          iD.defined = false;
+          table_insert(table, iD, token.value->str);
+        }
+      }
+      else{
+
+      }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

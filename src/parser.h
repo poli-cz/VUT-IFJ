@@ -19,9 +19,6 @@
  * Pomocný zásobník k rekurzivnímu sestupu, probíhá na něm rozklad neterminálů na terminály
  */
 
-
-
-
 typedef struct teminal{
   int k_w[20]; // keywords for check
   int used; // how many items are used
@@ -60,6 +57,8 @@ void      print_stack       (synt_stack stack);
 bool      is_correct_kword  (char* id, int which[20], int used);
 bool      is_fce            (char* id, Symtable *table);
 bool      is_defined        (char* id, Symtable *table);
+bool      is_predefined     (char* id, Symtable *table);
 bool      is_in_stack       (synt_stack stack, token_type type);
 void      id_check          (tToken func, Symtable *local_table, Symtable *table);
 tToken    scope_check       (tToken scope, Symtable *global_table, Symtable *func_table);
+void      id_add            (tToken token, Symtable *table);

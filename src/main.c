@@ -17,5 +17,25 @@ int main(){
 return error;
 }
 
+
+
+int scanner_debug(){
   return 0;
+}
+
+
+int parser_debug(){
+
+
+
+
+
+
+
+
+
+
+
+
+  return parser();
 }

@@ -35,22 +35,22 @@ typedef enum{
   t_assign,//16
   t_grt,
   t_lesst,
-  t_lbra,
-  t_rbra,
-  t_colon,
-  t_curll,
-  t_curlr,
-  t_exclam,
-  t_neq,
-  t_lst,
-  t_grteq,
-  t_lste,
-  t_undefined,
-  t_number,
-  t_keyword,
-  t_string,
-  t_ultime_skip, //34
-  t_check_for_def_function, //35
+  t_lbra, //19
+  t_rbra, //20
+  t_colon, //21
+  t_curll, //22
+  t_curlr, //23
+  t_exclam, //24
+  t_neq, //25
+  t_lst, //26
+  t_grteq, //27
+  t_lste, //28
+  t_undefined, //29
+  t_number, //30
+  t_keyword, //31
+  t_string, //32
+  t_ultime_skip, //33
+  t_check_for_def_function, //34
   // sem si můžeš přidávat další typy
   // ale jenom opravdu na konec
   // NIC NEVKLADAT DOPROSTRED !!!
@@ -58,24 +58,24 @@ typedef enum{
 
 
   // NON TERMINALS
-  n_prog, //36
-  n_func, //37
-  n_param_n, //38
-  n_retvals, //39
-  n_body, //40
-  n_fretvals, //41
-  n_retval, // 42
-  n_expr,   // 43
-  n_body_id, // 44
-  n_if,     //45
-  n_for,    //46
-  n_body_id_var, //47
-  n_func_call, //48
-  n_fretval, //49
-  n_call_param, //50
-  n_body_comma, //51
-  n_def,        //52
-  n_assign,     //53
+  n_prog, //35
+  n_func, //36
+  n_param_n, //37
+  n_retvals, //38
+  n_body, //39
+  n_fretvals, //40
+  n_retval, // 41
+  n_expr,   // 42
+  n_body_id, // 43
+  n_if,     //44
+  n_for,    //45
+  n_body_id_var, //46
+  n_func_call, //47
+  n_fretval, //48
+  n_call_param, //49
+  n_body_comma, //50
+  n_def,        //51
+  n_assign,     //52
 
 
 

@@ -27,7 +27,7 @@ int parser(){
 // semantic prerun, only check for some basic semantic actions
   tList pre = syntactic_prerun(&g_table);
 
-    printf("\n--------SYNTAX CHECK-------\n");
+  //  printf("\n--------SYNTAX CHECK-------\n");
 
     tToken s_tok = (*pre.first); // Token for syntax check
     T_term p_term;
@@ -38,13 +38,13 @@ int parser(){
 
     while(1){ // until EOF
 
-      printf("-----------------\n");
-      print_token(s_tok);
-      printf("-----------------\n");
-      print_stack(stack);
+//      printf("-----------------\n");
+//      print_token(s_tok);
+//      printf("-----------------\n");
+//      print_stack(stack);
 
       if((stack->t[stack->top].type) > t_check_for_def_function){ // Non terminal on stack
-        printf("EXPAND\n");
+  //      printf("EXPAND\n");
         stack_expand(&g_table, stack, s_tok, pars_err);
       }
       else{
@@ -55,22 +55,22 @@ int parser(){
 
 // --------EMPTY STACK--- ANALYSIS--DONE--------------------//
           if((stack->top==1)&&(s_tok.type == 7)){
-            printf("\n-------------SYNTAX OK-------------\n");
+    //        printf("\n-------------SYNTAX OK-------------\n");
             break;
           }
           else if((stack->top!=1)&&(s_tok.type == 7)){
-            printf("unexpected EOF\n Returning error 3\n");
+            fprintf(stderr, "unexpected EOF\n Returning error 2\n");
             senor_clean_fist(&g_table, stack, pre);
-            error_handler(3);
+            error_handler(2);
           }
         }
 
 //----------------------------------------------------------//
 
         else{
-          printf("Syntax check failed\n");
+          fprintf(stderr, "Syntax check failed\n");
           senor_clean_fist(&g_table, stack, pre);
-          error_handler(3);
+          error_handler(2);
         }
         s_tok = *s_tok.next;
       }
@@ -95,12 +95,14 @@ int parser(){
  if(err != 0){
    senor_clean_fist(&g_table, stack, pre);
    error_handler(err);
+ }else{
+   senor_clean_fist(&g_table, stack, pre);
  }
 
-senor_clean_fist(&g_table, stack, pre);
 
 
-printf("\n----ALL GOOD----\n\n");
+
+//printf("\n----ALL GOOD----\n\n");
 
 return 0;
 }
@@ -118,19 +120,19 @@ return 0;
 
 
 bool stack_compare(synt_stack stack, tToken token, Symtable *table){
-  printf("%d on  STACK\n", (stack->t[stack->top]).type);
-  printf("%d is TOKEN\n", (token.type));
+//  printf("%d on  STACK\n", (stack->t[stack->top]).type);
+//  printf("%d is TOKEN\n", (token.type));
 
 
 // ----- aditional check for Kword name -------//
   if((stack->t[stack->top]).k_check == true){
     if(token.type != t_keyword){
-      printf("Bad Keyword\n");
+  //    printf("Bad Keyword\n");
       return false;
     }
     bool ok = is_correct_kword(token.value->str, (stack->t[stack->top]).k_w, (stack->t[stack->top]).used);
     if(!ok){
-      printf("Bad Keyword\n");
+  //    printf("Bad Keyword\n");
       return false;
     }
   }
@@ -144,7 +146,7 @@ bool stack_compare(synt_stack stack, tToken token, Symtable *table){
       return true;            // we dont need to do pop, only check is there is defined function in token
     }
     else{
-      printf("function used before definition\n");
+      fprintf(stderr, "Function used before definition\n");
       error_handler(3);
       return false;
     }
@@ -189,7 +191,7 @@ void stack_init(synt_stack *stack, int err_code){
 
 bool stack_pop(synt_stack stack, int err_code){
   if((stack->top) == 0){
-    printf("empty stack\n");
+  //  printf("empty stack\n");
     err_code = 1;
     return false;
   }
@@ -219,8 +221,6 @@ void stack_remove(synt_stack *stack){
 
 
 bool is_in_stack(synt_stack stack, token_type type){
-
-
 
   for(int i = 0; i < stack->top; i++){
     if((stack->t[(stack->top)-i].type)==type){
@@ -437,8 +437,8 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
     //  stack_push(stack, ex_term, err_code);
     }
     else{
-      printf("UNEXPECTED IN n_fretval\n");
-      exit(3);
+      fprintf(stderr, "UNEXPECTED IN function retvals\n");
+      exit(2);
     }
   }
 
@@ -530,29 +530,29 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
       stack_pop(stack, err_code);
     }
     else{
-      printf("UNEXPECTED token in BODY\n");
-      exit(3);
+      fprintf(stderr, "UNEXPECTED token in BODY\n");
+      exit(2);
     }
 
   }
     //---------------------IF THERE IS ID----------------------------------//
   else if((stack->t[stack->top].type) == n_body_id){
-      if(token.type == t_eq){
-        stack_pop(stack, err_code);
-
-        ex_term.type = n_body_id_var;
-        stack_push(stack, ex_term, err_code);
-
-        ex_term.type = t_eq;
-        stack_push(stack, ex_term, err_code);
-      }
-      else if(token.type == t_assign){
+      if(token.type == t_assign){
         stack_pop(stack, err_code);
 
         ex_term.type = n_body_id_var;
         stack_push(stack, ex_term, err_code);
 
         ex_term.type = t_assign;
+        stack_push(stack, ex_term, err_code);
+      }
+      else if(token.type == t_def){
+        stack_pop(stack, err_code);
+
+        ex_term.type = n_body_id_var;
+        stack_push(stack, ex_term, err_code);
+
+        ex_term.type = t_def;
         stack_push(stack, ex_term, err_code);
       }
       else if(token.type == t_comma){ // assigning multiple variables
@@ -569,9 +569,10 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
       }
 
       else{   // AM I supposed to give error?
-        printf("Unexpected token after ID \n");
+        fprintf(stderr, "Unexpected token after ID \n");
+        //print_token(token);
         //senor_clean_fist(table, stack, err_code);
-        error_handler(6);
+        error_handler(2);
       }
   }
     //---------------------ASSIGNING MORE THAN ONE VARIABLE----------------------------------//
@@ -580,7 +581,7 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
     ex_term.type = n_body_id_var;
     stack_push(stack, ex_term, err_code);
 
-    ex_term.type = t_assign;
+    ex_term.type = t_def;
     stack_push(stack, ex_term, err_code);
 
 
@@ -588,8 +589,8 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
   else if((stack->t[stack->top].type) == n_body_id_var){
 
       if(token.type == t_eol){
-        printf("Expected ASSIGN\n"); // EOL here somehow causing SIGSEGV
-        error_handler(3);
+        fprintf(stderr, "Expected ASSIGN\n"); // EOL here somehow causing SIGSEGV
+        error_handler(2);
       }
 
       else if(is_fce(token.value->str, table)==1){
@@ -653,8 +654,8 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
       stack_pop(stack, err_code);// Destroy
     }
     else{
-      printf("UNEXPECTED token in return values of function\n");
-      exit(3);
+      fprintf(stderr, "UNEXPECTED token in return values of function\n");
+      exit(2);
     }
   }
   // -------------------------------WRITE EXTERN FUNCTION-------------------//
@@ -742,6 +743,9 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
     ex_term.type = t_curlr;
     stack_push(stack, ex_term, err_code);
 
+    ex_term.type = n_fretvals;
+    stack_push(stack, ex_term, err_code);
+
     ex_term.type = n_body;
     stack_push(stack, ex_term, err_code);
 
@@ -756,6 +760,9 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
     ex_term.k_check = false;
 
     ex_term.type = t_curlr;
+    stack_push(stack, ex_term, err_code);
+
+    ex_term.type = n_fretvals;
     stack_push(stack, ex_term, err_code);
 
     ex_term.type = n_body;
@@ -779,6 +786,9 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
     stack_pop(stack, err_code);
 
     ex_term.type = t_curlr;
+    stack_push(stack, ex_term, err_code);
+
+    ex_term.type = n_fretvals;
     stack_push(stack, ex_term, err_code);
 
     ex_term.type = n_body;
@@ -820,7 +830,7 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
       ex_term.type = n_expr;
       stack_push(stack, ex_term, err_code);
 
-      ex_term.type = t_assign;
+      ex_term.type = t_def;
       stack_push(stack, ex_term, err_code);
 
       ex_term.type = t_id;
@@ -838,7 +848,7 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
       ex_term.type = n_expr;
       stack_push(stack, ex_term, err_code);
 
-      ex_term.type = t_eq;
+      ex_term.type = t_assign;
       stack_push(stack, ex_term, err_code);
 
       ex_term.type = t_id;
@@ -848,7 +858,7 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
 
 // This should NEVER happen, if so... we are all DOOMED :)
   else{
-    printf("UNEXPECTED NON_TERMINAL ON STACK \n");
+    fprintf(stderr, "UNEXPECTED NON_TERMINAL ON STACK \n");
     exit(99);
   }
 }
@@ -860,7 +870,7 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
 //  -----------------------SEMANTIC STUFF-------------------------------------- //
 
 int semantic_check(Symtable *table, synt_stack stack, tList list, int err_code){
-  printf("\n-----------SEMANTIC CHECK----------\n" );
+  //printf("\n-----------SEMANTIC CHECK----------\n" );
 
   Symtable *local_table;
   tToken token = (*list.first);
@@ -897,8 +907,8 @@ int semantic_check(Symtable *table, synt_stack stack, tList list, int err_code){
       def.defined = true;
       table_insert(&local_table, def, "_");
 
-      printf("BUILDED LOCAL FRAME for %s\n", func_name);
-      printf("------------------------------\n");
+    //  printf("BUILDED LOCAL FRAME for %s\n", func_name);
+    //  printf("------------------------------\n");
 
 
 // TODO -- load parameters of function and correct return //
@@ -906,7 +916,7 @@ int semantic_check(Symtable *table, synt_stack stack, tList list, int err_code){
 // --------------------------------------------------------//
 
       while(fce_end){
-
+      //  print_table(&local_table);
         id_check(func, &local_table, table);
         func = scope_check(func, table, &local_table);
 
@@ -945,7 +955,7 @@ return 0;
 void id_check(tToken func, Symtable *local_table, Symtable *table){
 
   if((func.type == t_id)&&(!is_fce(func.value->str ,table))){
-    if((*func.next).type == t_assign){
+    if((*func.next).type == t_def){
 
       if(is_in_table(local_table, func.value->str)){
         Sym_table_item *temp;
@@ -982,14 +992,14 @@ void id_check(tToken func, Symtable *local_table, Symtable *table){
       call = *call.next;
 
       if(is_fce(call.value->str, table)){
-        fprintf(stderr, "Cant initialize variable with function ASSIGN\n" );
-        error_handler(6);
+        //fprintf(stderr, "Cant initialize variable with function ASSIGN\n" );
+        //error_handler(3);
       }
     }
-    else if((*func.next).type == t_eq){
+    else if((*func.next).type == t_assign){
       if(is_in_table(local_table, func.value->str)==0){
-        printf("Varianle \"%s\" used before definition\n", func.value->str);
-        error_handler(6);
+        fprintf(stderr, "Varianle \"%s\" used before definition\n", func.value->str);
+        error_handler(3);
       }
     }
   }
@@ -1106,6 +1116,20 @@ bool is_defined(char *id, Symtable *table){
     Sym_table_item *temp;
     temp = search_in_table(table, id);
     if(temp->data.defined == true){
+      return true;
+    }
+  }
+  return false;
+
+}
+
+
+
+bool is_predefined(char *id, Symtable *table){
+  if(is_in_table(table, id)==1){
+    Sym_table_item *temp;
+    temp = search_in_table(table, id);
+    if(temp->data.predefined == true){
       return true;
     }
   }

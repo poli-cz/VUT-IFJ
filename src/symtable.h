@@ -27,6 +27,7 @@ typedef struct Data_item{
   char* retvals;
   bool defined;
   bool redef_flag;
+  bool predefined;
 }table_data;
 
 typedef struct hash_table_item{ // structure of hash table
