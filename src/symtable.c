@@ -203,11 +203,8 @@ void print_table(Symtable *table){
       }
       else if((*table)[i]->data.type == 1){
 
-
-
-
          t = "Function";
-         printf("%s with ID \"%s\" defined-> %d  \n", t, (*table)[i]->identifier, (*table)[i]->data.defined);
+         printf("%s with ID \"%s\" defined-> %d  with params--> NULL\n", t, (*table)[i]->identifier, (*table)[i]->data.defined);
       }
       else{
          t = "other";
@@ -252,10 +249,4 @@ void set_redef_flag_by_id (Symtable *table,char *id, bool flag){
         }
     }
   }
-
-
-
-
-
-
 }

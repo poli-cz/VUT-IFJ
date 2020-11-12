@@ -27,7 +27,7 @@ int parser(){
 // semantic prerun, only check for some basic semantic actions
   tList pre = syntactic_prerun(&g_table);
 
-  //  printf("\n--------SYNTAX CHECK-------\n");
+    if(DEBUG){printf("\n--------SYNTAX CHECK-------\n");}
 
     tToken s_tok = (*pre.first); // Token for syntax check
     T_term p_term;
@@ -38,13 +38,15 @@ int parser(){
 
     while(1){ // until EOF
 
-//      printf("-----------------\n");
-//      print_token(s_tok);
-//      printf("-----------------\n");
-//      print_stack(stack);
+      if(DEBUG){printf("-----------------\n");}
+      if(DEBUG){print_token(s_tok);}
+      if(DEBUG){printf("-----------------\n");}
+      if(DEBUG){print_stack(stack);}
 
       if((stack->t[stack->top].type) > t_check_for_def_function){ // Non terminal on stack
-  //      printf("EXPAND\n");
+
+        if(DEBUG){printf("EXPAND\n");}
+
         stack_expand(&g_table, stack, s_tok, pars_err);
       }
       else{
@@ -55,7 +57,7 @@ int parser(){
 
 // --------EMPTY STACK--- ANALYSIS--DONE--------------------//
           if((stack->top==1)&&(s_tok.type == 7)){
-    //        printf("\n-------------SYNTAX OK-------------\n");
+            if(DEBUG){printf("\n-------------SYNTAX OK-------------\n");}
             break;
           }
           else if((stack->top!=1)&&(s_tok.type == 7)){
@@ -102,7 +104,7 @@ int parser(){
 
 
 
-//printf("\n----ALL GOOD----\n\n");
+if(DEBUG){printf("\n----ALL GOOD----\n\n");}
 
 return 0;
 }
@@ -120,14 +122,14 @@ return 0;
 
 
 bool stack_compare(synt_stack stack, tToken token, Symtable *table){
-//  printf("%d on  STACK\n", (stack->t[stack->top]).type);
-//  printf("%d is TOKEN\n", (token.type));
+  if(DEBUG){printf("%d on  STACK\n", (stack->t[stack->top]).type);}
+  if(DEBUG){printf("%d is TOKEN\n", (token.type));}
 
 
 // ----- aditional check for Kword name -------//
   if((stack->t[stack->top]).k_check == true){
     if(token.type != t_keyword){
-  //    printf("Bad Keyword\n");
+      if(DEBUG){printf("Bad Keyword\n");}
       return false;
     }
     bool ok = is_correct_kword(token.value->str, (stack->t[stack->top]).k_w, (stack->t[stack->top]).used);
@@ -870,7 +872,7 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
 //  -----------------------SEMANTIC STUFF-------------------------------------- //
 
 int semantic_check(Symtable *table, synt_stack stack, tList list, int err_code){
-  //printf("\n-----------SEMANTIC CHECK----------\n" );
+  if(DEBUG){printf("\n-----------SEMANTIC CHECK----------\n" );}
 
   Symtable *local_table;
   tToken token = (*list.first);
@@ -907,8 +909,8 @@ int semantic_check(Symtable *table, synt_stack stack, tList list, int err_code){
       def.defined = true;
       table_insert(&local_table, def, "_");
 
-    //  printf("BUILDED LOCAL FRAME for %s\n", func_name);
-    //  printf("------------------------------\n");
+      if(DEBUG){printf("BUILDED LOCAL FRAME for %s\n", func_name);}
+      if(DEBUG){printf("------------------------------\n");}
 
 
 // TODO -- load parameters of function and correct return //
@@ -1034,9 +1036,10 @@ tToken scope_check(tToken scope, Symtable *global_table, Symtable *func_table){
           scope = *scope.next;
           scope = scope_check(scope, global_table, &scope_table);
         }
-  //  print_table(&scope_table);
-  //      printf("exiting scope\n");
-    //    printf("-------------\n");
+        if(DEBUG){printf("SCOPE TABLE\n");}
+        if(DEBUG){print_table(&scope_table);}
+        if(DEBUG){ printf("exiting scope\n");}
+        if(DEBUG){printf("-------------\n");}
         destroy_table(&scope_table);
       }
 

@@ -23,7 +23,7 @@ tList syntactic_prerun(Symtable *g_table){
     tToken *token = (tToken*)(malloc(sizeof(tToken)));
     *token = get_token();
 
-    //print_token(*token);
+    if(DEBUG){print_token(*token);}
 
     if(tokens.last == NULL){
       tokens.last = token;
@@ -48,7 +48,6 @@ tList syntactic_prerun(Symtable *g_table){
   }
 
 
-  //exit(3);
 
 
 // --------loading and listing tokens done--------------//
@@ -86,10 +85,12 @@ tList syntactic_prerun(Symtable *g_table){
       if(!is_in_table(g_table, test.value->str) && !is_key_word(test.value)){
         table_data id;
 
-      //  id.params = get_params(test);
-      //  printf("%s\n", id.params);
+        //id.params = get_params(test);
+
+        //id.params = "hoj";
         id.type = func;
         id.defined = true;
+        //printf("%s\n", id.params);
 
         table_insert(g_table, id, test.value->str);
 
@@ -188,7 +189,11 @@ tList syntactic_prerun(Symtable *g_table){
       error_handler(3);
     }
 
-    //printf("\n--------PRERUN Ok-------\n");
+    if(DEBUG){print_table(g_table);}
+  //  print_table(g_table);
+  //  print_table(g_table);
+  //  exit(2);
+    if(DEBUG){printf("\n--------PRERUN Ok-------\n");}
 
     return tokens;
 }
@@ -198,17 +203,21 @@ tList syntactic_prerun(Symtable *g_table){
 char *get_params(tToken token){
   token = *token.next; // skipp func name
   token = *token.next; // skipp l_brac
-  char *params = NULL;
+  char *params;
 
   while(token.type != t_rbra){
 
     if(token.type == t_keyword){
-
-      if(-1 == asprintf(&params,"%s %s",token.value->str, params)){
-        fprintf(stderr, "internal\n");
+      if(token.value->str!=NULL){
+        if(-1 == asprintf(&params,"%s %s",token.value->str, params)){
+          fprintf(stderr, "internal\n");
+        }
       }
+
+
     }
     token = *token.next;
+    //printf("parametry: %s\n", params);
   }
 
   return params;
@@ -247,7 +256,6 @@ void  id_add(tToken token, Symtable *table){
         }
       }
       else{
-
       }
     }
 

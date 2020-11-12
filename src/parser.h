@@ -13,6 +13,7 @@
 #include "scanner.h"
 #include "basic.h"
 #define STACK_DEFAULT 1000
+#define DEBUG 0
                     // Velikost alokační jednotky zásobníku
 
 /**
