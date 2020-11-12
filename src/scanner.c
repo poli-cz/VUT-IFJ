@@ -139,7 +139,7 @@ tToken get_token(){
         else if (sym== '\\'){
           state=s_lslash;
         }
-        
+
         else {
         add_char(sym,&token.value);
         state=s_error;
@@ -175,10 +175,10 @@ tToken get_token(){
         ungetc(sym,stdin);
         token.type=t_assign;
         return token;
-      }  
+      }
     }
     break;
-    
+
     case s_lst:
       if(sym=='='){
         add_char(sym,&token.value);
@@ -374,7 +374,7 @@ tToken get_token(){
       }
     break;
 
-    
+
     //exponencialna cast
     case s_exp:
     if(sym == '+' || sym == '-'){
@@ -444,7 +444,8 @@ tToken get_token(){
 
     case s_mul:
     {
-      ungetc(sym,source_file);
+    //  add_char(sym,&token.value);
+      ungetc(sym,stdin);
       token.type=t_mul;
       return token;
     }
@@ -453,15 +454,14 @@ tToken get_token(){
     case s_colon:
       if(sym == '=')
       {
-        add_char(sym,&token.value); 
+        add_char(sym,&token.value);
         state=s_def;
-
       }
       else
       {
         add_char(sym,&token.value);
         ungetc(sym,stdin);
-        token.type=t_neq;
+        token.type=t_colon;
         return token;
       }
     break;
@@ -477,7 +477,7 @@ tToken get_token(){
       token.type=t_semico;
       return token;
     break;
-    
+
    case s_eol:
       token.type = t_eol;
       ungetc(sym,stdin);
@@ -516,6 +516,8 @@ tToken get_token(){
         token.type= t_error;
         return token;
         break;
+
+
     case s_eof:
       token.type=t_eof;
       return token;

@@ -2,12 +2,14 @@
 // POZOR! mycode.go musi zachovat priponu go, jinak bude problem s oznacenim package jako main dle prologu v zadani.
 // Zajisteni zakladni kompatibility IFJ20->Go @ Merlin, verze 0.5
 
-//package main
+package main
 
-/*import 	"bufio"
-/	"fmt"
+import (
+	"bufio"
+	"fmt"
 	"os"
-)*/
+)
+
 var __αscannerα__ = bufio.NewScanner(os.Stdin)
 
 func inputi() (int, int) {
@@ -40,7 +42,7 @@ func inputs() (string, int) {
 	scanner := __αscannerα__
 	ok := scanner.Scan()
 	if ok == false {
-		err := scannernErr()
+		err := scanner.Err()
 		if err != nil {
 			return "", 1
 		} else {	// EOF
@@ -105,15 +107,15 @@ func float2int(f float64) (int) {
 	return int(f)
 }
 
-func print(a nnninterface{}) {
+func print(a ...interface{}) {
 	for _, item := range a {
-		switch itemn(type) {
+		switch item.(type) {
 		case float64:
-			fmtnPrintf("%x", item)
+			fmt.Printf("%x", item)
 		case int:
-			fmtnPrintf("%d", item)
+			fmt.Printf("%d", item)
 		default:
-			fmtnPrint(item)
+			fmt.Print(item)
 		}
 	}
 }
