@@ -1,7 +1,7 @@
 /**
  * @file PSA.c
  *
- * Implemntace Precedenční syntaktické analýzy pro zpracování výrazů
+ * Implementace preprocesoru pro Precedenční syntaktickou analýzu
  *
  * IFJ Projekt 2020, Tým 2
  *

@@ -49,7 +49,6 @@ tList syntactic_prerun(Symtable *g_table){
 
 
 
-
 // --------loading and listing tokens done--------------//
 
 
@@ -69,6 +68,7 @@ tList syntactic_prerun(Symtable *g_table){
     // Check for package main //
     if((test.type == t_keyword) && (strcmp(test.value->str, "package")==0)){
       tToken test2 = *test.next;
+
       if((test2.type == 0)&&(strcmp(test2.value->str, "main")==0)){
         pkg_main = 1;
         test = *test.next;
@@ -82,15 +82,15 @@ tList syntactic_prerun(Symtable *g_table){
     if((test.type == t_keyword) && (strcmp(test.value->str, "func")==0)){
       test = *test.next;
 
+
       if(!is_in_table(g_table, test.value->str) && !is_key_word(test.value)){
         table_data id;
 
-        //id.params = get_params(test);
-
-        //id.params = "hoj";
+        id.params = get_params(test);
+        id.retvals = get_retvals(test);
         id.type = func;
         id.defined = true;
-        //printf("%s\n", id.params);
+
 
         table_insert(g_table, id, test.value->str);
 
@@ -150,18 +150,41 @@ tList syntactic_prerun(Symtable *g_table){
 
 
 // --- LOAD INBUILT FCE IN SYMTABLE --- //
+
+
     table_data inbuilt_fce;
     inbuilt_fce.type = func;
     inbuilt_fce.defined = true;
+
+    inbuilt_fce.params = "";
+    inbuilt_fce.retvals = "string int";
     table_insert(g_table, inbuilt_fce, "inputs");
+    inbuilt_fce.params = "";
+    inbuilt_fce.retvals = "int int";
     table_insert(g_table, inbuilt_fce, "inputi");
+    inbuilt_fce.params = "";
+    inbuilt_fce.retvals = "float64 int";
     table_insert(g_table, inbuilt_fce, "inputf");
+    inbuilt_fce.params = "term, term, term";
+    inbuilt_fce.retvals = "";
     table_insert(g_table, inbuilt_fce, "print");
+    inbuilt_fce.params = "int";
+    inbuilt_fce.retvals = "float64";
     table_insert(g_table, inbuilt_fce, "int2float");
+    inbuilt_fce.params = "float";
+    inbuilt_fce.retvals = "int";
     table_insert(g_table, inbuilt_fce, "float2int");
+    inbuilt_fce.params = "string";
+    inbuilt_fce.retvals = "int";
     table_insert(g_table, inbuilt_fce, "len");
+    inbuilt_fce.params = "string int int";
+    inbuilt_fce.retvals = "string int";
     table_insert(g_table, inbuilt_fce, "substr");
+    inbuilt_fce.params = "string int";
+    inbuilt_fce.retvals = "int int";
     table_insert(g_table, inbuilt_fce, "ord");
+    inbuilt_fce.params = "int";
+    inbuilt_fce.retvals = "string int";
     table_insert(g_table, inbuilt_fce, "chr");
 
 
@@ -171,6 +194,7 @@ tList syntactic_prerun(Symtable *g_table){
     f_count.defined = true;
 
     table_insert(g_table, f_count, "function_count");
+
 
 // --- LOAD INBUILT FCE IN SYMTABLE --- //
 
@@ -189,13 +213,53 @@ tList syntactic_prerun(Symtable *g_table){
       error_handler(3);
     }
 
+
+
     if(DEBUG){print_table(g_table);}
   //  print_table(g_table);
   //  print_table(g_table);
   //  exit(2);
     if(DEBUG){printf("\n--------PRERUN Ok-------\n");}
 
+
     return tokens;
+}
+
+
+
+
+
+
+char *get_retvals(tToken token){
+  char *params= "";
+
+  while(token.type != t_rbra){
+
+    if(token.type == t_eof){
+      return params;
+    }
+    token = *token.next;
+  }
+  token = *token.next;
+
+  if(token.type == t_curll){
+    return params;
+  }
+  else if(token.type == t_lbra){
+    while(token.type != t_rbra){
+      if(token.type == t_eof){
+        return params;
+      }
+
+      if(token.type == t_keyword){
+          if(-1 == asprintf(&params,"%s %s",token.value->str, params)){
+            fprintf(stderr, "internal\n");
+        }
+      }
+      token = *token.next;
+    }
+  }
+  return params;
 }
 
 
@@ -203,21 +267,19 @@ tList syntactic_prerun(Symtable *g_table){
 char *get_params(tToken token){
   token = *token.next; // skipp func name
   token = *token.next; // skipp l_brac
-  char *params;
+  char *params= "";
 
   while(token.type != t_rbra){
+    if(token.type == t_eof){
+      return params;
+    }
 
     if(token.type == t_keyword){
-      if(token.value->str!=NULL){
         if(-1 == asprintf(&params,"%s %s",token.value->str, params)){
           fprintf(stderr, "internal\n");
-        }
       }
-
-
     }
     token = *token.next;
-    //printf("parametry: %s\n", params);
   }
 
   return params;
@@ -232,6 +294,7 @@ void  id_add(tToken token, Symtable *table){
         table_data iD;
         iD.type = id;
         iD.predefined = true;
+        iD.redef_flag = 0;
         iD.defined = false;
         table_insert(table, iD, token.value->str);
 
@@ -241,6 +304,7 @@ void  id_add(tToken token, Symtable *table){
         table_data iD;
         iD.type = id;
         iD.predefined = true;
+        iD.redef_flag = 0;
         iD.defined = false;
         table_insert(table, iD, token.value->str);
         next = *next.next;
@@ -251,6 +315,7 @@ void  id_add(tToken token, Symtable *table){
           table_data iD;
           iD.type = id;
           iD.predefined = true;
+          iD.redef_flag = 0;
           iD.defined = false;
           table_insert(table, iD, token.value->str);
         }

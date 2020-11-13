@@ -95,16 +95,21 @@ int parser(){
 
 
  if(err != 0){
-   senor_clean_fist(&g_table, stack, pre);
-   error_handler(err);
- }else{
-   senor_clean_fist(&g_table, stack, pre);
- }
+      senor_clean_fist(&g_table, stack, pre);
+      error_handler(err);
+    }
+
+    if(DEBUG){printf("\n----CHECKS OK----\n\n");}
 
 
+    err = generate_code(pre, &g_table);
+  if(err != 0){
+    senor_clean_fist(&g_table, stack, pre);
+    error_handler(err);
+  }else{
+    senor_clean_fist(&g_table, stack, pre);
+  }
 
-
-if(DEBUG){printf("\n----ALL GOOD----\n\n");}
 
 return 0;
 }
@@ -134,7 +139,7 @@ bool stack_compare(synt_stack stack, tToken token, Symtable *table){
     }
     bool ok = is_correct_kword(token.value->str, (stack->t[stack->top]).k_w, (stack->t[stack->top]).used);
     if(!ok){
-  //    printf("Bad Keyword\n");
+      fprintf(stderr, "Bad Keyword\n");
       return false;
     }
   }
@@ -913,12 +918,20 @@ int semantic_check(Symtable *table, synt_stack stack, tList list, int err_code){
       if(DEBUG){printf("------------------------------\n");}
 
 
+
+
 // TODO -- load parameters of function and correct return //
 
 // --------------------------------------------------------//
 
       while(fce_end){
-      //  print_table(&local_table);
+
+
+        if(((func.type == t_id)||(func.type == t_keyword))&&((*func.next).type == t_lbra)){
+        }
+
+
+
         id_check(func, &local_table, table);
         func = scope_check(func, table, &local_table);
 
@@ -935,6 +948,8 @@ int semantic_check(Symtable *table, synt_stack stack, tList list, int err_code){
       destroy_table(&local_table);
     }
 //-----------------------END LOCAL FRAME----------------------//
+
+
 
 
 
@@ -987,6 +1002,7 @@ void id_check(tToken func, Symtable *local_table, Symtable *table){
       iD.defined = true;
       iD.redef_flag = 1;
       table_insert(local_table, iD, func.value->str);
+
 
     }
 
@@ -1049,6 +1065,9 @@ return scope;
 }
 
 //  -------------------------------------------------------------- //
+
+
+
 
 
 

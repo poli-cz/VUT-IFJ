@@ -4,5 +4,5 @@
 package main
 
 func main() {
-  print("Hello from IFJ20", "\n")
+  print("Hello_from_IFJ20", "\n")
 }

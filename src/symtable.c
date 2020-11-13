@@ -69,6 +69,7 @@ bool table_insert(Symtable *table, table_data data, char *key){
         (*table)[hash]->next = NULL;
       }
       else{
+
         temp = malloc(sizeof(Sym_table_item));
         temp->identifier = key;
         temp->data = data;
@@ -201,15 +202,27 @@ void print_table(Symtable *table){
          t = "Variable";
          printf("%s with ID \"%s\" defined-> %d redef_flag-> %d\n", t, (*table)[i]->identifier, (*table)[i]->data.defined, (*table)[i]->data.redef_flag);
       }
+
+    }
+  }
+  printf("--------------------------------------------------------\n");
+  for(int i = 0; i<SYMTABLE_SIZE; i++){
+    if((*table)[i] != NULL){
+      if((*table)[i]->data.type == 0){
+
+      }
       else if((*table)[i]->data.type == 1){
 
+        char *params = "";
+        params = (*table)[i]->data.params;
+
          t = "Function";
-         printf("%s with ID \"%s\" defined-> %d  with params--> NULL\n", t, (*table)[i]->identifier, (*table)[i]->data.defined);
+         printf("%s with ID \"%s\" defined-> %d  with params--> \"%s\" retvals--> \"%s\"\n", t, (*table)[i]->identifier, (*table)[i]->data.defined, params, (*table)[i]->data.retvals);
       }
-      else{
-         t = "other";
-         printf("%s with ID \"%s\" value-> %d \n", t, (*table)[i]->identifier, (*table)[i]->data.data);
-    }
+    //  else{
+    //     t = "other";
+    //     printf("%s with ID \"%s\" value-> %d \n", t, (*table)[i]->identifier, (*table)[i]->data.data);
+    //}
 
 
     }
