@@ -4,9 +4,7 @@
  * Projekt  :   Implementace překladače imperativního jazyka IFJ20
  * Tým č    :
  * Varianta :
- * Autor    : Jan Polišenský (xpolis04)
- */
-#pragma once
+ * Autor    : Jan Polišenský (xpolis04#pragm#i #pragma once*/
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -16,25 +14,25 @@
 
 
 typedef enum{
-  t_id,//0
-  t_error,//1
-  t_def,//2
-  t_if,
-  t_and,//4
-  t_or,
-  t_eol,//6
-  t_eof,
-  t_mul,//8
-  t_div,
-  t_plus,//10
-  t_minus,
-  t_comma,//12
-  t_semico,
-  t_eq,//14
-  t_float,
-  t_assign,//16
-  t_grt,
-  t_lesst,
+  t_id, //0
+  t_error, //1
+  t_def, //2
+  t_if, //3
+  t_and, //4
+  t_or, //5
+  t_eol, //6
+  t_eof, //7
+  t_mul, //8
+  t_div, //9
+  t_plus, //10
+  t_minus, //11
+  t_comma, //12
+  t_semico, //13
+  t_eq, //14
+  t_float, //15
+  t_assign, //16
+  t_grt, //17
+  t_lesst, //18
   t_lbra, //19
   t_rbra, //20
   t_colon, //21
@@ -48,9 +46,10 @@ typedef enum{
   t_undefined, //29
   t_number, //30
   t_keyword, //31
-  t_string, //32
-  t_ultime_skip, //33
-  t_check_for_def_function, //34
+  t_pkgmain, //32
+  t_string, //33
+  t_ultime_skip, //34
+  t_check_for_def_function, //35
   // sem si můžeš přidávat další typy
   // ale jenom opravdu na konec
   // NIC NEVKLADAT DOPROSTRED !!!
@@ -58,26 +57,27 @@ typedef enum{
 
 
   // NON TERMINALS
-  n_prog, //35
-  n_func, //36
-  n_param_n, //37
-  n_retvals, //38
-  n_body, //39
-  n_fretvals, //40
-  n_retval, // 41
-  n_expr,   // 42
-  n_body_id, // 43
-  n_if,     //44
-  n_for,    //45
-  n_body_id_var, //46
-  n_func_call, //47
-  n_fretval, //48
-  n_call_param, //49
-  n_body_comma, //50
-  n_def,        //51
-  n_assign,     //52
+  n_prog, //36
+  n_func, //37
+  n_param_n, //38
+  n_retvals, //39
+  n_body, //40
+  n_fretvals, //41
+  n_retval, // 42
+  n_expr,   // 43
+  n_body_id, // 44
+  n_if,     //45
+  n_for,    //46
+  n_body_id_var, //47
+  n_func_call, //48
+  n_fretval, //49
+  n_call_param, //50
+  n_body_comma, //51
+  n_def,        //52
+  n_assign,     //53
 
 
+ // tady nic, dojebal by se mi parser, ale fakt ošklivým způsobem
 
 }token_type;
 
@@ -114,7 +114,10 @@ typedef enum{
   s_fact,
   s_neq,
   s_linecom,
-  s_def
+  s_def,
+  s_exp2,
+  s_exp3,
+  s_zero
 
   // TODO add more states
 }lex_state;
@@ -139,3 +142,5 @@ int     is_key_word     (dynamic_string* string);
 int     parser          ();
 void    print_token     (tToken token);
 int     is_hexa         ();
+
+
