@@ -8,6 +8,8 @@ func factorial(n int) (int) {
   } else {
     tmp := 0
     tmp = factorial(dec_n)
+
+
     return n * tmp
   }
 }

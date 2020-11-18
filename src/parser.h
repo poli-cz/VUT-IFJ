@@ -13,6 +13,7 @@
 #include "scanner.h"
 #include "basic.h"
 #define STACK_DEFAULT 1000
+#define DEBUG 0
                     // Velikost alokační jednotky zásobníku
 
 /**
@@ -49,6 +50,8 @@ void      stack_remove      (synt_stack *stack);
 bool      stack_compare     (synt_stack stack, tToken token, Symtable *table);
 tList     syntactic_prerun  (Symtable *table);
 char     *get_params        (tToken token);
+char     *get_retvals       (tToken token);
+int       generate_code     (tList list, Symtable *table);
 
 void      stack_expand      (Symtable *table, synt_stack stack, tToken token ,int err_code);
 void      senor_clean_fist  (Symtable *table, synt_stack stack, tList token_list);

@@ -1,7 +1,7 @@
 /**
  * @file PSA.c
  *
- * Implemntace Precedenční syntaktické analýzy pro zpracování výrazů
+ * Implementace preprocesoru pro Precedenční syntaktickou analýzu
  *
  * IFJ Projekt 2020, Tým 2
  *
@@ -22,12 +22,12 @@ int expr_parse(Symtable *table, synt_stack stack, tToken token ,int err_code){
 
   int bracket_counter = 0;
 
-//  printf("----RUNNING PSA PRE-CHECKS----\n");
+  if(DEBUG){printf("----RUNNING PSA PRE-CHECKS----\n");}
 
   while(1){
 
-
-    //print_token(previe);
+    if(DEBUG){printf("PSA TOKEN");}
+    if(DEBUG){print_token(previe);}
     if(previe.type == t_eof){
       fprintf(stderr, "Unexpected eof\n");
       exit(1);
@@ -68,7 +68,7 @@ int expr_parse(Symtable *table, synt_stack stack, tToken token ,int err_code){
 
 
     //print_token(token);
-  //  printf("Is in table %d\n", is_in_table(table, token.value->str));
+    if(DEBUG){printf("Is in table %d\n", is_in_table(table, token.value->str));}
 
     if(token.type == t_id){
       if(!is_predefined(token.value->str,table)){
@@ -104,7 +104,7 @@ int expr_parse(Symtable *table, synt_stack stack, tToken token ,int err_code){
           exit(2);
         }
       }
-    //  printf("----Exiting PSA prerun----\n");
+      if(DEBUG){printf("----Exiting PSA prerun----\n");}
 
 
       if(psa(first)!=0){

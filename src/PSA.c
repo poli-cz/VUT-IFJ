@@ -49,7 +49,7 @@
 
 
 int psa(tToken token){
-//  printf("ENTERING PSA\n");
+  if(DEBUG){printf("ENTERING PSA\n");}
 
   psa_stack stack;
   PSA_term term;
@@ -61,17 +61,17 @@ int psa(tToken token){
   bool success = false;
 
   do{
-  //  print_token(token);
-  //  ps_print_stack(stack);
-  //  printf("%d\n", token_to_table(token));
+    if(DEBUG){print_token(token);}
+    if(DEBUG){ps_print_stack(stack);}
+    if(DEBUG){printf("%d\n", token_to_table(token));}
     Prec_table_sym symtok = token_to_table(token);
 //  printf("%d stack top \n", get_stack_top(stack));
     switch (prec_table[get_stack_top(stack)][symtok]) {
 
       case '<':
-  //      printf("shift\n");
+        if(DEBUG){printf("shift\n");}
 
-    //    ps_print_stack(stack);
+        if(DEBUG){ps_print_stack(stack);}
         term.sym = shift;
 
         int push_count = 0;
@@ -89,8 +89,8 @@ int psa(tToken token){
           ps_stack_push(stack, term);
         }
 
-  //      printf("after\n");
-  //      ps_print_stack(stack);
+      if(DEBUG){printf("after\n");}
+      if(DEBUG){ps_print_stack(stack);}
 
         term.sym = symtok;
         ps_stack_push(stack, term);
@@ -98,23 +98,23 @@ int psa(tToken token){
       break;
 
       case '>':
-  //      printf("reduce\n");
-  //      printf("Sould move %d down\n", get_stack_top(stack));
-    //    ps_print_stack(stack);
+      if(DEBUG){printf("reduce\n");}
+      if(DEBUG){printf("Sould move %d down\n", get_stack_top(stack));}
+      if(DEBUG){ps_print_stack(stack);}
         reduce_rule(stack);
       break;
 
       case '=':
-  //      printf("equal\n");
+        if(DEBUG){printf("equal\n");}
         term.sym = symtok;
         ps_stack_push(stack, term);
-    //    ps_print_stack(stack);
+        if(DEBUG){ps_print_stack(stack);}
         token = *token.next;
       break;
 
       case 'x':
-    //    ps_print_stack(stack);
-    //    printf("Should be empty stack\n");
+        if(DEBUG){ps_print_stack(stack);}
+        if(DEBUG){printf("Should be empty stack\n");}
         //exit(2);
         return 0;
 
@@ -175,7 +175,7 @@ void reduce_by_rule(psa_stack stack, int count){
     break;
 
     case 3:
-  //  printf("Rule for 3 tokens\n");
+    if(DEBUG){printf("Rule for 3 tokens\n");}
       if((stack->t[(stack->top)].sym) == r_bra){
         if((stack->t[(stack->top)-1].sym) == final_E){
           if((stack->t[(stack->top)-2].sym) == l_bra){

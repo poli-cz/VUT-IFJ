@@ -1,7 +1,11 @@
 package main
 
-func main()
+func main(){
 
+if 3 {
 
+}
+else{
 
-{go go go}
+}
+}

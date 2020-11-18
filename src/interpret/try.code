@@ -1,0 +1,21 @@
+.IFJcode20
+  DEFVAR GF@input_prompt
+  CREATEFRAME
+  PUSHFRAME
+  JUMP main$
+
+LABEL inputs$
+  PUSHFRAME
+  DEFVAR LF@$return
+  READ LF@$return string
+  POPFRAME
+  RETURN
+LABEL print$
+  DEFVAR LF@out
+  POPS LF@out
+  WRITE LF@out
+  POPFRAME
+	RETURN
+LABEL main$
+PUSHS string@Hello_from_IFJ20
+CALL print$
