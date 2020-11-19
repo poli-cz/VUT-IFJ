@@ -1,3 +1,4 @@
+ * 
 // Program 2: Vypocet faktorialu (rekurzivne)
 package main
 

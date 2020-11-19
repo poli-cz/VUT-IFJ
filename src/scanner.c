@@ -145,7 +145,6 @@ tToken get_token(){
         else if (sym== '\\'){
           state=s_lslash;
         }
-   
         else {
         add_char(sym,&token.value);
         state=s_error;
@@ -254,6 +253,7 @@ tToken get_token(){
           return token;
     break;
 
+
     case s_div:
       if(sym == '/'){
         //ungetc(sym,stdin);
@@ -357,6 +357,11 @@ tToken get_token(){
          add_char(sym,&token.value);
          state = s_floatpoint;
       }
+    else if (isspace(sym)|| sym=='\n')
+    {
+      token.type=t_number;
+      return token;
+    } 
     else{
       state=s_error;
     }
@@ -491,7 +496,7 @@ tToken get_token(){
 
     case s_mul:
     {
-      ungetc(sym,source_file);
+      //ungetc(sym,source_file);
       token.type=t_mul;
       return token;
     }
