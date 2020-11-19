@@ -4,7 +4,7 @@
 void main_code(){
   // base code generation
   printf(".IFJcode20\n\
-  DEFVAR GF@input_prompt\n\
+  DEFVAR GF@expr_resul\n\
   CREATEFRAME\n\
   PUSHFRAME\n\
   JUMP main$\n\
@@ -14,11 +14,12 @@ LABEL inputs$\n\
   DEFVAR LF@$return\n\
   READ LF@$return string\n\
   POPFRAME\n\
-  RETURN\n\
-LABEL print$\n\
-  DEFVAR LF@out\n\
-  POPS LF@out \n\
-  WRITE LF@out\n\
+	RETURN\n\
+  \n\
+LABEL inputf$\n\
+  PUSHFRAME\n\
+  DEFVAR LF@$return\n\
+  READ LF@$return float\n\
   POPFRAME\n\
 	RETURN\n");
 
@@ -27,8 +28,16 @@ LABEL print$\n\
           // -- TODO -- //
   //add  all inbuit function... //
 }
+char *stringToInterpret(char *rawString){
+	//int rawLen = strlen(rawString);
 
+
+
+// TODO //
+	return rawString;
+}
 /*
+
 
 char *string_to_ifj(char *string){
 

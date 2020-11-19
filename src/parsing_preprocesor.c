@@ -38,6 +38,7 @@ tList syntactic_prerun(Symtable *g_table){
 
     if(token->type == 1  ){  // CHECKING FOR RIGHT TOKENS
       fprintf(stderr, "Invalid token --> %s\n", (*token).value->str);
+      destroy_table(g_table);
       error_handler(1);
     }
   //--------------------//
@@ -48,7 +49,7 @@ tList syntactic_prerun(Symtable *g_table){
   }
 
 
-
+//exit(3);
 // --------loading and listing tokens done--------------//
 
 
@@ -62,6 +63,7 @@ tList syntactic_prerun(Symtable *g_table){
   tToken test = (*tokens.first);
   bool pkg_main = 0;
   int func_count = 0;
+  bool return_flag = 0;
 
   while(test.type != 7){
 
@@ -82,6 +84,11 @@ tList syntactic_prerun(Symtable *g_table){
     if((test.type == t_keyword) && (strcmp(test.value->str, "func")==0)){
       test = *test.next;
 
+      if(return_flag==1){
+        fprintf(stderr, "Mising return in non void function\n");
+        exit(6);
+      }
+
 
       if(!is_in_table(g_table, test.value->str) && !is_key_word(test.value)){
         table_data id;
@@ -90,6 +97,10 @@ tList syntactic_prerun(Symtable *g_table){
         id.retvals = get_retvals(test);
         id.type = func;
         id.defined = true;
+
+        if(strcmp(id.retvals,"")){
+          return_flag = 1;
+        }
 
 
         table_insert(g_table, id, test.value->str);
@@ -104,6 +115,11 @@ tList syntactic_prerun(Symtable *g_table){
 
     }
     else{
+      if(test.type == t_keyword){
+        if(!strcmp(test.value->str, "return")){
+          return_flag = 0;
+        }
+      }
 
       test = *test.next;
   }
@@ -156,35 +172,35 @@ tList syntactic_prerun(Symtable *g_table){
     inbuilt_fce.type = func;
     inbuilt_fce.defined = true;
 
-    inbuilt_fce.params = "";
-    inbuilt_fce.retvals = "string int";
+    inbuilt_fce.params = "0 ";
+    inbuilt_fce.retvals = "string int ";
     table_insert(g_table, inbuilt_fce, "inputs");
-    inbuilt_fce.params = "";
-    inbuilt_fce.retvals = "int int";
+    inbuilt_fce.params = "0 ";
+    inbuilt_fce.retvals = "int int ";
     table_insert(g_table, inbuilt_fce, "inputi");
-    inbuilt_fce.params = "";
-    inbuilt_fce.retvals = "float64 int";
+    inbuilt_fce.params = "0 ";
+    inbuilt_fce.retvals = "float64 int ";
     table_insert(g_table, inbuilt_fce, "inputf");
-    inbuilt_fce.params = "term, term, term";
-    inbuilt_fce.retvals = "";
+    inbuilt_fce.params = "3 term, term, term ";
+    inbuilt_fce.retvals = " ";
     table_insert(g_table, inbuilt_fce, "print");
-    inbuilt_fce.params = "int";
-    inbuilt_fce.retvals = "float64";
+    inbuilt_fce.params = "1 int ";
+    inbuilt_fce.retvals = "float64 ";
     table_insert(g_table, inbuilt_fce, "int2float");
-    inbuilt_fce.params = "float";
-    inbuilt_fce.retvals = "int";
+    inbuilt_fce.params = "1 float ";
+    inbuilt_fce.retvals = "int ";
     table_insert(g_table, inbuilt_fce, "float2int");
-    inbuilt_fce.params = "string";
-    inbuilt_fce.retvals = "int";
+    inbuilt_fce.params = "1 string ";
+    inbuilt_fce.retvals = "int ";
     table_insert(g_table, inbuilt_fce, "len");
-    inbuilt_fce.params = "string int int";
-    inbuilt_fce.retvals = "string int";
+    inbuilt_fce.params = "3 int int string ";
+    inbuilt_fce.retvals = "string int ";
     table_insert(g_table, inbuilt_fce, "substr");
-    inbuilt_fce.params = "string int";
-    inbuilt_fce.retvals = "int int";
+    inbuilt_fce.params = "2 int string ";
+    inbuilt_fce.retvals = "int int ";
     table_insert(g_table, inbuilt_fce, "ord");
-    inbuilt_fce.params = "int";
-    inbuilt_fce.retvals = "string int";
+    inbuilt_fce.params = "1 int ";
+    inbuilt_fce.retvals = "string int ";
     table_insert(g_table, inbuilt_fce, "chr");
 
 
@@ -212,11 +228,15 @@ tList syntactic_prerun(Symtable *g_table){
       destroy_table(g_table);
       error_handler(3);
     }
+    if(return_flag==1){
+      fprintf(stderr, "Mising return in non void function\n");
+      exit(6);
+    }
 
 
 
     if(DEBUG){print_table(g_table);}
-  //  print_table(g_table);
+    //print_table(g_table);
   //  print_table(g_table);
   //  exit(2);
     if(DEBUG){printf("\n--------PRERUN Ok-------\n");}
@@ -268,6 +288,7 @@ char *get_params(tToken token){
   token = *token.next; // skipp func name
   token = *token.next; // skipp l_brac
   char *params= "";
+  int count = 0;
 
   while(token.type != t_rbra){
     if(token.type == t_eof){
@@ -278,10 +299,13 @@ char *get_params(tToken token){
         if(-1 == asprintf(&params,"%s %s",token.value->str, params)){
           fprintf(stderr, "internal\n");
       }
+      count++;
     }
     token = *token.next;
   }
-
+  if(-1 == asprintf(&params,"%d %s",count, params)){
+    fprintf(stderr, "internal\n");
+  }
   return params;
 }
 

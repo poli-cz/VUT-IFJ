@@ -1,39 +1,79 @@
  #include "PSA.h"
 
+ 
 
- static char prec_table[8][8] =
+
+ static char prec_table[12][12] =
  {
- //   +-    *     /     R     (     )     i     $
-  	{ '>' , '<' , '<' , '<' , '<' , '>' , '<' , '>' }, /// +-
-  	{ '>' , '>' , '>' , '>' , '<' , '>' , '<' , '>' }, /// */ -- MUL
-  	{ '>' , '<' , '>' , '>' , '<' , '>' , '<' , '>' }, /// \ / -- div
-  	{ '<' , '<' , '<' , ' ' , '<' , '>' , '<' , '>' }, /// r (realtion operators) = <> <= < >= >
-  	{ '<' , '<' , '<' , '<' , '<' , '=' , '<' , 'x' }, /// (
-  	{ '>' , '>' , '>' , '>' , '=' , '>' , ' ' , '>' }, /// )
-  	{ '>' , '>' , '>' , '>' , ' ' , '>' , ' ' , '>' }, /// i (id, int, float64, string)
-  	{ '<' , '<' , '<' , '<' , '<' , 'x' , '<' , 'x' }  /// $
+ //   +     -    *     /     R     (     )      id  int float str  $
+  	{ '>','>', '<' , '<' , '<' , '<' , '>' , '<', '<', '<', '<', '>' }, /// +
+    { '>','>', '<' , '<' , '<' , '<' , '>' , '<', '<', '<', '<', '>' }, /// -
+  	{ '>','>', '>' , '>' , '>' , '<' , '>' , '<', '<', '<', '<', '>' }, /// */ -- MUL
+  	{ '>','>', '<' , '>' , '>' , '<' , '>' , '<', '<', '<', '<', '>' }, /// \ / -- div
+  	{ '<','<', '<' , '<' , ' ' , '<' , '>' , '<', '<', '<', '<', '>' }, /// r (realtion operators) = <> <= < >= >
+  	{ '<','<', '<' , '<' , '<' , '<' , '=' , '<', '<', '<', '<', 'x' }, /// (
+  	{ '>','>', '>' , '>' , '>' , '=' , '>' , ' ', ' ', ' ', ' ', '>' }, /// )
+    { '>','>', '>' , '>' , '>' , ' ' , '>' , ' ', ' ', ' ', ' ', '>' }, /// pid
+  	{ '>','>', '>' , '>' , '>' , ' ' , '>' , ' ', ' ', ' ', ' ', '>' }, /// int
+    { '>','>', '>' , '>' , '>' , ' ' , '>' , ' ', ' ', ' ', ' ', '>' }, /// float
+    { '>','>', '>' , '>' , '>' , ' ' , '>' , ' ', ' ', ' ', ' ', '>' }, /// str
+  	{ '<','<', '<' , '<' , '<' , '<' , 'x' , '<', '<', '<', '<', 'x' }  /// $
   };
 
 
 
-  Prec_table_sym token_to_table(tToken token){
+  Prec_table_sym token_to_table(tToken token, bool generate){
 
     switch (token.type) {
 
-      case t_plus: return 0; break;
-      case t_minus: return 0; break;
-      case t_mul: return 1; break;
-      case t_div: return 2; break;
-      case t_lbra: return 4; break;
-      case t_rbra: return 5; break;
-      case t_id: return 6; break;
-      case t_number: return 6; break;
-      case t_float: return 6; break;
-      case t_string: return 6; break;
+      case t_plus:
+          return plus;
+      break;
+
+      case t_minus:
+          return minus;
+      break;
+
+      case t_mul:
+          return mul;
+      break;
+
+      case t_div:
+          return ddiv;
+      break;
+
+      case t_lbra:
+          return l_bra;
+      break;
+
+      case t_rbra:
+          return r_bra;
+      break;
+
+      case t_id:
+
+          if(generate){
+            printf("PUSHS LF@%s\n", token.value->str);
+          }
+          return pid;
+      break;
+
+      case t_number:
+          if(generate){printf("PUSHS int@%s\n", token.value->str);}
+          return pint;
+      break;
+
+      case t_float:
+          return pfloat;
+      break;
+
+      case t_string:
+          return pstring;
+      break;
 
       default:
        if((token.type == 14)||(token.type == 27)||(token.type == 26)){
-         return 3;
+         return rela;
        }
        else{
          if((token.type == t_colon)){
@@ -41,14 +81,14 @@
            error_handler(1);
          }
 
-         return 7;
+         return dolar;
        }
       break;
        }
   }
 
 
-int psa(tToken token){
+int psa(tToken token, bool print_expr){
   if(DEBUG){printf("ENTERING PSA\n");}
 
   psa_stack stack;
@@ -58,14 +98,14 @@ int psa(tToken token){
   ps_stack_init(&stack);
   ps_stack_push(stack, term);
 
+
   bool success = false;
 
   do{
     if(DEBUG){print_token(token);}
     if(DEBUG){ps_print_stack(stack);}
-    if(DEBUG){printf("%d\n", token_to_table(token));}
-    Prec_table_sym symtok = token_to_table(token);
-//  printf("%d stack top \n", get_stack_top(stack));
+    if(DEBUG){printf("%d\n", token_to_table(token, print_expr));}
+    Prec_table_sym symtok = token_to_table(token, print_expr);
     switch (prec_table[get_stack_top(stack)][symtok]) {
 
       case '<':
@@ -76,8 +116,9 @@ int psa(tToken token){
 
         int push_count = 0;
 
-        while((stack->t[(stack->top)].sym)==final_E){
+        data_type temp = stack->t[(stack->top)].data_type;
 
+        while((stack->t[(stack->top)].sym)==final_E){
           push_count++;
           ps_stack_pop(stack);
         }
@@ -85,7 +126,9 @@ int psa(tToken token){
         ps_stack_push(stack, term);
 
         for (int i = 0; i < push_count; i++) {
+          term.data_type = temp;
           term.sym = final_E;
+
           ps_stack_push(stack, term);
         }
 
@@ -101,7 +144,7 @@ int psa(tToken token){
       if(DEBUG){printf("reduce\n");}
       if(DEBUG){printf("Sould move %d down\n", get_stack_top(stack));}
       if(DEBUG){ps_print_stack(stack);}
-        reduce_rule(stack);
+        reduce_rule(stack, print_expr);
       break;
 
       case '=':
@@ -115,7 +158,8 @@ int psa(tToken token){
       case 'x':
         if(DEBUG){ps_print_stack(stack);}
         if(DEBUG){printf("Should be empty stack\n");}
-        //exit(2);
+        if(DEBUG){printf("Exiting PSA\n");}
+        ps_stack_remove(&stack);
         return 0;
 
       break;
@@ -129,10 +173,12 @@ int psa(tToken token){
 
 
   }while(!success);
+
+  return 0;
 }
 
 
-void reduce_rule(psa_stack stack){
+void reduce_rule(psa_stack stack, int generate){
 
   int reduce_count = stack_shift_count(stack);
   //printf("%d\n", reduce_count);
@@ -141,49 +187,84 @@ void reduce_rule(psa_stack stack){
 
   if(reduce_count == 1){
 
-    reduce_by_rule(stack, 1);
+    reduce_by_rule(stack, 1, generate);
 
   }else if(reduce_count == 3){
 
-    reduce_by_rule(stack, 3);
+    reduce_by_rule(stack, 3, generate);
 
   }else{
     fprintf(stderr, "Missing operand in expr\n");
     error_handler(5);
   }
+
 }
 
 
 
-void reduce_by_rule(psa_stack stack, int count){
+void reduce_by_rule(psa_stack stack, int count, int generate){
   PSA_term term;
+
 
   switch (count) {
     case 1:
-      if((stack->t[(stack->top)].sym)==iid){
-        ps_stack_pop(stack);
-        ps_stack_pop(stack);
-        term.sym = final_E;
-        ps_stack_push(stack, term);
 
+      term.sym = final_E;
+      if((stack->t[(stack->top)].sym)==pid){
+          ps_stack_pop(stack);
+          ps_stack_pop(stack);
+          term.data_type = type_NDEF;
+      } else if((stack->t[(stack->top)].sym)==pint){
+          ps_stack_pop(stack);
+          ps_stack_pop(stack);
+          term.data_type = type_int;
+
+      } else if((stack->t[(stack->top)].sym)==pfloat){
+          ps_stack_pop(stack);
+          ps_stack_pop(stack);
+          term.data_type = type_float64;
+      } else if((stack->t[(stack->top)].sym)==pstring){
+          ps_stack_pop(stack);
+          ps_stack_pop(stack);
+          term.data_type = type_string;
       }
       else{
         fprintf(stderr, "Expression id error\n");
         exit(5);
       }
-
+      ps_stack_push(stack, term);
     break;
 
     case 3:
     if(DEBUG){printf("Rule for 3 tokens\n");}
+    // -------- CHECK FOR RIGHT DATA TYPES ------------//
+    if((stack->t[(stack->top)].sym) != r_bra){
+      if((stack->t[(stack->top)-2].data_type)!=(stack->t[(stack->top)].data_type)){
+        if((stack->t[(stack->top)-2].data_type)!=type_NDEF){
+          if((stack->t[(stack->top)].data_type)!=type_NDEF){
+            printf("Comparing %d with %d\n", (stack->t[(stack->top)-2].data_type), (stack->t[(stack->top)].data_type));
+            fprintf(stderr, "TOKEN TYPE ERROR\n");
+            exit(5);
+          }
+        }
+      }
+    }
+
+
+
+
+
       if((stack->t[(stack->top)].sym) == r_bra){
         if((stack->t[(stack->top)-1].sym) == final_E){
           if((stack->t[(stack->top)-2].sym) == l_bra){
-            ps_stack_pop(stack);
-            ps_stack_pop(stack);
-            ps_stack_pop(stack);
-            ps_stack_pop(stack);
             term.sym = final_E;
+            term.data_type = stack->t[(stack->top-1)].data_type;
+
+            ps_stack_pop(stack);
+            ps_stack_pop(stack);
+            ps_stack_pop(stack);
+            ps_stack_pop(stack);
+
             ps_stack_push(stack, term);
           }
         }
@@ -195,11 +276,14 @@ void reduce_by_rule(psa_stack stack, int count){
       else if((stack->t[(stack->top)].sym) == final_E){
         if((stack->t[(stack->top)-1].sym) == mul){
           if((stack->t[(stack->top)-2].sym) == final_E){
-            ps_stack_pop(stack);
-            ps_stack_pop(stack);
-            ps_stack_pop(stack);
-            ps_stack_pop(stack);
             term.sym = final_E;
+            term.data_type = stack->t[(stack->top-2)].data_type;
+            if(generate){printf("MULS\n");}
+            ps_stack_pop(stack);
+            ps_stack_pop(stack);
+            ps_stack_pop(stack);
+            ps_stack_pop(stack);
+
             ps_stack_push(stack, term);
           }
           else{
@@ -209,11 +293,14 @@ void reduce_by_rule(psa_stack stack, int count){
         }
         else if((stack->t[(stack->top)-1].sym) == ddiv){
           if((stack->t[(stack->top)-2].sym) == final_E){
-            ps_stack_pop(stack);
-            ps_stack_pop(stack);
-            ps_stack_pop(stack);
-            ps_stack_pop(stack);
             term.sym = final_E;
+            term.data_type = stack->t[(stack->top-2)].data_type;
+            if(generate){printf("IDIVS\n");}
+            ps_stack_pop(stack);
+            ps_stack_pop(stack);
+            ps_stack_pop(stack);
+            ps_stack_pop(stack);
+
             ps_stack_push(stack, term);
           }
           else{
@@ -221,13 +308,22 @@ void reduce_by_rule(psa_stack stack, int count){
             exit(5);
           }
         }
-        else if((stack->t[(stack->top)-1].sym) == plus_minus){
+        else if( ( (stack->t[(stack->top)-1].sym) == plus) || ((stack->t[(stack->top)-1].sym) == minus)){
           if((stack->t[(stack->top)-2].sym) == final_E){
-            ps_stack_pop(stack);
-            ps_stack_pop(stack);
-            ps_stack_pop(stack);
-            ps_stack_pop(stack);
             term.sym = final_E;
+            if((stack->t[(stack->top)-1].sym) == plus){
+              if(generate){printf("ADDS\n");}
+            }else{
+              if(generate){printf("SUBS\n");}
+            }
+
+            term.data_type = stack->t[(stack->top-2)].data_type;
+
+            ps_stack_pop(stack);
+            ps_stack_pop(stack);
+            ps_stack_pop(stack);
+            ps_stack_pop(stack);
+
             ps_stack_push(stack, term);
           }
           else{
@@ -237,11 +333,14 @@ void reduce_by_rule(psa_stack stack, int count){
         }
         else if((stack->t[(stack->top)-1].sym) == rela){
           if((stack->t[(stack->top)-2].sym) == final_E){
-            ps_stack_pop(stack);
-            ps_stack_pop(stack);
-            ps_stack_pop(stack);
-            ps_stack_pop(stack);
             term.sym = final_E;
+            term.data_type = stack->t[(stack->top-2)].data_type;
+
+            ps_stack_pop(stack);
+            ps_stack_pop(stack);
+            ps_stack_pop(stack);
+            ps_stack_pop(stack);
+
             ps_stack_push(stack, term);
           }
           else{
@@ -285,6 +384,7 @@ int get_stack_top(psa_stack stack){
       return stack->t[(stack->top)-i].sym;
     }
   }
+  return 0;
 }
 
 
@@ -344,7 +444,25 @@ void ps_print_stack(psa_stack stack){
   printf("\nPRINTING PSA STACK\n");
 
   for(int i = 0; i < 4; i++){
-    printf("%d\n", (stack->t[(stack->top)-i].sym));
+    printf("%d ", (stack->t[(stack->top)-i].sym));
+    if((stack->t[(stack->top)-i].sym)==final_E){
+      printf("with data type: ");
+      if((stack->t[(stack->top)-i].data_type == type_int)){
+        printf("Int\n");
+      }else if((stack->t[(stack->top)-i].data_type == type_float64)){
+        printf("float\n");
+      }else if((stack->t[(stack->top)-i].data_type == type_string)){
+        printf("string\n");
+      }else if((stack->t[(stack->top)-i].data_type == type_NDEF)){
+        printf("NDEF\n");
+      }
+      else{
+        printf("WHAT\n");
+      }
+    }
+    else{printf("\n");}
+
+
   }
 
 

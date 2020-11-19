@@ -36,4 +36,6 @@ int init_dynamc_string(dynamic_string **string);
 */
 int add_char(char c,dynamic_string **string);
 
+void free_string(dynamic_string **string);
+
 #endif

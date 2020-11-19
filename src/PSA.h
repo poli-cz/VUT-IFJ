@@ -14,40 +14,32 @@
 
 
 typedef enum{
-  plus_minus, //0
-  mul, //1
-  ddiv, //2
-  rela, //3
-  l_bra, //4
-  r_bra,// 5
-  iid, //6
-  dolar, //7 like terminals
+  plus, //0
+  minus, //1
+  mul, //2
+  ddiv, //3
+  rela, //4
+  l_bra, //5
+  r_bra,// 6
+  pid,   //7
+  pint, //8
+  pfloat, //9
+  pstring, //10
+  dolar, //11 like terminals
 
-  shift,    // 8 <
-  reduce,   // 9 >
-  equal,    //10 =
-  error,    //11
+  shift,    // 12 <
+  reduce,   // 13 >
+  equal,    //14 =
+  error,    //15
 
-  final_E,   // 12 same behaviour like dolar
+  final_E,   // 16 same behaviour like dolar
 
 } Prec_table_sym;
 
-typedef enum
-{
-	NT_EQ_NT,		/// E -> E = E
-	NT_LEQ_NT,		/// E -> E <= E
-	NT_LTN_NT,		/// E -> E < E
-	NT_MEQ_NT,		/// E -> E => E
-	NT_MTN_NT,		/// E -> E > E
-	NT_PLUS_NT,		/// E -> E + E
-	NT_MINUS_NT,	/// E -> E - E
-	NT_IDIV_NT,		/// E -> E \ E
-	NT_MUL_NT,		/// E -> E * E
-	NT_DIV_NT,		/// E -> E / E
-	LBR_NT_RBR,		/// E -> (E)
-	OPERAND,		/// i -> E
-	NOT_A_RULE		/// rule doesn't exist
-} Prec_rules_enum;
+//typedef struct token_val{
+//
+//
+//}token_val;
 
 
 
@@ -55,6 +47,8 @@ typedef enum
 
 typedef struct psateminal{
   Prec_table_sym sym;
+  data_type data_type;
+
 }PSA_term;
 
 // structure of syntax_stact
@@ -71,8 +65,8 @@ bool      ps_stack_pop        (psa_stack stack);
 bool      ps_stack_push       (psa_stack stack, PSA_term term);
 void      ps_stack_remove     (psa_stack *stack);
 void      ps_print_stack      (psa_stack stack);
-void      reduce_rule         (psa_stack stack);
-int       psa                 (tToken token);
+void      reduce_rule         (psa_stack stack, int generate);
+int       psa                 (tToken token, bool expr_print);
 int       stack_shift_count   (psa_stack stack);
-void      reduce_by_rule      (psa_stack stack, int count);
+void      reduce_by_rule      (psa_stack stack, int count, int generate);
 int       get_stack_top       (psa_stack);

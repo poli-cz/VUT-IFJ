@@ -167,11 +167,18 @@ Function to destroy all elements in table and free all memory
 void destroy_table(Symtable *table){
     for(int i = 0; i < SYMTABLE_SIZE; i++){
       if((*table)[i] != NULL ){
+        //free((*table)[i]->data.params);
         free((*table)[i]);
         (*table)[i] = NULL;
       }
     }
 }
+
+
+
+
+
+
 /*
 Function return symtable allocation percentage
 try to keep it under 75%
@@ -200,7 +207,17 @@ void print_table(Symtable *table){
     if((*table)[i] != NULL){
       if((*table)[i]->data.type == 0){
          t = "Variable";
-         printf("%s with ID \"%s\" defined-> %d redef_flag-> %d\n", t, (*table)[i]->identifier, (*table)[i]->data.defined, (*table)[i]->data.redef_flag);
+         char* type;
+         if((*table)[i]->data.d_type==0){
+           type = "NDEF";
+         }else if((*table)[i]->data.d_type==1){
+           type = "INT";
+         }else if((*table)[i]->data.d_type==2){
+           type = "float64";
+         }else if((*table)[i]->data.d_type==3){
+           type = "string";
+         }
+         printf("%s with ID \"%s\" defined-> %d redef_flag-> %d value--> %s\n", t, (*table)[i]->identifier, (*table)[i]->data.defined, (*table)[i]->data.redef_flag, type);
       }
 
     }

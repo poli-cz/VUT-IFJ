@@ -58,3 +58,11 @@ int add_char(char c, dynamic_string** string) {
 
     return 0;
 }
+
+
+void free_string(dynamic_string** string){
+
+  free((*string)->str);
+  free(*string);
+
+}

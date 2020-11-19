@@ -45,17 +45,6 @@ int expr_parse(Symtable *table, synt_stack stack, tToken token ,int err_code){
     else if(token.type == t_rbra){
       bracket_counter--;
     }
-    if(token.type == t_number){
-      tToken div;
-      div = *token.next;
-      if(div.type == t_div){
-        div = *div.next;
-        if((div.type == t_number)&&(strcmp(div.value->str, "0")==0)){
-          fprintf(stderr, "ZERO IN DIV\n" );
-          exit(9);
-        }
-      }
-    }
 
 
 
@@ -67,7 +56,10 @@ int expr_parse(Symtable *table, synt_stack stack, tToken token ,int err_code){
 
 
 
-    //print_token(token);
+
+
+
+
     if(DEBUG){printf("Is in table %d\n", is_in_table(table, token.value->str));}
 
     if(token.type == t_id){
@@ -89,7 +81,7 @@ int expr_parse(Symtable *table, synt_stack stack, tToken token ,int err_code){
 
       if(in_function){
         if(bracket_counter!=-1){
-          fprintf(stderr, "bracket missmatch in lonely expr()\n");
+          fprintf(stderr, "bracket missmatch in lonely expr\n");
 
           stack_remove(&stack);
           exit(2);
@@ -107,7 +99,7 @@ int expr_parse(Symtable *table, synt_stack stack, tToken token ,int err_code){
       if(DEBUG){printf("----Exiting PSA prerun----\n");}
 
 
-      if(psa(first)!=0){
+      if(psa(first, 0)!=0){
         exit(5);
       }
 

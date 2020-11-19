@@ -14,6 +14,8 @@
 #include "basic.h"
 #define STACK_DEFAULT 1000
 #define DEBUG 0
+
+
                     // Velikost alokační jednotky zásobníku
 
 /**
@@ -55,6 +57,7 @@ int       generate_code     (tList list, Symtable *table);
 
 void      stack_expand      (Symtable *table, synt_stack stack, tToken token ,int err_code);
 void      senor_clean_fist  (Symtable *table, synt_stack stack, tList token_list);
+void      all_fresh         ();
 int       semantic_check    (Symtable *table, synt_stack stack, tList list, int err_code);
 void      print_stack       (synt_stack stack);
 bool      is_correct_kword  (char* id, int which[20], int used);
@@ -65,3 +68,10 @@ bool      is_in_stack       (synt_stack stack, token_type type);
 void      id_check          (tToken func, Symtable *local_table, Symtable *table);
 tToken    scope_check       (tToken scope, Symtable *global_table, Symtable *func_table);
 void      id_add            (tToken token, Symtable *table);
+bool      check_ok_params   (Symtable  *table, char* func, tToken token);
+data_type get_data_type     (Symtable *table, tToken token);
+void      parse_fc_params   (Symtable *table, tToken token);
+void      multi_checker     (Symtable *table, tToken token);
+void      check_multi_def   (Symtable *table, tToken token);
+void      check_retvals     (Symtable *table, tToken token);
+void      func_call_checker (Symtable *table, tToken token);

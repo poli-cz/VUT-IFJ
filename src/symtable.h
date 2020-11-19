@@ -7,7 +7,7 @@
  *
  * @author <xpolis04> Jan Polišenský
  */
- #pragma once
+#pragma once
 #include<stdlib.h>
 #include<string.h>
 #include<stdio.h>
@@ -20,14 +20,26 @@ typedef enum{
   other,
 }iType;
 
+typedef enum{
+  type_NDEF,
+  type_int,
+  type_float64,
+  type_string,
+}data_type;
+
 typedef struct Data_item{
+  // for Functions //
   int data;
   iType type;
   char* params;
   char* retvals;
   bool defined;
+
+  // for ids //
   bool redef_flag;
   bool predefined;
+  data_type d_type;
+
 }table_data;
 
 typedef struct hash_table_item{ // structure of hash table

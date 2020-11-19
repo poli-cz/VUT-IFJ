@@ -8,18 +8,29 @@
  * @author <xpolis04> Jan Polišenský
  */
 
-
+#define _GNU_SOURCE
 #include <stdbool.h>
 #include "parser.h"
 #include "PSA.h"
+#include <stdio.h>
+
+// global variables for right Dealocation of memory
+tList dispose;
+Symtable g_table;
+synt_stack stack;
+
+int multival = 0;
 
 
-// Main parsing function
+
+/*
+ Main parsing function
+
+
+ */
 int parser(){
 
   int pars_err = 0;
-  Symtable g_table;
-  synt_stack stack;
 
   table_init(&g_table);
   stack_init(&stack, pars_err);
@@ -29,6 +40,7 @@ int parser(){
 
     if(DEBUG){printf("\n--------SYNTAX CHECK-------\n");}
 
+    dispose = pre;
     tToken s_tok = (*pre.first); // Token for syntax check
     T_term p_term;
     p_term.type = n_prog;  // Default non terminal
@@ -94,7 +106,7 @@ int parser(){
  int err = semantic_check(&g_table, stack, pre, pars_err);
 
 
- if(err != 0){
+    if(err != 0){
       senor_clean_fist(&g_table, stack, pre);
       error_handler(err);
     }
@@ -106,11 +118,9 @@ int parser(){
   if(err != 0){
     senor_clean_fist(&g_table, stack, pre);
     error_handler(err);
-  }else{
-    senor_clean_fist(&g_table, stack, pre);
   }
 
-
+  senor_clean_fist(&g_table, stack, pre);
 return 0;
 }
 
@@ -125,7 +135,11 @@ return 0;
 //  ------------------- Functions for work with synt_stack  ------------------- //
 
 
+/*
+ Comparing terminals on stack
+ Also does other checks
 
+ */
 bool stack_compare(synt_stack stack, tToken token, Symtable *table){
   if(DEBUG){printf("%d on  STACK\n", (stack->t[stack->top]).type);}
   if(DEBUG){printf("%d is TOKEN\n", (token.type));}
@@ -294,6 +308,8 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
     stack_push(stack, ex_term, err_code);
     ex_term.type = n_body;
     stack_push(stack, ex_term, err_code);
+    ex_term.type = t_eol;
+    stack_push(stack, ex_term, err_code);
     ex_term.type = t_curll;
     stack_push(stack, ex_term, err_code);
     ex_term.type = n_retvals;
@@ -437,7 +453,7 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
       ex_term.type = t_eol;
       stack_push(stack, ex_term, err_code);
     }
-    else if(token.type = t_curlr){
+    else if(token.type == t_curlr){
       stack_pop(stack, err_code);// Destroy
 
     //  ex_term.type = t_curlr;
@@ -445,6 +461,7 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
     }
     else{
       fprintf(stderr, "UNEXPECTED IN function retvals\n");
+      all_fresh();
       exit(2);
     }
   }
@@ -538,6 +555,7 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
     }
     else{
       fprintf(stderr, "UNEXPECTED token in BODY\n");
+      all_fresh();
       exit(2);
     }
 
@@ -662,6 +680,7 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
     }
     else{
       fprintf(stderr, "UNEXPECTED token in return values of function\n");
+      all_fresh();
       exit(2);
     }
   }
@@ -866,6 +885,7 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
 // This should NEVER happen, if so... we are all DOOMED :)
   else{
     fprintf(stderr, "UNEXPECTED NON_TERMINAL ON STACK \n");
+    all_fresh();
     exit(99);
   }
 }
@@ -879,20 +899,25 @@ void stack_expand(Symtable *table, synt_stack stack, tToken token ,int err_code)
 int semantic_check(Symtable *table, synt_stack stack, tList list, int err_code){
   if(DEBUG){printf("\n-----------SEMANTIC CHECK----------\n" );}
 
-  Symtable *local_table;
-  tToken token = (*list.first);
 
+  tToken token = (*list.first);
 
 
 
   while(token.type != 7){
 
     // 1) Call without definition
-    if((token.type == t_id)&&((*token.next).type == t_lbra)){
+    if(((token.type == t_keyword)||(token.type == t_id))&&((*token.next).type == t_lbra)){
       if(is_fce(token.value->str ,table)){
         if(is_defined(token.value->str ,table)==0){
           fprintf(stderr, "FUNCTION %s NOT DEFINED\n", token.value->str);
           return 3;
+        }
+        else{
+          if(check_ok_params(table, token.value->str, token)!=0){
+            fprintf(stderr, "FUNCTION %s BAD PARAMS\n", token.value->str);
+            return 3;
+          }
         }
       }
     }
@@ -905,7 +930,6 @@ int semantic_check(Symtable *table, synt_stack stack, tList list, int err_code){
       bool fce_end = 1;
       table_init(&local_table);
 
-
       char *func_name = func.value->str;
       func = *func.next;
 
@@ -914,24 +938,14 @@ int semantic_check(Symtable *table, synt_stack stack, tList list, int err_code){
       def.defined = true;
       table_insert(&local_table, def, "_");
 
+      parse_fc_params(&local_table, func);
+
       if(DEBUG){printf("BUILDED LOCAL FRAME for %s\n", func_name);}
       if(DEBUG){printf("------------------------------\n");}
 
-
-
-
-// TODO -- load parameters of function and correct return //
-
-// --------------------------------------------------------//
-
       while(fce_end){
 
-
-        if(((func.type == t_id)||(func.type == t_keyword))&&((*func.next).type == t_lbra)){
-        }
-
-
-
+        func_call_checker(&local_table, func);
         id_check(func, &local_table, table);
         func = scope_check(func, table, &local_table);
 
@@ -943,20 +957,31 @@ int semantic_check(Symtable *table, synt_stack stack, tList list, int err_code){
         else if(func.type == t_eof){
           fce_end = 0;
         }
-        func = *func.next;
+
+        if(fce_end == 0){
+          break;
+        }else{
+          func = *func.next;
+        }
       }
+      if(DEBUG){print_table(&local_table);}
+      //print_table(&local_table);
+      //exit(2);
       destroy_table(&local_table);
     }
 //-----------------------END LOCAL FRAME----------------------//
 
+// --------------- CHECKING VARIABLE VALUES AND DATA TYPES ----------- //
 
 
 
+
+
+
+  //print_token(token);
 
   token = *token.next;
 }
-
-
 
 
 return 0;
@@ -978,50 +1003,68 @@ void id_check(tToken func, Symtable *local_table, Symtable *table){
         Sym_table_item *temp;
         temp = search_in_table(local_table, func.value->str);
 
-      if(temp->data.redef_flag == 0){
-        set_redef_flag_by_id(local_table, func.value->str, 1);
-      }
-      else{
-        if(is_defined(func.value->str, local_table)){
-          fprintf(stderr, "Variable %s redefined\n", func.value->str);
-          error_handler(3);
+        if(temp->data.redef_flag == 0){
+          set_redef_flag_by_id(local_table, func.value->str, 1);
+
+          get_data_type(local_table, func); // add here insert
+
+
+          if(DEBUG){printf("Variable %s redefined in scope to value: ", func.value->str);}
+
         }
         else{
+          if(is_defined(func.value->str, local_table)){
+            fprintf(stderr, "Variable %s redefined\n", func.value->str);
+            all_fresh();
+            destroy_table(table);
+            error_handler(3);
+
+          }
+          else{
+
           table_data iD;
+          iD.d_type = get_data_type(local_table, func);
           iD.type = id;
           iD.defined = true;
           iD.redef_flag = 1;
           table_insert(local_table, iD, func.value->str);
 
+          }
         }
-      }
     }
     else{
       table_data iD;
+      iD.d_type = get_data_type(local_table, func);
       iD.type = id;
       iD.defined = true;
       iD.redef_flag = 1;
       table_insert(local_table, iD, func.value->str);
-
 
     }
 
       tToken call = *func.next;
       call = *call.next;
 
-      if(is_fce(call.value->str, table)){
-        //fprintf(stderr, "Cant initialize variable with function ASSIGN\n" );
-        //error_handler(3);
-      }
-    }
-    else if((*func.next).type == t_assign){
-      if(is_in_table(local_table, func.value->str)==0){
+
+    }else if((*func.next).type == t_assign){
+
+      if(multival){
+        check_multi_def(local_table, (*func.next));
+
+
+      }else if(is_in_table(local_table, func.value->str)==0){
         fprintf(stderr, "Varianle \"%s\" used before definition\n", func.value->str);
         error_handler(3);
       }
+      else if(is_fce((*(*func.next).next).value->str, &g_table)){
+
+        check_retvals(local_table, func);
+      }
+
+
+  }else if((*func.next).type == t_comma){
+      multi_checker(local_table, func);
     }
-  }
-  else{
   }
 }
 
@@ -1029,7 +1072,6 @@ void id_check(tToken func, Symtable *local_table, Symtable *table){
 tToken scope_check(tToken scope, Symtable *global_table, Symtable *func_table){
   if(scope.type == t_keyword){
     if(((strcmp(scope.value->str, "for")==0)||(strcmp(scope.value->str, "if")==0)||(strcmp(scope.value->str, "else")==0))){
-
 
         Symtable scope_table;
         table_init(&scope_table);
@@ -1045,9 +1087,8 @@ tToken scope_check(tToken scope, Symtable *global_table, Symtable *func_table){
 
         while(scope.type != t_curlr){
 
-
           id_check(scope, &scope_table, global_table);
-          //print_table(&scope_table);
+          func_call_checker(&scope_table, scope);
 
           scope = *scope.next;
           scope = scope_check(scope, global_table, &scope_table);
@@ -1083,13 +1124,32 @@ void senor_clean_fist(Symtable *table, synt_stack stack, tList token_list){
 
   while(temp->type != 7){
     point = temp->next;
-    dynamic_string *string = temp->value;
-  //  free(string);
-  //free(point);
+    free_string(&temp->value);
     free(temp);
     temp = point;
   }
+  free_string(&point->value);
+  free(point);
+
   destroy_table(table);
+  stack_remove(&stack);
+}
+
+void all_fresh(){
+
+  tToken *temp = dispose.first;
+  tToken *point;
+
+  while(temp->type != 7){
+    point = temp->next;
+    free_string(&temp->value);
+    free(temp);
+    temp = point;
+  }
+  free_string(&point->value);
+  free(point);
+
+  destroy_table(&g_table);
   stack_remove(&stack);
 }
 
@@ -1157,4 +1217,389 @@ bool is_predefined(char *id, Symtable *table){
   }
   return false;
 
+}
+
+bool check_ok_params(Symtable  *table, char* func, tToken token){
+  tToken def_check = token;
+    bool prototype = 0;
+
+  while(def_check.type != t_eol){
+
+      if(def_check.type == t_curll){
+        prototype = 1;
+      }
+      def_check = *def_check.next;
+  }
+
+  if(!prototype){
+    Sym_table_item *temp;
+    int param_count = 0;
+    int expected = 0;
+
+
+    if(!strcmp(token.value->str, "print")){
+
+      return 0;
+    }
+
+    temp = search_in_table(table, token.value->str);
+    char *params = temp->data.params;
+
+
+
+// params count //
+    char p = params[0];
+
+    expected = atoi(&p);
+    //printf("%d\n", expected);
+
+// skip function name and assign mark //
+    token = *token.next;
+    token = *token.next;
+
+    tToken last;
+    while(token.type != t_rbra){
+
+      if(last.type == token.type){
+        if(token.type == t_comma){
+          fprintf(stderr, "UNEXPECTED COMMA\n");
+          return 1;
+        }
+      }
+
+      if(token.type != t_comma){
+
+        param_count++;
+        last = token;
+      }else if((*token.next).type == t_rbra){
+          fprintf(stderr, "UNEXPECTED COMMA\n");
+          return 1;
+
+        }else{
+          last = token;
+        }
+        token = *token.next;
+      }
+
+      if(expected == param_count){
+        return 0;
+      }else{
+        return 1;
+      }
+    }
+    else{
+      return 0;
+    }
+}
+
+
+data_type get_data_type(Symtable *table, tToken token){
+
+
+  token = *token.next;
+
+  if(token.type != t_def){
+    fprintf(stderr, "Expeting definition, but Im just program not a cop\n");
+    all_fresh();
+    exit(3);
+  }
+
+  token_type arg_type = t_error; // store type of expression
+  data_type arg_value = type_NDEF;
+
+  while(token.type != t_eol){
+
+    if(arg_type == t_error){
+      if(token.type == t_string){
+        arg_type = t_string;
+        arg_value = type_string;
+      }else if(token.type == t_number){
+        arg_type = t_number;
+        arg_value = type_int;
+      }else if(token.type == t_float){
+        arg_type = t_float;
+        arg_value = type_float64;
+      }
+    }
+
+    if(token.type == t_id){
+      Sym_table_item *temp;
+
+      temp = search_in_table(table, token.value->str);
+      if(temp!=NULL){
+        if(arg_type != t_error){
+          if(temp->data.d_type != arg_value){
+            fprintf(stderr, "Variable data type mismatch\n");
+            all_fresh();
+            exit(3);
+          }
+        }
+      }
+      else{
+        fprintf(stderr, "Undefined variable in expresion\n");
+        all_fresh();
+        exit(3);
+      }
+
+
+    }
+
+    if((token.type == t_number)||(token.type == t_float)||(token.type == t_string)){
+      if(token.type != arg_type){
+        printf("EXPR ANDVANCED ERR\n");
+        all_fresh();
+        exit(3);
+      }
+
+    }
+
+    if(token.type == t_eof){
+      fprintf(stderr, "Unexpected EOF\n");
+    }
+    else{
+      token = *token.next;
+    }
+
+    if(token.type == t_semico){
+      break; // if we are in for or if definition
+    }
+  }
+
+
+  if(DEBUG){printf("-------------\n");}
+  if(DEBUG){printf("EXITING TYPE CHECKER with %d\n", arg_type);}
+
+  if(arg_type == t_number){
+    return 1;
+  }else if(arg_type == t_float){
+    return 2;
+  }else if(arg_type == t_string){
+    return 3;
+  }
+  else{
+    //printf("%d\n", arg_type);
+    //printf("WE ARE ALL DOMED\n");
+  }
+
+  return type_NDEF;
+}
+
+
+
+void parse_fc_params(Symtable *table, tToken token){
+
+
+  while(token.type!=t_rbra){
+
+    if(token.type == t_id){
+      table_data def;
+      def.type = id;
+      def.defined = true;
+      def.redef_flag = 0;
+
+      if(strcmp((*token.next).value->str, "int")){
+        def.d_type = type_int;
+      }else if(strcmp((*token.next).value->str, "float64")){
+        def.d_type = type_float64;
+      }else if(strcmp((*token.next).value->str, "string")){
+        def.d_type = type_string;
+      }
+      table_insert(table, def, token.value->str);
+    }
+
+    token = *token.next;
+  }
+}
+
+
+
+void multi_checker (Symtable *table, tToken token){
+  char *id = token.value->str;
+  token = *token.next;
+
+  while(token.type != t_eol){
+    if(token.type == t_eof){
+      break;
+    }
+    if(token.type == t_assign){
+      if(!is_defined(id, table)){
+        fprintf(stderr, "Variable %s not defined\n",id);
+        exit(3);
+      }
+      multival++;
+    }
+    token = *token.next;
+  }
+}
+
+void check_multi_def(Symtable *table, tToken token){
+    int val_cnt = 0;
+    if(DEBUG){printf("-----ENTERED MULTIVAL ASSIGN CHECK -----\n");}
+
+    token = *token.next;
+
+    if((token.type == t_id)||(token.type == t_keyword)){
+      if(is_fce(token.value->str, &g_table)){
+        if(DEBUG){printf("Check for correct funtion retvals\n");}
+
+        multival = 0;
+        return;
+      }
+    }
+
+
+    while(token.type != t_eol){
+      if(token.type == t_id){
+        if(!is_defined(token.value->str, table)){
+          fprintf(stderr, "Value %s in multiassign not defined\n",token.value->str);
+          exit(3);
+        }
+        val_cnt++;
+      }else if(token.type == t_number){
+        val_cnt++;
+      }else if(token.type == t_string){
+        val_cnt++;
+      }else if(token.type == t_float){
+        val_cnt++;
+      }
+
+
+      if(token.type == t_eof){
+        fprintf(stderr, "UNEXPECTED EOF\n");
+        exit(2);
+      }
+      token = *token.next;
+    }
+
+    if(val_cnt != (multival+1)){
+      fprintf(stderr, "BAD multival assign\n");
+      exit(3);
+    }
+
+    multival = 0;
+}
+
+
+void check_retvals(Symtable *table, tToken token){
+
+  data_type var_type;
+  char* retvals;
+  Sym_table_item *temp;
+  Sym_table_item *f_ret;
+
+
+
+  temp = search_in_table(table, token.value->str);
+  var_type = temp->data.d_type;
+
+  f_ret = search_in_table(&g_table, (*(*token.next).next).value->str);
+  retvals = f_ret->data.retvals;
+
+
+
+
+  if(var_type == type_int){
+
+    if(strcmp(retvals, "int ")!=0){
+      printf("%s|%d\n",retvals,strcmp(retvals, "int "));
+      fprintf(stderr, "Value of type INT not matched with function return type\n");
+      exit(3);
+    }
+  }else if(var_type == type_string){
+    if(strcmp(retvals, "string ")!=0){
+      //printf("%s|%d\n",retvals,strcmp(retvals, "int "));
+      fprintf(stderr, "Value of type STR not matched with function return type\n");
+      exit(3);
+    }
+  }else if(var_type == type_float64){
+    if(strcmp(retvals, "float64 ")!=0){
+      //printf("%s|%d\n",retvals,strcmp(retvals, "int "));
+      fprintf(stderr, "Value of type FLOAT not matched with function return type\n");
+      exit(3);
+    }
+  }
+}
+
+
+
+
+
+
+void func_call_checker(Symtable *table, tToken token){
+
+
+  if(((token.type == t_id)||(token.type == t_keyword))&&((*token.next)).type == t_lbra){
+
+    char* name = token.value->str;
+
+    if(!strcmp(name, "print")){return;}
+
+    Sym_table_item *func_info;
+    func_info = search_in_table(&g_table, token.value->str);
+    char *f_params = func_info->data.params;
+
+    char *params= "";
+    int count = 0;
+
+    token = *token.next;
+    while(token.type != t_eol){
+      if(token.type == t_number){
+        if(-1 == asprintf(&params,"int %s", params)){
+          fprintf(stderr, "internal\n");
+        }
+        count++;
+      }else if(token.type == t_string){
+        if(-1 == asprintf(&params,"string %s", params)){
+          fprintf(stderr, "internal\n");
+        }
+        count++;
+      }else if(token.type == t_float){
+        if(-1 == asprintf(&params,"float64 %s", params)){
+          fprintf(stderr, "internal\n");
+        }
+        count++;
+      }else if(token.type == t_id){
+        if(!is_defined(token.value->str, table)){
+          fprintf(stderr, "ID %s in function call undefined\n", token.value->str);
+        }else{
+          Sym_table_item *temp;
+          temp = search_in_table(table, token.value->str);
+          data_type var_type = temp->data.d_type;
+          if(var_type == type_int){
+            if(-1 == asprintf(&params,"int %s", params)){
+              fprintf(stderr, "internal\n");
+            }
+          }else if(var_type == type_string){
+            if(-1 == asprintf(&params,"string %s", params)){
+              fprintf(stderr, "internal\n");
+            }
+          }else if(var_type  == type_float64){
+            if(-1 == asprintf(&params,"float64 %s", params)){
+              fprintf(stderr, "internal\n");
+            }
+          }
+          count++;
+        }
+      }
+
+      if(token.type == t_eof){
+        fprintf(stderr, "Unexpected EOF\n");
+        exit(2);
+      }
+      token = *token.next;
+    }
+    if(-1 == asprintf(&params,"%d %s",count, params)){
+      fprintf(stderr, "internal\n");
+    }
+    if(DEBUG){printf("%s expected PARAMS\n", f_params);}
+    if(DEBUG){printf("%s REAL PARAMS\n\n", params);}
+
+    if(strcmp(params, f_params)){
+      fprintf(stderr, "bad parameters for function %s\n", name);
+      fprintf(stderr, "%s expected PARAMS\n", f_params);
+      fprintf(stderr, "%s got PARAMS\n\n", params);
+      exit(6);
+    }
+
+  }
 }

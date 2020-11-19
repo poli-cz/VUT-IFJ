@@ -1,4 +1,3 @@
- * 
 // Program 2: Vypocet faktorialu (rekurzivne)
 package main
 
@@ -7,8 +6,11 @@ func factorial(n int) (int) {
   if n < 2 {
     return 1
   } else {
+    a := 2
     tmp := 0
-    tmp = factorial(dec_n)
+    tmp = factorial(a)
+
+
 
 
     return n * tmp
@@ -31,4 +33,15 @@ func main() {
   } else {
     print("Chyba pri nacitani celeho cisla!\n")
   }
+}
+
+
+
+func tricker(n int)(string){
+
+  n := "kobliha"
+
+
+
+  return n
 }
