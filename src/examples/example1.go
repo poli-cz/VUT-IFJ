@@ -1,4 +1,4 @@
-/// Program 1: Vypocet faktorialu (iterativne)
+// Program 1: Vypocet faktorialu (iterativne)
 package main
 
 func main() {
@@ -9,10 +9,6 @@ func main() {
     print("Faktorial nejde spocitat!\n")
   } else {
     vysl := 1
-    a := 0
-    b := 0
-    c := 0
-    a,a = 1,2
     for ; a > 0; a = a - 1 {
       vysl = vysl * a
     }

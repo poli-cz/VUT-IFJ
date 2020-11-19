@@ -6,13 +6,8 @@ func factorial(n int) (int) {
   if n < 2 {
     return 1
   } else {
-    a := 2
     tmp := 0
-    tmp = factorial(a)
-
-
-
-
+    tmp = factorial(dec_n)
     return n * tmp
   }
 }
@@ -31,17 +26,6 @@ func main() {
       print("Vysledek je ", vysl, "\n")
     }
   } else {
-    print("Chyba pri nacitani celeho cisla!\n")
+    print("Chyba pri nacitani celeho cisla!\n")	
   }
-}
-
-
-
-func tricker(n int)(string){
-
-  n := "kobliha"
-
-
-
-  return n
 }

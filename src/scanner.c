@@ -53,7 +53,7 @@ tToken get_token(){
 
   while(1){
      sym = getchar();
-     //printf("%d\n", state);
+    // printf("%d\n", state);
 
     switch (state){
     case s_start:
@@ -64,6 +64,12 @@ tToken get_token(){
         else if(isspace(sym)){
           state=s_start;
         }
+
+         else if (sym=='0'){
+          add_char(sym,&token.value);
+          state=s_zero;
+        }
+
         else if(isdigit(sym)){
           add_char(sym,&token.value);
           state=s_number;
@@ -139,7 +145,6 @@ tToken get_token(){
         else if (sym== '\\'){
           state=s_lslash;
         }
-
         else {
         add_char(sym,&token.value);
         state=s_error;
@@ -208,12 +213,17 @@ tToken get_token(){
 
      else if(sym == '\n'){
       add_char(sym,&token.value);
-      token.value = NULL;
       token.type=t_eol;
       return token;
      }
-     else
+     else if(sym > 31){
       add_char(sym, &token.value);
+     }
+    else{
+      ungetc(sym,stdin);
+      state=s_error;
+    }
+
     break;
 
     //checking !
@@ -243,9 +253,10 @@ tToken get_token(){
           return token;
     break;
 
+
     case s_div:
       if(sym == '/'){
-        ungetc(sym,stdin);
+        //ungetc(sym,stdin);
         state = s_linecom;
       }
       else if(sym== '*')
@@ -320,26 +331,40 @@ tToken get_token(){
 
     //integer
     case s_number:
-      if(isdigit(sym)){
+      if (sym == 'e' || sym == 'E'){
+        add_char(sym,&token.value);
+        state = s_exp;
+       }
+      else if(isdigit(sym)){
        add_char(sym,&token.value);
        state=s_number;
-       break;
       }
       else if (sym == '.'){
          add_char(sym,&token.value);
          state = s_floatpoint;
       }
-      else if (sym == 'e' || sym == 'E'){
-        add_char(sym,&token.value);
-        state = s_exp;
-       }
       else{
         ungetc(sym,stdin);
         token.type=t_number;
+        state=s_start;
         return token;
       }
      // return token; // musel jsem to sem pridat, nacitani cisel bylo nejak broken
       break;        // chyběl tu return, ale jinak to podle mě funguje dobře...
+
+    case s_zero:
+    if (sym == '.'){
+         add_char(sym,&token.value);
+         state = s_floatpoint;
+      }
+    else
+    {
+      ungetc(sym,stdin);
+      token.type=t_number;
+      return token;
+    }
+
+    break;
 
     //cislo desatina cast
     case s_floatpoint:
@@ -372,6 +397,7 @@ tToken get_token(){
         token.type=t_error;
         return token;
       }
+
     break;
 
 
@@ -379,16 +405,41 @@ tToken get_token(){
     case s_exp:
     if(sym == '+' || sym == '-'){
       add_char(sym,&token.value);
+      state=s_exp2;
     }
     else if(isdigit(sym)){
+      state=s_exp3;
        add_char(sym,&token.value);
     }
-    else if(isspace(sym)){
+    else{
       ungetc(sym,stdin);
+      ungetc('e',stdin);
       token.type=t_number;
       return token;
+      state=s_start;
     }
     break;
+
+  case s_exp2:
+		if(isdigit(sym)){
+      add_char(sym,&token.value);
+      state = s_exp3;
+    }
+    else {
+      ungetc(sym,stdin);
+      state = s_error;
+    }
+  break;
+
+  case s_exp3:
+    if(isdigit(sym))
+      state = s_exp3;
+		else
+    token.type=t_float;
+    ungetc(sym,stdin);
+    state=s_start;
+    return token;
+	break;
 
 
     case s_lslash:
@@ -410,8 +461,8 @@ tToken get_token(){
         add_char('1',&token.value);
         add_char('1',&token.value);
         state=s_string;
-      } 
-      else if(sym=='x'){     
+      }
+      else if(sym=='x'){
        int hex=is_hexa();
        if(hex==-1){
          state=s_error;
@@ -420,7 +471,7 @@ tToken get_token(){
         {
           add_char(hex,&token.value);
           state=s_string;
-        } 
+        }
         else
         {
           add_char('\\',&token.value);
@@ -430,7 +481,7 @@ tToken get_token(){
           add_char(str[i],&token.value);
           state=s_string;
         }
-        
+
       }
      else
      {
@@ -438,31 +489,30 @@ tToken get_token(){
         state=s_error;
        return token;
      }
-        
+
     }
     break;
 
     case s_mul:
-    {
-    //  add_char(sym,&token.value);
-      ungetc(sym,stdin);
-      token.type=t_mul;
-      return token;
-    }
-    break;
+      {
+        ungetc(sym,stdin);
+        token.type=t_mul;
+        state=s_start;
+        return token;
+      }
+      break;
 
     case s_colon:
       if(sym == '=')
       {
         add_char(sym,&token.value);
         state=s_def;
+
       }
       else
       {
-        add_char(sym,&token.value);
         ungetc(sym,stdin);
-        token.type=t_colon;
-        return token;
+        state=s_error;
       }
     break;
 
@@ -516,12 +566,11 @@ tToken get_token(){
         token.type= t_error;
         return token;
         break;
-
-
     case s_eof:
       token.type=t_eof;
       return token;
       break;
+
     }
   }
 }
