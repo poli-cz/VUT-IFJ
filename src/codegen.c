@@ -1,4 +1,15 @@
-#include "codegen.h"
+/**
+ * @file codegen.c
+ *
+ * Hlavní funkce pro generování kódu
+ *
+ * IFJ Projekt 2020, Tým 2
+ *
+ * @author <xpolis04> Jan Polišenský
+ */
+
+
+ #include "codegen.h"
 
 
 int generate_code(tList list, Symtable *table){
@@ -29,30 +40,18 @@ int generate_code(tList list, Symtable *table){
 
       else if(token.type == t_id){
 
-        if((*token.next).type == t_def){
-          printf("DEFVAR LF@%s\n",token.value->str);
-          generate_params(token, table); // solve expr or function call
+          id_solver(token, table, 0);
 
-
-        }else if((*token.next).type == t_assign){
-          generate_params(token, table); // solve expr or function call
-
-
-        }else if((*token.next).type == t_comma){
-          // solve mutli a
-// ----------------------------- //
-
-}
-    }
-    else if(token.type == t_keyword){
-      if(strcmp(token.value->str, "func")==0){
-        printf("JUMP END%s$\n", (*token.next).value->str);
-        printf("LABEL %s$\n", (*token.next).value->str);
-        printf("CREATEFRAME\n");
-        printf("PUSHFRAME\n");
-        printf("DEFVAR LF@$return\n");
-        function_start(table, token);
-        current_fce = (*token.next).value->str;
+      }
+      else if(token.type == t_keyword){
+        if(strcmp(token.value->str, "func")==0){
+          printf("JUMP END%s$\n", (*token.next).value->str);
+          printf("LABEL %s$\n", (*token.next).value->str);
+          printf("CREATEFRAME\n");
+          printf("PUSHFRAME\n");
+          printf("DEFVAR LF@_\n");
+          function_start(table, token);
+          current_fce = (*token.next).value->str;
       }
 
     // -------------CREATING FRAMES FOR SCOPES OR FUNCTIONS---------------- //
@@ -71,15 +70,13 @@ int generate_code(tList list, Symtable *table){
 
       }
       else if(strcmp(token.value->str, "return")==0){
-        // Udělat pomocí push and pop atd //
+          if( (*(*token.next).next).type == t_comma ){
+            multi_solver(*token.next, table, 0);
+          }else{
+            expr_generator(*token.next);
+            printf("MOVE GF@$$retval0 TF@$$retval\n");
 
-
-          expr_generator(*token.next);
-          printf("MOVE LF@$return TF@$$retval\n");
-
-
-
-
+          }
       }
 
       // -------------FUNCTION CALL---------------- //
@@ -101,6 +98,25 @@ int generate_code(tList list, Symtable *table){
 
 //printf("BREAK\n"); // JUST FOR DEBUG
 return 0;
+}
+
+
+void id_solver(tToken token, Symtable *table, int rekurze_cnt){
+  //print_token(token);
+
+  if((*token.next).type == t_def){
+    printf("DEFVAR LF@%s\n",token.value->str);
+    generate_params(token, table, 0); // solve expr or function call
+
+
+  }else if((*token.next).type == t_assign){
+    generate_params(token, table, rekurze_cnt); // solve expr or function call
+
+
+  }else if((*token.next).type == t_comma){
+    id_solver((*(*token.next).next), table, rekurze_cnt+1);
+    printf("MOVE LF@%s GF@$$retval%d\n", token.value->str, rekurze_cnt);
+  }
 }
 
 
@@ -133,18 +149,30 @@ void function_start(Symtable *table, tToken token){
 
 // GENERATE VALUES FOR ASSIGN
 
-void generate_params(tToken token, Symtable *table){
+void generate_params(tToken token, Symtable *table, int rekurze_cnt){
   char *name = token.value->str;
+
 
   token = *token.next; // Skip name
   token = *token.next; // skip assign or equal
+
+  if((*token.next).type == t_comma){
+
+    multi_solver(token, table, 0);
+    printf("MOVE LF@%s GF@$$retval%d\n", name, rekurze_cnt);
+    return;
+  }
 
 
   if(is_fce(token.value->str, table)){
     printf("CREATEFRAME\n");
     call_params(token);
     printf("CALL %s$\n", token.value->str);
-    printf("MOVE LF@%s TF@$return\n", name);
+
+    if(strcmp(name, "_")!=0){
+      printf("MOVE LF@%s GF@$$retval%d\n", name, rekurze_cnt);
+    }
+
     return;
   }else{
 
@@ -152,27 +180,24 @@ void generate_params(tToken token, Symtable *table){
     printf("MOVE LF@%s TF@$$retval\n", name);
   }
 
-
-
 }
+
+
+
+
 
 
 //--------------------------------------------//
 
 void expr_generator(tToken token){
   printf("CREATEFRAME\n");
-
-
   printf("DEFVAR TF@$$retval\n");
   printf("\n");
   psa(token, 1);
   printf("\n");
   printf("POPS TF@$$retval\n");
 
-
 }
-
-
 //--------------------------------------------//
 void call_params(tToken token){
 
@@ -189,6 +214,17 @@ void call_params(tToken token){
     }
     token = *token.next;
   }
+}
+
+//--------------------------------------------//
+
+void multi_solver(tToken token, Symtable *table, int rekurze_cnt){
+
+  if((*token.next).type == t_comma){
+    multi_solver(*(*token.next).next, table, rekurze_cnt+1);
+  }
+  expr_generator(token);
+  printf("MOVE GF@$$retval%d TF@$$retval\n\n", rekurze_cnt);
 }
 
 //--------------------------------------------//

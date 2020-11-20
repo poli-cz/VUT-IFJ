@@ -4,7 +4,12 @@
 void main_code(){
   // base code generation
   printf(".IFJcode20\n\
-  DEFVAR GF@expr_resul\n\
+  DEFVAR GF@$$retval0\n\
+  DEFVAR GF@$$retval1\n\
+  DEFVAR GF@$$retval2\n\
+  DEFVAR GF@$$retval3\n\
+  DEFVAR GF@$$retval4\n\
+  DEFVAR GF@$$retval5\n\
   CREATEFRAME\n\
   PUSHFRAME\n\
   JUMP main$\n\
@@ -13,15 +18,25 @@ LABEL inputs$\n\
   PUSHFRAME\n\
   DEFVAR LF@$return\n\
   READ LF@$return string\n\
+  MOVE GF@$$retval0 LF@$return\n\
   POPFRAME\n\
 	RETURN\n\
   \n\
+LABEL inputi$\n\
+  PUSHFRAME\n\
+  DEFVAR LF@$return\n\
+  READ LF@$return int\n\
+  MOVE GF@$$retval0 LF@$return\n\
+  POPFRAME\n\
+  RETURN\n\
+    \n\
 LABEL inputf$\n\
   PUSHFRAME\n\
   DEFVAR LF@$return\n\
   READ LF@$return float\n\
+  MOVE GF@$$retval0 LF@$return\n\
   POPFRAME\n\
-	RETURN\n");
+	RETURN\n\n");
 
 
 
