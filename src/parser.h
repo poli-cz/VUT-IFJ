@@ -1,5 +1,5 @@
 /**
- * @file symtable.c
+ * @file parser.c
  *
  * Hlavičkový soubor pro parser
  *
