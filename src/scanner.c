@@ -17,7 +17,7 @@
 FILE *source_file;
 
 const char* KEYWORDS[] = {"if","else","for","float64","func","int","return","string","inputs","inputi","inputf","print","int2float","float2int","len","substr","ord",
-"package"
+"package" , "chr"
 };
 
 int is_key_word(dynamic_string *string){
