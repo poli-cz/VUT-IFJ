@@ -128,7 +128,7 @@ echo -e "=======\e[33mTESTING CODE GENERATING \e[0m========\n"
  ok0=`expr $ok0 + 1`
  fi
 
- rm -r tmp.out
+ #rm -r tmp.out
  rm -r diff.out
  rm -r tmp.code
  cd ..
