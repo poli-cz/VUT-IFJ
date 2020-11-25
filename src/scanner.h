@@ -103,7 +103,6 @@ typedef enum{
   s_comma,
   s_semico,
   s_eq,
-  s_assign,
   s_grt,
   s_lst,
   s_lbra,
@@ -142,5 +141,3 @@ int     is_key_word     (dynamic_string* string);
 int     parser          ();
 void    print_token     (tToken token);
 int     is_hexa         ();
-
-

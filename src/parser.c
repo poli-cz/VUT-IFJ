@@ -193,7 +193,7 @@ void stack_init(synt_stack *stack, int err_code){
   *stack = malloc(sizeof(struct SyntaxStack));
 
   if(!(*stack)){
-    err_code = 1;
+    error_handler(99);
     return;
   }
   (*stack)->top = 1;
@@ -202,7 +202,7 @@ void stack_init(synt_stack *stack, int err_code){
 
   (*stack)->t = malloc(STACK_DEFAULT * sizeof(T_term));
   if(!(*stack)->t){
-    err_code = 1;
+    error_handler(99);
     return;
   }
 
@@ -996,6 +996,7 @@ return 0;
 // TOTAL MESS, dont touch it until it works
 void id_check(tToken func, Symtable *local_table, Symtable *table){
 
+
   if((func.type == t_id)&&(!is_fce(func.value->str ,table))){
     if((*func.next).type == t_def){
 
@@ -1039,6 +1040,28 @@ void id_check(tToken func, Symtable *local_table, Symtable *table){
       iD.defined = true;
       iD.redef_flag = 1;
       table_insert(local_table, iD, func.value->str);
+
+      tToken temp = func;
+      bool for_flag = false;
+
+      while(temp.type != t_eol){
+        if(temp.type == t_semico){
+          for_flag = true;
+        }
+        if(temp.type == t_eof){
+          fprintf(stderr, "Unexpected EOF\n");
+          exit(2);
+        }
+        temp = *temp.next;
+      }
+
+      if(for_flag){
+        set_redef_flag_by_id(local_table, func.value->str, 0);
+      }
+
+
+
+
 
     }
 
@@ -1396,12 +1419,14 @@ void parse_fc_params(Symtable *table, tToken token){
       def.type = id;
       def.defined = true;
       def.redef_flag = 0;
+      //print_token(token);
 
-      if(strcmp((*token.next).value->str, "int")){
+      if(!strcmp((*token.next).value->str, "int")){
         def.d_type = type_int;
-      }else if(strcmp((*token.next).value->str, "float64")){
+      }else if(!strcmp((*token.next).value->str, "float64")){
+
         def.d_type = type_float64;
-      }else if(strcmp((*token.next).value->str, "string")){
+      }else if(!strcmp((*token.next).value->str, "string")){
         def.d_type = type_string;
       }
       table_insert(table, def, token.value->str);
@@ -1417,7 +1442,9 @@ void multi_checker (Symtable *table, tToken token){
   char *id = token.value->str;
   token = *token.next;
 
+
   while(token.type != t_eol){
+  //  print_token(token);
     if(token.type == t_eof){
       break;
     }
@@ -1454,12 +1481,9 @@ void check_multi_def(Symtable *table, tToken token){
           fprintf(stderr, "Value %s in multiassign not defined\n",token.value->str);
           exit(3);
         }
-        val_cnt++;
-      }else if(token.type == t_number){
-        val_cnt++;
-      }else if(token.type == t_string){
-        val_cnt++;
-      }else if(token.type == t_float){
+
+      }
+      if(token.type == t_comma){
         val_cnt++;
       }
 
@@ -1471,7 +1495,7 @@ void check_multi_def(Symtable *table, tToken token){
       token = *token.next;
     }
 
-    if(val_cnt != (multival+1)){
+    if(val_cnt != multival){
       fprintf(stderr, "BAD multival assign\n");
       exit(3);
     }
@@ -1527,7 +1551,7 @@ void check_retvals(Symtable *table, tToken token){
 
 void func_call_checker(Symtable *table, tToken token){
 
-
+  if(token.type == t_id){
   if(((token.type == t_id)||(token.type == t_keyword))&&((*token.next)).type == t_lbra){
 
     char* name = token.value->str;
@@ -1546,16 +1570,19 @@ void func_call_checker(Symtable *table, tToken token){
       if(token.type == t_number){
         if(-1 == asprintf(&params,"int %s", params)){
           fprintf(stderr, "internal\n");
+          exit(99);
         }
         count++;
       }else if(token.type == t_string){
         if(-1 == asprintf(&params,"string %s", params)){
           fprintf(stderr, "internal\n");
+          exit(99);
         }
         count++;
       }else if(token.type == t_float){
         if(-1 == asprintf(&params,"float64 %s", params)){
           fprintf(stderr, "internal\n");
+          exit(99);
         }
         count++;
       }else if(token.type == t_id){
@@ -1565,6 +1592,9 @@ void func_call_checker(Symtable *table, tToken token){
           Sym_table_item *temp;
           temp = search_in_table(table, token.value->str);
           data_type var_type = temp->data.d_type;
+
+
+        //  printf("%d var_type\n", var_type);
           if(var_type == type_int){
             if(-1 == asprintf(&params,"int %s", params)){
               fprintf(stderr, "internal\n");
@@ -1601,5 +1631,7 @@ void func_call_checker(Symtable *table, tToken token){
       exit(6);
     }
 
+
   }
+}
 }

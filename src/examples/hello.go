@@ -5,5 +5,6 @@ package main
 
 func main() {
 
-  print("Hello_from_IFJ20", "\n")
+  a:=30.3
+  print(a, "\n")
 }

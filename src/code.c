@@ -1,13 +1,3 @@
-/**
- * @file code.c
- * 
- * Hlavní funkce pro generování kódu
- *
- * IFJ Projekt 2020, Tým 2
- *
- * @author <xstefe11> Nina Stefekova
- */
-
 #include "codegen.h"
 
 
@@ -22,43 +12,44 @@ void main_code(){
   DEFVAR GF@$$retval5\n\
   CREATEFRAME\n\
   PUSHFRAME\n\
-  JUMP main$\n\
-  \n");
+  JUMP main$\n");
 
 
-//inputs
-printf("LABEL inputs\n");
+  //inputs
+printf("LABEL inputs$\n");
 printf("  CREATEFRAME\n");
 printf("  PUSHFRAME\n");
 printf("  DEFVAR LF@$return\n");
 printf("  DEFVAR LF@check\n");
 printf("  READ LF@$return string\n");
-printf("  TYPE LF@check LF@$return");
+printf("  TYPE LF@check LF@$return\n");
 printf("  JUMPIFNEQ  inputs_error LF@check string@string\n");
 printf("  MOVE GF@$$retval0 LF@$return\n");
 printf("  MOVE GF@$$retval1 int@0\n");
 printf("  JUMP inputs_end\n");
 printf("  LABEL inputs_error\n");
+printf("  MOVE GF@$$retval0 LF@$return\n");
 printf("  MOVE GF@$$retval1 int@1\n");
-printf("  LABEL inputs_end");
+printf("  LABEL inputs_end\n");
 printf("  POPFRAME\n");
 printf("  RETURN\n");
 printf("\n");
 
 
 //inputi
-printf("  LABEL inputi\n");
+printf("  LABEL inputi$\n");
 printf("  CREATEFRAME\n");
 printf("  PUSHFRAME\n");
 printf("  DEFVAR LF@$return\n");
 printf("  DEFVAR LF@checki\n");
 printf("  READ LF@$return int\n");
-printf("  TYPE LF@checki LF@$$return\n");
-printf("  JUMPIFNEQ  inputi_error LF@checki string@int\n");
+printf("  TYPE LF@checki LF@$return\n");
+printf("  JUMPIFNEQ inputi_error LF@checki string@int\n");
 printf("  MOVE GF@$$retval0 LF@$return\n");
 printf("  MOVE GF@$$retval1 int@0\n");
 printf("  JUMP inputi_end\n");
 printf("  LABEL inputi_error\n");
+printf("  MOVE GF@$$retval0 LF@$return\n");
 printf("  MOVE GF@$$retval1 int@1\n");
 printf("  LABEL inputi_end\n");
 printf("  POPFRAME\n");
@@ -66,18 +57,19 @@ printf("  RETURN\n");
 printf("\n");
 
 //inputf
-printf("  LABEL inputf\n");
+printf("  LABEL inputf$\n");
 printf("  CREATEFRAME\n");
 printf("  PUSHFRAME\n");
 printf("  DEFVAR LF@checkf\n");
 printf("  DEFVAR LF@$return\n");
 printf("  READ LF@$return float\n");
-printf("  TYPE LF@checkf LF@$return");
+printf("  TYPE LF@checkf LF@$return\n");
 printf("  JUMPIFNEQ  inputf_error LF@checkf string@float\n");
 printf("  MOVE GF@$$retval0 LF@$return\n");
 printf("  MOVE GF@$$retval1 int@0\n");
 printf("  JUMP inputf_end\n");
 printf("  LABEL inputf_error\n");
+printf("  MOVE GF@$$retval0 LF@$return\n");
 printf("  MOVE GF@$$retval1 int@1\n");
 printf("  LABEL inputf_end\n");
 printf("  POPFRAME\n");
@@ -85,7 +77,7 @@ printf("  RETURN\n\n");
 
 
 //print
-printf("LABEL print\n");
+printf("LABEL print$\n");
 printf("  CREATEFRAME\n");
 printf("  PUSHFRAME\n");
 printf("  DEFVAR LF@n\n");
@@ -104,7 +96,7 @@ printf("\n");
 
 
 //len
-printf("LABEL len\n");
+printf("LABEL len$\n");
 printf("  CREATEFRAME\n");
 printf("  PUSHFRAME\n");
 printf("  DEFVAR LF@s\n");
@@ -119,7 +111,7 @@ printf("\n");
 
 
 //substr
-printf("LABEL substr\n");
+printf("LABEL substr$\n");
 printf("  CREATEFRAME\n");
 printf("  PUSHFRAME\n");
 printf("  DEFVAR LF@s\n");
@@ -137,18 +129,18 @@ printf("  POPS LF@n\n");
 printf("  POPS LF@i\n");
 printf("  POPS LF@s\n");
 printf("  STRLEN LF@s_length LF@s\n");
-printf("  GT LF@s_condition LF@i LF@s_length\n"); 
+printf("  GT LF@s_condition LF@i LF@s_length\n");
 printf("  JUMPIFEQ SUB_LABEL_ERROR LF@s_condition bool@true\n");
-printf("  LT LF@n_condition LF@n int@0\n"); 
+printf("  LT LF@n_condition LF@n int@0\n");
 printf("  JUMPIFEQ SUB_LABEL_ERROR LF@n_condition bool@true\n");
 
-printf("  LT LF@s_condition LF@i int@0\n"); 
+printf("  LT LF@s_condition LF@i int@0\n");
 printf("  JUMPIFEQ SUB_LABEL_ERROR LF@s_condition bool@true\n");
 
 
 printf("  LABEL SUB_LABEL_LOOP\n");
 printf("  GETCHAR LF@char LF@s LF@i\n");
-printf("  MOVE LF@tmp_string LF@sub_string");
+printf("  MOVE LF@tmp_string LF@sub_string\n");
 printf("  CONCAT LF@sub_string LF@tmp_string LF@char\n");
 printf("  ADD LF@i LF@i int@1\n");
 printf("  SUB LF@n  LF@n int@1\n");
@@ -247,108 +239,59 @@ printf("\n");
 
 
 
-void *safeMalloc(size_t size){
-  void *ret = malloc(size);
-  if(ret == NULL){
-    fprintf(stderr, "Failed safeMalloc\n");
-    exit(99);
-  }
-  return ret;
+          // -- TODO -- //
+  //add  all inbuit function... //
 }
+char *stringToInterpret(char *rawString){
+  int rawLen = strlen(rawString);
 
-void *safeRealloc(void *block, size_t size){
-  void *ret = realloc(block,size);
-  if(ret == NULL){
-    fprintf(stderr, "Failed safeRealloc\n");
-    exit(99);
-  }
-  return ret;
-}
-
-
-
-
-
-char *string_to_ifj(char *string){
-  int len = strlen(string);
-  int maxLen = len + 1;
+  int max = rawLen + 1;
   int pos = 7;
-  char *out = safeMalloc(sizeof(char) * (maxLen + 20));
+  char *out = malloc(sizeof(char) * (max + 20));
   strcpy(out, "string@");
 
-  	for(int i = 1; i < len - 1; i++){
-  		if(maxLen <= pos + 4){
-  			maxLen += 100;
-  			out = safeRealloc(out, sizeof(char) * maxLen);
-  		}
+  for(int i = 0; i < rawLen; i++){
+    if(max <= pos + 4){
+      max += 100;
+      out = realloc(out, sizeof(char) * max);
+    }
 
-  		out[pos] = '\\';
-  		if(string[i] == '\\'){
-  			i++;
-  			if(string[i] == '"'){
-  				out[pos] = '"';
-  				pos -= 3;
-  			}else if(string[i] == 'n'){
-  				out[pos+1] = '0';
-  				out[pos+2] = '1';
-  				out[pos+3] = '0';
-  			}else if(string[i] == 't'){
-  				out[pos+1] = '0';
-  				out[pos+2] = '0';
-  				out[pos+3] = '9';
-  			}else if(string[i] == '\\'){
-  				out[pos+1] = '0';
-  				out[pos+2] = '9';
-  				out[pos+3] = '2';
-  			}else if(string[i] == 'x'){
-  				int l = isxdigit(string[i+2])?2:1;
-  				char hex[3] = {0};
-  				hex[0] = string[i+1];
-  				if(l > 1) hex[1] = string[i+2];
-  				i += l;
-  				sprintf(&out[pos+1], "%03ld", strtol(hex, NULL, 16));
-  			}else{
-  				out[pos+1] = '0';
-  				out[pos+2] = '3';
-  				out[pos+3] = '2';
-  			}
-  			pos += 3;
-  		}else if(string[i] == ' '){
-  			out[pos+1] = '0';
-  			out[pos+2] = '3';
-  			out[pos+3] = '2';
-  			pos += 3;
-  		}else if(string[i] <= '#'){
-  			out[pos+1] = '0';
-  			out[pos+2] = '3';
-  			out[pos+3] = '5';
-  			pos += 3;
-  		}else{
-  			out[pos] = string[i];
-  		}
+    out[pos] = '\\';
+    if(rawString[i] <= ' '){
+      out[pos+1] = '0';
+      out[pos+2] = '3';
+      out[pos+3] = '2';
+      pos += 3;
+    }else{
+      out[pos] = rawString[i];
+    }
 
-  		pos++;
-  	}
+    pos++;
+  }
 
-  	out[pos] = '\0';
-  	out = safeRealloc(out, sizeof(char) * (pos + 1));
-  	return out;
+  out[pos] = '\0';
+  out = realloc(out, sizeof(char) * (pos + 1));
+  return out;
+
 }
 
-
-
 char *int_to_ifj(char *rawInt){
-    char *out = safeMalloc(sizeof(char)*(50));
+    char *out = malloc(sizeof(char)*(50));
       if(rawInt[0] == '0' && strlen(rawInt) > 1 && rawInt[1] == 'b'){
         sprintf(out, "int@%lld", strtoll(&rawInt[2], NULL, 2));
       }
       else   sprintf(out, "int@%lld", strtoll(rawInt, NULL, 0));
-    return safeRealloc(out, strlen(out));
+    return realloc(out, strlen(out));
 }
+
+
 
 char *float_to_ifj(char *rawFloat){
-    char *out = safeMalloc(sizeof(char)*(50));
+    char *out = malloc(sizeof(char)*(50));
     sprintf(out, "float@%a", strtod(rawFloat, NULL));
-    return safeRealloc(out, strlen(out));
+    return realloc(out, strlen(out));
 }
 
+
+// atd, prost víc funkcí na převádění normalních data typů
+// na ty fakin IFJ20 datové typy

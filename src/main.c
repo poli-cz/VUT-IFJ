@@ -9,21 +9,22 @@
 
 
 
-int main(int argc, char** argv){
+int main(){
   int error = 0;
+  error = parser_debug();
+
+
 return error;
 }
 
 
 
-//int scanner_debug(int argc, char **argv)){
-  
-  
-//  return 0;
-//}
+int scanner_debug(){
+  return 0;
+}
 
 
-/*int parser_debug(){
+int parser_debug(){
 
 
 
@@ -38,4 +39,3 @@ return error;
 
   return parser();
 }
-*/
