@@ -9,6 +9,7 @@
  */
 #pragma once
 #include "parser.h"
+#include "codegen.h"
 #include <stdbool.h>
 #define STACK_DEFAULT 1000
 
@@ -41,13 +42,18 @@ typedef enum{
 //
 //}token_val;
 
-
+typedef enum{
+  type_for,
+  type_if,
+}bra_type;
 
 
 
 typedef struct psateminal{
   Prec_table_sym sym;
   data_type data_type;
+  int id;
+  bra_type type;
 
 }PSA_term;
 
@@ -70,3 +76,4 @@ int       psa                 (tToken token, bool expr_print);
 int       stack_shift_count   (psa_stack stack);
 void      reduce_by_rule      (psa_stack stack, int count, int generate);
 int       get_stack_top       (psa_stack);
+void      id_solver           (tToken token, Symtable *table, int rekurze_cnt, psa_stack stack);

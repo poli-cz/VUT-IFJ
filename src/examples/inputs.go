@@ -13,7 +13,7 @@ func main() {
     s := ""
     err := 0
     s, err = inputs()
-    print("STRING", i, "=", s, ".", " CHYBA=", err, "\n")  
+    print("STRING", i, "=", s, ".", " CHYBA=", err, "\n")
   }
-  
+
 }

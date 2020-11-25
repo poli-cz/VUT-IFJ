@@ -217,7 +217,7 @@ void print_table(Symtable *table){
          }else if((*table)[i]->data.d_type==3){
            type = "string";
          }
-         printf("%s with ID \"%s\" defined-> %d redef_flag-> %d value--> %s\n", t, (*table)[i]->identifier, (*table)[i]->data.defined, (*table)[i]->data.redef_flag, type);
+         printf("%s with ID \"%s\" defined-> %d redef_flag-> %d value--> %s level flag --> %d\n", t, (*table)[i]->identifier, (*table)[i]->data.defined, (*table)[i]->data.redef_flag, type, (*table)[i]->data.level_flag);
       }
 
     }
@@ -279,4 +279,31 @@ void set_redef_flag_by_id (Symtable *table,char *id, bool flag){
         }
     }
   }
+}
+
+void set_level_flag_by_id (Symtable *table,char *id, int level){
+  for(int i = 0; i<SYMTABLE_SIZE; i++){
+    if((*table)[i] != NULL){
+
+        if(strcmp(id, (*table)[i]->identifier)==0){
+
+          (*table)[i]->data.level_flag = level;
+        }
+    }
+  }
+}
+
+void set_level_flag(Symtable *table, int level_flag){
+  for(int i = 0; i<SYMTABLE_SIZE; i++){
+    if((*table)[i] != NULL){
+    //  printf("%d level, %d flag lvl\n",(*table)[i]->data.level_flag, level_flag);
+        if((*table)[i]->data.level_flag<=level_flag){
+
+        }else{
+          (*table)[i]->data.level_flag=0;
+        }
+
+        }
+    }
+
 }

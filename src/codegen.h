@@ -8,8 +8,9 @@
  * @author <xpolis04> Jan Polišenský
  */
 
-#include "parser.h"
+#pragma once
 #include <ctype.h>
+#include "PSA.h"
 
 
 
@@ -21,6 +22,13 @@ tToken    next_line               (tToken token);
 void      call_params             (tToken token);
 void      function_start          (Symtable *table, tToken token);
 char      *stringToInterpret      (char *rawString);
-void      id_solver               (tToken token, Symtable *table, int rekurze_cnt);
+char      *int_to_ifj             (char *rawInt);
+char      *float_to_ifj           (char *rawFloat);
 void      multi_solver            (tToken token, Symtable *table, int rekurze_cnt);
+void      rela_parser             (tToken token);
+bool      concat_check            (tToken token);
+void      type_print              (tToken token);
+char      *id_mannager            (tToken token);
+void      for_id_definer          (tToken token, Symtable *get_table, Symtable *table);
+
 //char      *string_to_ifj      (char *string);

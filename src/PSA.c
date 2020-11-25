@@ -1,6 +1,6 @@
  #include "PSA.h"
 
- 
+
 
 
  static char prec_table[12][12] =
@@ -53,7 +53,7 @@
       case t_id:
 
           if(generate){
-            printf("PUSHS LF@%s\n", token.value->str);
+            printf("PUSHS LF@%s\n", id_mannager(token));
           }
           return pid;
       break;
@@ -64,15 +64,19 @@
       break;
 
       case t_float:
+          if(generate){printf("PUSHS %s\n", float_to_ifj(token.value->str));}
           return pfloat;
       break;
 
       case t_string:
+        if(generate){printf("PUSHS %s\n", stringToInterpret(token.value->str));}
+
           return pstring;
       break;
 
       default:
        if((token.type == 14)||(token.type == 27)||(token.type == 26)){
+         if(generate){return dolar;}
          return rela;
        }
        else{
@@ -394,7 +398,7 @@ void ps_stack_init(psa_stack *stack){
 *stack = malloc(sizeof(struct PSAStack));
 
 if(!(*stack)){
-
+  error_handler(99);
   return;
 }
 (*stack)->top = 1;
@@ -403,7 +407,7 @@ if(!(*stack)){
 
 (*stack)->t = malloc(STACK_DEFAULT * sizeof(T_term));
   if(!(*stack)->t){
-  //  fprintf(stderr, "UH stacky stack\n");
+   error_handler(99);
     return;
   }
   (*stack)->size = STACK_DEFAULT;

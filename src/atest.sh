@@ -106,34 +106,6 @@ fi
 
 score=$var1
 ################### END OF BASIC TESTS ###################
-
-ok0=0
-echo ""
-echo -e "=======\e[33mTESTING CODE GENERATING \e[0m========\n"
-
-
-./proj < interpret/gen1.go > interpret/tmp.code
- cd interpret
- ./ic20int tmp.code > tmp.out
- diff tmp.out gen1.out > diff.out
-
- if [ -s "diff.out" ]
- then
-   echo -e "! \e[31mSome sort of error, reading diff file:\e[0m         "
-   echo ""
-   cat diff.out
-   exit
- else
- echo -e "\e[32mok\e[0m gen1.go"
- ok0=`expr $ok0 + 1`
- fi
-
- rm -r tmp.out
- rm -r diff.out
- rm -r tmp.code
- cd ..
-
-
 echo ""
 echo -e "=======\e[33mTESTING CORRECT RETURN VALUE \e[0m========\n"
 
@@ -309,6 +281,184 @@ else
   echo "================"
 
 fi
+ok0=0
+echo ""
+echo -e "=======\e[33mTESTING CODE GENERATING \e[0m========\n"
+
+
+./proj < interpret/gen1.go > interpret/tmp.code
+ cd interpret
+ ./ic20int tmp.code > tmp.out
+ diff tmp.out gen1.out > diff.out
+
+ if [ -s "diff.out" ]
+ then
+   echo -e "! \e[31mSome sort of error, reading diff file:\e[0m         "
+   echo ""
+   cat diff.out
+   exit
+ else
+ echo -e "\e[32mok\e[0m gen1.go"
+ ok0=`expr $ok0 + 1`
+ fi
+
+ rm -r tmp.out
+ rm -r diff.out
+ rm -r tmp.code
+ cd ..
+
+  ################################
+ ./proj < interpret/example1.go > interpret/tmp.code
+  cd interpret
+  ./ic20int tmp.code <example1.in > tmp.out
+  diff tmp.out example1.out > diff.out
+
+  if [ -s "diff.out" ]
+  then
+    echo -e "! \e[31mSome sort of error, reading diff file:\e[0m         "
+    echo ""
+    cat diff.out
+    exit
+  else
+  echo -e "\e[32mok\e[0m example1.go (iterative faktorial)"
+  ok0=`expr $ok0 + 1`
+  fi
+
+  rm -r tmp.out
+  rm -r diff.out
+  rm -r tmp.code
+  cd ..
+
+  ################################
+   ./proj < interpret/example2.go > interpret/tmp.code
+    cd interpret
+    ./ic20int tmp.code <example2.in > tmp.out
+    diff tmp.out example2.out > diff.out
+
+    if [ -s "diff.out" ]
+    then
+      echo -e "! \e[31mSome sort of error, reading diff file:\e[0m         "
+      echo ""
+      cat diff.out
+      exit
+    else
+    echo -e "\e[32mok\e[0m example2.go (rekursive faktorial)"
+    ok0=`expr $ok0 + 1`
+    fi
+
+    rm -r tmp.out
+    rm -r diff.out
+    rm -r tmp.code
+    cd ..
+
+
+    ################################
+
+    ./proj < interpret/example3.go > interpret/tmp.code
+     cd interpret
+     ./ic20int tmp.code <example3.in > tmp.out
+     diff tmp.out example3.out > diff.out
+
+     if [ -s "diff.out" ]
+     then
+       echo -e "! \e[31mSome sort of error, reading diff file:\e[0m         "
+       echo ""
+       cat diff.out
+       exit
+     else
+     echo -e "\e[32mok\e[0m example3.go "
+     ok0=`expr $ok0 + 1`
+     fi
+
+     rm -r tmp.out
+     rm -r diff.out
+     rm -r tmp.code
+     cd ..
+    ################################
+    ./proj < interpret/hello.go > interpret/tmp.code
+    cd interpret
+    ./ic20int tmp.code  > tmp.out
+    diff tmp.out hello.out > diff.out
+
+    if [ -s "diff.out" ]
+    then
+      echo -e "! \e[31mSome sort of error, reading diff file:\e[0m         "
+      echo ""
+      cat diff.out
+      exit
+    else
+    echo -e "\e[32mok\e[0m hello.go (HELL WORLD)"
+    ok0=`expr $ok0 + 1`
+    fi
+
+    rm -r tmp.out
+    rm -r diff.out
+    rm -r tmp.code
+    cd ..
+    ################################
+    ./proj < interpret/inputs.go > interpret/tmp.code
+     cd interpret
+     ./ic20int tmp.code <inputs.in > tmp.out
+     diff tmp.out inputs.out > diff.out
+
+     if [ -s "diff.out" ]
+     then
+       echo -e "! \e[31mSome sort of error, reading diff file:\e[0m         "
+       echo ""
+       cat diff.out
+       exit
+     else
+     echo -e "\e[32mok\e[0m inputs.go "
+     ok0=`expr $ok0 + 1`
+     fi
+
+     rm -r tmp.out
+     rm -r diff.out
+     rm -r tmp.code
+     cd ..
+
+     ################################
+     ./proj < interpret/varfun.go > interpret/tmp.code
+      cd interpret
+      ./ic20int tmp.code <varfun.in > tmp.out
+      diff tmp.out varfun.out > diff.out
+
+      if [ -s "diff.out" ]
+      then
+        echo -e "! \e[31mSome sort of error, reading diff file:\e[0m         "
+        echo ""
+        cat diff.out
+        exit
+      else
+      echo -e "\e[32mok\e[0m varfun.go "
+      ok0=`expr $ok0 + 1`
+      fi
+
+      rm -r tmp.out
+      rm -r diff.out
+      rm -r tmp.code
+      cd ..
+################################
+./proj < interpret/two-pass.go > interpret/tmp.code
+cd interpret
+./ic20int tmp.code  > tmp.out
+diff tmp.out two-pass.out > diff.out
+
+if [ -s "diff.out" ]
+then
+  echo -e "! \e[31mSome sort of error, reading diff file:\e[0m         "
+  echo ""
+  cat diff.out
+  exit
+else
+echo -e "\e[32mok\e[0m two-pass.go"
+ok0=`expr $ok0 + 1`
+fi
+
+rm -r tmp.out
+rm -r diff.out
+rm -r tmp.code
+cd ..
 
 
 score=`expr $ok2 + $ok + $ok3 + $ok1`
@@ -321,7 +471,7 @@ if [[ "$1" == "--silent" ]]; then
   echo -e "============\e[33mSUMMARY\e[0m=============\n"
   echo -e "BASIC TESTS \e[32m$var1/8\e[0m OK"
   echo -e "ERROR TESTS \e[32m$score/40\e[0m OK"
-  echo -e "CODE GENERATION \e[32m$ok0/1\e[0m OK"
+  echo -e "CODE GENERATION \e[32m$ok0/7\e[0m OK"
   echo "================================"
 
   exit
@@ -347,5 +497,5 @@ echo "================================"
 echo -e "============\e[33mSUMMARY\e[0m=============\n"
 echo -e "BASIC TESTS \e[32m$var1/8\e[0m OK"
 echo -e "ERROR TESTS \e[32m$score/40\e[0m OK"
-echo -e "CODE GENERATION \e[32m$ok0/1\e[0m OK"
+echo -e "CODE GENERATION \e[32m$ok0/8\e[0m OK"
 echo "================================"

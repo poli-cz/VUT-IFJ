@@ -38,6 +38,7 @@ typedef struct Data_item{
   // for ids //
   bool redef_flag;
   bool predefined;
+  int level_flag;
   data_type d_type;
 
 }table_data;
@@ -66,3 +67,5 @@ void                print_table                   (Symtable *table);
 void                copy_table                    (Symtable *source, Symtable*dest);
 void                set_redef_flag                (Symtable *table, bool flag);
 void                set_redef_flag_by_id          (Symtable *table,char *id, bool flag);
+void                set_level_flag_by_id          (Symtable *table,char *id, int level);
+void                set_level_flag                (Symtable *table, int level_flag);

@@ -16,10 +16,12 @@ func main() {
 	if a < b {
 		print(a, "<", b, "\n")
 		a := 666
+
 		print(a) // otherwise, warning "unused a"
 	} else {
 		print(a, ">=", b, "\n")
 		a = 33
+		a, b = foo(a, b)
 	}
 	print(a)
 }
