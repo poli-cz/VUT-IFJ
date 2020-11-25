@@ -11,13 +11,6 @@
 
 int main(int argc, char** argv){
   int error = 0;
- // error = parser_debug();
-  tToken j;
-  while (j.type!= t_eof)
-  {
-    j=get_token();
-    printf("%d  %s\n",(j.type),(j.value)->str);    
-  }
 return error;
 }
 
