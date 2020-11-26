@@ -126,7 +126,7 @@ tToken get_token(){
           state=s_curlr;
         }
         else if (sym=='/'){
-          add_char(sym,&token.value);
+          //add_char(sym,&token.value);
           state=s_div;
         }
 
@@ -262,6 +262,7 @@ tToken get_token(){
       else if(sym== '*')
         state =s_blockcom;
       else{
+        add_char('/',&token.value);
         token.type=t_div;
         ungetc(sym,stdin);
         return token;
