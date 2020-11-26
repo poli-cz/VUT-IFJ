@@ -30,5 +30,7 @@ bool      concat_check            (tToken token);
 void      type_print              (tToken token);
 char      *id_mannager            (tToken token);
 void      for_id_definer          (tToken token, Symtable *get_table, Symtable *table);
+void      *safe_realloc           (void * ptr, size_t mem_size);
+void      *safe_malloc            (size_t mem_size);
 
-//char      *string_to_ifj      (char *string);
+char      *string_to_ifj      (char *string);
