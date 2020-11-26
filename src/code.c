@@ -237,23 +237,42 @@ printf("  POPFRAME\n");
 printf("  RETURN\n");
 printf("\n");
 
-
-
-          // -- TODO -- //
-  //add  all inbuit function... //
 }
+
+
+void *safe_realloc(void * ptr, size_t mem_size){
+	void *ret = realloc(ptr,mem_size);
+	if(ret == NULL){
+		fprintf(stderr, "ERROR ALLOCATING MEMORY\n");
+		exit(99);
+	}
+	return ret;
+}
+
+
+
+void *safe_malloc(size_t mem_size){
+	void *ret = malloc(mem_size);
+	if(ret == NULL){
+		fprintf(stderr, "ERROR ALLOCATING MEMORY\n");
+		exit(99);
+	}
+	return ret;
+}
+
+
 char *stringToInterpret(char *rawString){
   int rawLen = strlen(rawString);
 
   int max = rawLen + 1;
   int pos = 7;
-  char *out = malloc(sizeof(char) * (max + 20));
+  char *out = safe_malloc(sizeof(char) * (max + 20));
   strcpy(out, "string@");
 
   for(int i = 0; i < rawLen; i++){
     if(max <= pos + 4){
       max += 100;
-      out = realloc(out, sizeof(char) * max);
+      out = safe_realloc(out, sizeof(char) * max);
     }
 
     out[pos] = '\\';
@@ -270,28 +289,25 @@ char *stringToInterpret(char *rawString){
   }
 
   out[pos] = '\0';
-  out = realloc(out, sizeof(char) * (pos + 1));
+  out = safe_realloc(out, sizeof(char) * (pos + 1));
   return out;
 
 }
 
 char *int_to_ifj(char *rawInt){
-    char *out = malloc(sizeof(char)*(50));
+    char *out = safe_malloc(sizeof(char)*(50));
       if(rawInt[0] == '0' && strlen(rawInt) > 1 && rawInt[1] == 'b'){
         sprintf(out, "int@%lld", strtoll(&rawInt[2], NULL, 2));
       }
       else   sprintf(out, "int@%lld", strtoll(rawInt, NULL, 0));
-    return realloc(out, strlen(out));
+    return safe_realloc(out, strlen(out));
 }
 
 
 
 char *float_to_ifj(char *rawFloat){
-    char *out = malloc(sizeof(char)*(50));
+    char *out = safe_malloc(sizeof(char)*(50));
     sprintf(out, "float@%a", strtod(rawFloat, NULL));
-    return realloc(out, strlen(out));
+    return safe_realloc(out, strlen(out));
 }
 
-
-// atd, prost víc funkcí na převádění normalních data typů
-// na ty fakin IFJ20 datové typy

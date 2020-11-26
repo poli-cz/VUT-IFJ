@@ -126,7 +126,7 @@ tToken get_token(){
           state=s_curlr;
         }
         else if (sym=='/'){
-          add_char(sym,&token.value);
+          //add_char(sym,&token.value);
           state=s_div;
         }
 
@@ -228,14 +228,15 @@ tToken get_token(){
 
     //checking !
     case s_fact:
-      if(sym=='=')
+      if(sym=='='){
+        add_char(sym,&token.value);
         state=s_neq;
-      else ungetc(sym,source_file);
+      }
+      else state=s_error;
     break;
 
     // !=
     case s_neq:
-      add_char(sym,&token.value);
       token.type = t_neq;
       ungetc(sym,stdin);
       return token;
@@ -262,6 +263,7 @@ tToken get_token(){
       else if(sym== '*')
         state =s_blockcom;
       else{
+        add_char('/',&token.value);
         token.type=t_div;
         ungetc(sym,stdin);
         return token;
