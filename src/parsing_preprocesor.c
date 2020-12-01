@@ -212,6 +212,8 @@ tList syntactic_prerun(Symtable *g_table){
     table_insert(g_table, f_count, "function_count");
 
 
+
+
 // --- LOAD INBUILT FCE IN SYMTABLE --- //
 
 
@@ -232,6 +234,18 @@ tList syntactic_prerun(Symtable *g_table){
       fprintf(stderr, "Mising return in non void function\n");
       exit(6);
     }
+
+  //  Sym_table_item *tmp;
+  //  tmp = search_in_table(g_table, "main");
+  //  char *params = tmp->data.params;
+
+
+  //  printf("%sparams, diff %d\n", params, strcmp(params, "0 "));
+
+  //  if(!strchr(params, '0')){
+  //    fprintf(stderr, "Main with parameters\n");
+  //    exit(6);
+  //  }
 
 
 

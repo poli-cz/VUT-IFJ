@@ -10,9 +10,16 @@ void main_code(){
   DEFVAR GF@$$retval3\n\
   DEFVAR GF@$$retval4\n\
   DEFVAR GF@$$retval5\n\
+  DEFVAR GF@ZERO\n\
   CREATEFRAME\n\
   PUSHFRAME\n\
   JUMP main$\n");
+printf(" LABEL zero$\n");
+printf("  JUMPIFNEQ  zerook GF@ZERO int@0\n");
+printf(" WRITE string@zero_division\n");
+printf(" EXIT int@9\n");
+printf("  LABEL zerook\n");
+printf("  RETURN\n");
 
 
   //inputs
@@ -310,4 +317,3 @@ char *float_to_ifj(char *rawFloat){
     sprintf(out, "float@%a", strtod(rawFloat, NULL));
     return safe_realloc(out, strlen(out));
 }
-

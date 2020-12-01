@@ -75,3 +75,5 @@ void      multi_checker     (Symtable *table, tToken token);
 void      check_multi_def   (Symtable *table, tToken token);
 void      check_retvals     (Symtable *table, tToken token);
 void      func_call_checker (Symtable *table, tToken token);
+void      check_print       (Symtable *table, tToken token);
+void      check_data_type   (Symtable *table, tToken token);

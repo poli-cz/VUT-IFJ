@@ -12,6 +12,7 @@
  #include "codegen.h"
 
 psa_stack name_stack;
+psa_stack id_stack;
 Symtable gen_table;
 
 int scope_lvl = 0;
@@ -43,6 +44,7 @@ int generate_code(tList list, Symtable *table){
 
   ps_stack_init(&stack);
   ps_stack_init(&name_stack);
+  ps_stack_init(&id_stack);
 // -----------------------------------//
 
 // stuff needed to solve nested for //
@@ -83,7 +85,12 @@ int generate_code(tList list, Symtable *table){
         else_flag--;
         is_end = false;
         scope_lvl--;
-        set_level_flag(&gen_table, scope_lvl);
+
+        if(id_stack->t[(id_stack->top)].lvl > scope_lvl){
+          ps_stack_pop(id_stack);
+        }
+
+
 
       }else if((bra_cnt != 0)&&(token.type == t_curlr)&&(in_for)&&(stack->t[(stack->top)].type == type_for)){
         printf("JUMP FOR$BEGIN%d\n",  stack->t[(stack->top)].id);
@@ -94,10 +101,11 @@ int generate_code(tList list, Symtable *table){
         bra_cnt--;
         in_for--;
         is_end = true;
-        //print_table(&gen_table);
-        set_level_flag(&gen_table, scope_lvl);
-        //print_table(&gen_table);
-        //printf("bra_cnt %d if_flag %d else_flag %d is_end %d\n", bra_cnt, if_flag, else_flag, is_end);
+
+        if(id_stack->t[(id_stack->top)].lvl > scope_lvl){
+          ps_stack_pop(id_stack);
+        }
+
       }
 
 // ASSIGN or DEF to id
@@ -195,7 +203,10 @@ int generate_code(tList list, Symtable *table){
 
         printf("JUMP IF$END$%d\n", stack->t[(stack->top)].id);
         scope_lvl--;
-        set_level_flag(&gen_table, scope_lvl);
+
+        if(id_stack->t[(id_stack->top)].lvl > scope_lvl){
+          ps_stack_pop(id_stack);
+        }
 
         printf("\nLABEL IF$FALSE$%d\n", stack->t[(stack->top)].id);
         bra_cnt++;
@@ -274,19 +285,24 @@ return 0;
 
 char *id_mannager(tToken token){
   char *retval = "";
+  char *name = token.value->str;
+  int index = 0;
   if(name_stack->top > 1){
-    //printf("%d scope level, name %s\n", scope_lvl, token.value->str);
 
-    Sym_table_item *temp;
-    temp = search_in_table(&gen_table, token.value->str);
-    if(temp->data.level_flag == 0){
-      asprintf(&retval, "%s ", token.value->str);
 
-    }else if(temp->data.level_flag==scope_lvl){
-      asprintf(&retval, "%s$%d ", token.value->str, name_stack->t[(name_stack->top)].id);
-    }else{
-      asprintf(&retval, "%s$%d ", token.value->str, temp->data.level_flag);
-    }
+      index = get_id_top(name);
+      if(index == -1){
+        asprintf(&retval, "%s ", token.value->str);
+        return retval;
+      }
+
+      asprintf(&retval ,"%s ", id_stack->t[index].full_name);
+
+
+
+
+
+
 
   }else{
     asprintf(&retval, "%s ", token.value->str);
@@ -304,9 +320,17 @@ void id_solver(tToken token, Symtable *table, int rekurze_cnt, psa_stack stack){
       if(stack->top > 1){
         if((stack->t[(stack->top)].type == type_for)||(stack->t[(stack->top)].type == type_if)){
 
-          set_level_flag_by_id(&gen_table, token.value->str, scope_lvl);
+          printf("DEFVAR LF@%s$%d$%d\n", token.value->str, stack->t[(stack->top)].id, scope_lvl);
+          char* full_name = "";
+          asprintf(&full_name,"%s$%d$%d ", token.value->str, stack->t[(stack->top)].id, scope_lvl);
+          PSA_term id_term;
+          id_term.name = token.value->str;
+          id_term.full_name = full_name;
+          id_term.lvl = scope_lvl;
 
-          printf("DEFVAR LF@%s$%d\n", token.value->str, stack->t[(stack->top)].id);
+          ps_stack_push(id_stack, id_term);
+
+
           generate_params(token, table, 0); // solve expr or function call
         }
       }else{
@@ -316,6 +340,17 @@ void id_solver(tToken token, Symtable *table, int rekurze_cnt, psa_stack stack){
 
 
       }
+    }else{
+      char* full_name = "";
+      //printf("MOVE LF@%s$%d$%d\n", token.value->str, stack->t[(stack->top)].id, scope_lvl);
+      asprintf(&full_name,"%s$%d$%d ", token.value->str, stack->t[(stack->top)].id, scope_lvl);
+      PSA_term id_term;
+      id_term.name = token.value->str;
+      id_term.full_name = full_name;
+      id_term.lvl = scope_lvl;
+      ps_stack_push(id_stack, id_term);
+
+      generate_params(token, table, 0); // solve expr or function call
     }
 
 
@@ -362,6 +397,7 @@ void function_start(Symtable *table, tToken token){
 void generate_params(tToken token, Symtable *table, int rekurze_cnt){
   char *name = token.value->str;
   tToken tname = token;
+
 
 
   token = *token.next; // Skip name
@@ -580,6 +616,12 @@ void for_id_definer(tToken token, Symtable *get_table, Symtable *table){
   int for_bra_cnt = 1;
   tToken temp = token;
   int for_scope_lvl  = scope_lvl;
+  int for_label_count = name_stack->t[(name_stack->top)].id;
+  PSA_term term;
+
+  bool is_end = false;
+
+
 
 
 
@@ -587,10 +629,8 @@ void for_id_definer(tToken token, Symtable *get_table, Symtable *table){
 
     if((*temp.next).type == t_def){
 
-      set_level_flag_by_id(&gen_table, temp.value->str, for_scope_lvl);
+      printf("DEFVAR LF@%s$%d$%d\n", temp.value->str, name_stack->t[(name_stack->top)].id, for_scope_lvl);
 
-      printf("DEFVAR LF@%s$%d\n", temp.value->str, name_stack->t[(name_stack->top)].id);
-      generate_params(temp, table, 0); // solve expr or function call
     }
 
 
@@ -599,21 +639,28 @@ void for_id_definer(tToken token, Symtable *get_table, Symtable *table){
     temp = *temp.next;
   }
 
-  //for_scope_lvl++;
+  for_scope_lvl++;
 
   while(for_bra_cnt != 0){
 
 
+
     if((*temp.next).type == t_def){
 
-      set_level_flag_by_id(&gen_table, temp.value->str, for_scope_lvl);
-
-      printf("DEFVAR LF@%s$%d\n", temp.value->str, for_scope_lvl);
-      generate_params(temp, table, 0); // solve expr or function call
+      printf("DEFVAR LF@%s$%d$%d\n", temp.value->str, name_stack->t[(name_stack->top)].id, for_scope_lvl);
     }
     else if(temp.type == t_keyword){
       if(!strcmp(temp.value->str, "if")){
-        break;
+        for_scope_lvl++;
+        for_label_count++;
+        is_end = false;
+        term.id = for_label_count;
+        term.type = type_if;
+        ps_stack_push(name_stack, term);
+
+      }
+      else if(!strcmp(temp.value->str, "else")){
+        is_end = true;
       }
     }
 
@@ -621,6 +668,11 @@ void for_id_definer(tToken token, Symtable *get_table, Symtable *table){
 
 
     if(temp.type == t_curll){
+      if(is_end){
+        ps_stack_pop(name_stack);
+        for_scope_lvl--;
+      }
+
       for_bra_cnt++;
     }else if(temp.type == t_curlr){
       for_bra_cnt--;
@@ -629,6 +681,22 @@ void for_id_definer(tToken token, Symtable *get_table, Symtable *table){
   }
 
 
+}
+
+
+int get_id_top(char* name){
+
+    for(int i = 0; i < id_stack->top; i++){
+      //printf("%d\n", id_stack->top);
+      //printf("%s name\n", id_stack->t[(id_stack->top)-i].name);
+      if(id_stack->t[(id_stack->top)-i].name){
+        if(!strcmp((id_stack->t[(id_stack->top)-i].name), name)){
+          return ((id_stack->top)-i);
+        }
+      }
+
+    }
+    return -1;
 }
 
 

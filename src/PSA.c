@@ -20,7 +20,7 @@
   	{ '<','<', '<' , '<' , '<' , '<' , 'x' , '<', '<', '<', '<', 'x' }  /// $
   };
 
-
+bool div_flag = false;
 
   Prec_table_sym token_to_table(tToken token, bool generate){
 
@@ -39,6 +39,10 @@
       break;
 
       case t_div:
+        if(generate){
+          div_flag = true;
+        }
+
           return ddiv;
       break;
 
@@ -54,17 +58,36 @@
 
           if(generate){
             printf("PUSHS LF@%s\n", id_mannager(token));
+            if(div_flag){
+              printf("MOVE GF@ZERO  LF@%s\n", id_mannager(token));
+              printf("CALL zero$\n");
+              div_flag = false;
+            }
           }
           return pid;
       break;
 
       case t_number:
-          if(generate){printf("PUSHS int@%s\n", token.value->str);}
+          if(generate){
+            printf("PUSHS int@%s\n", token.value->str);
+            if(div_flag){
+              printf("MOVE GF@ZERO  int@%s\n", token.value->str);
+              printf("CALL zero$\n");
+              div_flag = false;
+            }
+        }
           return pint;
       break;
 
       case t_float:
-          if(generate){printf("PUSHS %s\n", float_to_ifj(token.value->str));}
+          if(generate){
+            printf("PUSHS %s\n", float_to_ifj(token.value->str));
+            if(div_flag){
+              printf("MOVE GF@ZERO  float@%s\n", token.value->str);
+              printf("CALL zero$\n");
+              div_flag = false;
+            }
+          }
           return pfloat;
       break;
 

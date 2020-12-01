@@ -366,7 +366,7 @@ echo -e "=======\e[33mTESTING CODE GENERATING \e[0m========\n"
        cat diff.out
        exit
      else
-     echo -e "\e[32mok\e[0m example3.go "
+     echo -e "\e[32mok\e[0m example3.go (inbuit fce) "
      ok0=`expr $ok0 + 1`
      fi
 
@@ -459,6 +459,27 @@ rm -r tmp.out
 rm -r diff.out
 rm -r tmp.code
 cd ..
+################################
+./proj < interpret/scope.go > interpret/tmp.code
+ cd interpret
+ ./ic20int tmp.code <scope.in > tmp.out
+ diff tmp.out scope.out > diff.out
+
+ if [ -s "diff.out" ]
+ then
+   echo -e "! \e[31mSome sort of error, reading diff file:\e[0m         "
+   echo ""
+   cat diff.out
+   exit
+ else
+ echo -e "\e[32mok\e[0m scope.go "
+ ok0=`expr $ok0 + 1`
+ fi
+
+ rm -r tmp.out
+ rm -r diff.out
+ rm -r tmp.code
+ cd ..
 
 
 score=`expr $ok2 + $ok + $ok3 + $ok1`
@@ -471,7 +492,7 @@ if [[ "$1" == "--silent" ]]; then
   echo -e "============\e[33mSUMMARY\e[0m=============\n"
   echo -e "BASIC TESTS \e[32m$var1/8\e[0m OK"
   echo -e "ERROR TESTS \e[32m$score/40\e[0m OK"
-  echo -e "CODE GENERATION \e[32m$ok0/7\e[0m OK"
+  echo -e "CODE GENERATION \e[32m$ok0/9\e[0m OK"
   echo "================================"
 
   exit
@@ -497,5 +518,5 @@ echo "================================"
 echo -e "============\e[33mSUMMARY\e[0m=============\n"
 echo -e "BASIC TESTS \e[32m$var1/8\e[0m OK"
 echo -e "ERROR TESTS \e[32m$score/40\e[0m OK"
-echo -e "CODE GENERATION \e[32m$ok0/8\e[0m OK"
+echo -e "CODE GENERATION \e[32m$ok0/9\e[0m OK"
 echo "================================"
