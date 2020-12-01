@@ -55,6 +55,12 @@ typedef struct psateminal{
   int id;
   bra_type type;
 
+  // stuff needed to solve id mannagement in codegen
+
+  char *name;
+  char *full_name;
+  int lvl;
+
 }PSA_term;
 
 // structure of syntax_stact

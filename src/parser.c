@@ -1000,6 +1000,7 @@ void id_check(tToken func, Symtable *local_table, Symtable *table){
   if((func.type == t_id)&&(!is_fce(func.value->str ,table))){
     if((*func.next).type == t_def){
 
+
       if(is_in_table(local_table, func.value->str)){
         Sym_table_item *temp;
         temp = search_in_table(local_table, func.value->str);
@@ -1034,12 +1035,15 @@ void id_check(tToken func, Symtable *local_table, Symtable *table){
         }
     }
     else{
+
+
       table_data iD;
       iD.d_type = get_data_type(local_table, func);
       iD.type = id;
       iD.defined = true;
       iD.redef_flag = 1;
       table_insert(local_table, iD, func.value->str);
+
 
       tToken temp = func;
       bool for_flag = false;
@@ -1083,6 +1087,9 @@ void id_check(tToken func, Symtable *local_table, Symtable *table){
 
         check_retvals(local_table, func);
       }
+      else{
+        check_data_type(local_table, func);
+      }
 
 
   }else if((*func.next).type == t_comma){
@@ -1096,9 +1103,16 @@ tToken scope_check(tToken scope, Symtable *global_table, Symtable *func_table){
   if(scope.type == t_keyword){
     if(((strcmp(scope.value->str, "for")==0)||(strcmp(scope.value->str, "if")==0)||(strcmp(scope.value->str, "else")==0))){
 
+      if(strcmp(scope.value->str, "else")==0){  //  TRASH
+        return *scope.next;                     //  SOLVE
+      }                                         //
+
+
+
         Symtable scope_table;
         table_init(&scope_table);
         copy_table(func_table, &scope_table);
+
 
         set_redef_flag(&scope_table, 0);
 
@@ -1115,6 +1129,7 @@ tToken scope_check(tToken scope, Symtable *global_table, Symtable *func_table){
 
           scope = *scope.next;
           scope = scope_check(scope, global_table, &scope_table);
+
         }
         if(DEBUG){printf("SCOPE TABLE\n");}
         if(DEBUG){print_table(&scope_table);}
@@ -1479,7 +1494,7 @@ void check_multi_def(Symtable *table, tToken token){
       if(token.type == t_id){
         if(!is_defined(token.value->str, table)){
           fprintf(stderr, "Value %s in multiassign not defined\n",token.value->str);
-          exit(3);
+          exit(7);
         }
 
       }
@@ -1497,7 +1512,7 @@ void check_multi_def(Symtable *table, tToken token){
 
     if(val_cnt != multival){
       fprintf(stderr, "BAD multival assign\n");
-      exit(3);
+      exit(7);
     }
 
     multival = 0;
@@ -1527,19 +1542,19 @@ void check_retvals(Symtable *table, tToken token){
     if(strcmp(retvals, "int ")!=0){
       printf("%s|%d\n",retvals,strcmp(retvals, "int "));
       fprintf(stderr, "Value of type INT not matched with function return type\n");
-      exit(3);
+      exit(7);
     }
   }else if(var_type == type_string){
     if(strcmp(retvals, "string ")!=0){
       //printf("%s|%d\n",retvals,strcmp(retvals, "int "));
       fprintf(stderr, "Value of type STR not matched with function return type\n");
-      exit(3);
+      exit(7);
     }
   }else if(var_type == type_float64){
     if(strcmp(retvals, "float64 ")!=0){
       //printf("%s|%d\n",retvals,strcmp(retvals, "int "));
       fprintf(stderr, "Value of type FLOAT not matched with function return type\n");
-      exit(3);
+      exit(7);
     }
   }
 }
@@ -1551,15 +1566,24 @@ void check_retvals(Symtable *table, tToken token){
 
 void func_call_checker(Symtable *table, tToken token){
 
-  if(token.type == t_id){
+  if((token.type == t_id)||(token.type == t_keyword)){
   if(((token.type == t_id)||(token.type == t_keyword))&&((*token.next)).type == t_lbra){
+    if(!strcmp(token.value->str, "if")||!strcmp(token.value->str, "for")||!strcmp(token.value->str, "else")){
+      return;
+    }
+
 
     char* name = token.value->str;
 
-    if(!strcmp(name, "print")){return;}
+
+    if(!strcmp(name, "print")){
+      check_print(table, token);
+      return;
+    }
 
     Sym_table_item *func_info;
     func_info = search_in_table(&g_table, token.value->str);
+
     char *f_params = func_info->data.params;
 
     char *params= "";
@@ -1586,8 +1610,10 @@ void func_call_checker(Symtable *table, tToken token){
         }
         count++;
       }else if(token.type == t_id){
+
         if(!is_defined(token.value->str, table)){
           fprintf(stderr, "ID %s in function call undefined\n", token.value->str);
+          exit(6);
         }else{
           Sym_table_item *temp;
           temp = search_in_table(table, token.value->str);
@@ -1630,8 +1656,74 @@ void func_call_checker(Symtable *table, tToken token){
       fprintf(stderr, "%s got PARAMS\n\n", params);
       exit(6);
     }
+      }
+    }
+  }
+void check_print(Symtable *table, tToken token){
 
+  while(token.type != t_eol){
+    if(token.type == t_id){
+      if(!is_defined(token.value->str, table)){
+        fprintf(stderr, "Id %s in printf call undefine\n",token.value->str);
+        exit(3);
+      }
+    }
 
+    if(token.type == t_eof){
+      fprintf(stderr, "Unexpected eof in printf call\n");
+      exit(2);
+    }
+    token = *token.next;
   }
 }
+
+
+void check_data_type(Symtable *table, tToken token){
+
+  Sym_table_item *temp;
+
+  temp = search_in_table(table, token.value->str);
+  data_type var_type = temp->data.d_type;
+
+  while(token.type != t_eol){
+
+
+    if((token.type == t_number)||(token.type == t_string)||(token.type == t_float)){
+      if(var_type == type_int){
+        if(token.type != t_number){
+          fprintf(stderr, "Bad types during assing\n");
+          exit(5);
+        }
+
+      }else if(var_type == type_float64){
+        if(token.type != t_float){
+          fprintf(stderr, "Bad types during assing\n");
+          exit(5);
+        }
+      }else if(var_type == type_string){
+        if(token.type != t_string){
+          fprintf(stderr, "Bad types during assing\n");
+          exit(5);
+        }
+      }
+    }
+
+
+
+
+
+    token=*token.next;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
 }

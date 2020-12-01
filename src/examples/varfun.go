@@ -21,7 +21,7 @@ func main() {
 	} else {
 		print(a, ">=", b, "\n")
 		a = 33
-		a, b = foo(a, b)
+		
 	}
 	print(a)
 }
