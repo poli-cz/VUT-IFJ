@@ -85,8 +85,8 @@ tList syntactic_prerun(Symtable *g_table){
       test = *test.next;
 
       if(return_flag==1){
-        fprintf(stderr, "Mising return in non void function\n");
-        exit(6);
+        fprintf(stderr, "Missing return in non void function\n");
+        exit(2);
       }
 
 
@@ -228,7 +228,7 @@ tList syntactic_prerun(Symtable *g_table){
     if(is_in_table(g_table, "main")==0){
       fprintf(stderr, "Missing main--ERROR--\n");
       destroy_table(g_table);
-      error_handler(3);
+      error_handler(2);
     }
     if(return_flag==1){
       fprintf(stderr, "Mising return in non void function\n");

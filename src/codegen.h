@@ -31,5 +31,4 @@ void      type_print              (tToken token);
 char      *id_mannager            (tToken token);
 void      for_id_definer          (tToken token, Symtable *get_table, Symtable *table);
 int       get_id_top              (char *name);
-
-//char      *string_to_ifj      (char *string);
+char      *string_to_ifj          (char *string);

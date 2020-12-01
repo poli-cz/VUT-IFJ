@@ -213,7 +213,7 @@ tToken get_token(){
 
      else if(sym == '\n'){
       add_char(sym,&token.value);
-      token.type=t_eol;
+      token.type=t_error;
       return token;
      }
      else if(sym > 31){
@@ -359,13 +359,17 @@ tToken get_token(){
          add_char(sym,&token.value);
          state = s_floatpoint;
       }
+    else if (isdigit(sym))
+    {
+      token.type=t_error;
+      return token;
+    }
     else
     {
       ungetc(sym,stdin);
       token.type=t_number;
       return token;
     }
-
     break;
 
     //cislo desatina cast
@@ -389,17 +393,11 @@ tToken get_token(){
         add_char(sym,&token.value);
         state = s_exp;
       }
-      else if (isspace(sym)){
+      else{
         ungetc(sym,stdin);
         token.type=t_float;
         return token;
       }
-      else{
-        add_char(sym,&token.value);
-        token.type=t_error;
-        return token;
-      }
-
     break;
 
 
@@ -411,7 +409,7 @@ tToken get_token(){
     }
     else if(isdigit(sym)){
       state=s_exp3;
-       add_char(sym,&token.value);
+      add_char(sym,&token.value);
     }
     else{
       ungetc(sym,stdin);
@@ -436,11 +434,11 @@ tToken get_token(){
   case s_exp3:
     if(isdigit(sym))
       state = s_exp3;
-		else
-    token.type=t_float;
-    ungetc(sym,stdin);
-    state=s_start;
-    return token;
+		else{
+      token.type=t_float;
+      ungetc(sym,stdin);
+      return token;
+    }
 	break;
 
 
@@ -485,6 +483,10 @@ tToken get_token(){
         }
 
       }
+      else if(sym=='\\'){
+           add_char('\\',&token.value);
+           state=s_string;
+      }     
      else
      {
        ungetc(sym,stdin);
@@ -546,10 +548,9 @@ tToken get_token(){
     case s_id:
     if(isdigit(sym) || isalpha(sym) || sym == '_'){
       add_char(sym,&token.value);
-      break;
     }
     else{
-      ungetc(sym,stdin);// prevod atributu tokenu na lowercase
+      ungetc(sym,stdin);
 
       if(is_key_word(token.value)){
         token.type =t_keyword;
