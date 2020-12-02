@@ -485,6 +485,9 @@ tToken get_token(){
       }
       else if(sym=='\\'){
            add_char('\\',&token.value);
+           add_char('1',&token.value);
+           add_char('3',&token.value);
+           add_char('4',&token.value);
            state=s_string;
       }     
      else
