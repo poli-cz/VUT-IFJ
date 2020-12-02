@@ -229,6 +229,10 @@ int generate_code(tList list, Symtable *table){
         ps_stack_push(stack, term);
         ps_stack_push(name_stack, term);
 
+        if((*token.next).type == t_lbra){
+          token = *token.next;
+        }
+
         expr_generator(*token.next); // left side of condition
         printf("PUSHS TF@$$retval\n");
 
