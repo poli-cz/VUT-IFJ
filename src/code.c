@@ -11,14 +11,23 @@ void main_code(){
   DEFVAR GF@$$retval4\n\
   DEFVAR GF@$$retval5\n\
   DEFVAR GF@ZERO\n\
+  DEFVAR GF@f_ZERO\n\
   CREATEFRAME\n\
   PUSHFRAME\n\
   JUMP main$\n");
+
 printf(" LABEL zero$\n");
 printf("  JUMPIFNEQ  zerook GF@ZERO int@0\n");
 printf(" WRITE string@zero_division\n");
 printf(" EXIT int@9\n");
 printf("  LABEL zerook\n");
+printf("  RETURN\n");
+
+printf(" LABEL float_zero$\n");
+printf("  JUMPIFNEQ  zerook_f GF@f_ZERO float@0x0p+0\n");
+printf(" WRITE string@zero_division\n");
+printf(" EXIT int@9\n");
+printf("  LABEL zerook_f\n");
 printf("  RETURN\n");
 
 

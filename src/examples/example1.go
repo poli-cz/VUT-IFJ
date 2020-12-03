@@ -2,7 +2,12 @@
 package main
 
 func main () {
-	a := 1
-	b :=0
-	b = 10/a
+
+	b := 0.1
+	b = 10.1/b
+
+	print(b, "\n")
+
+	a := 2/2
+	print(a, "\n")
 }

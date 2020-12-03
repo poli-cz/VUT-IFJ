@@ -38,7 +38,7 @@ int expr_parse(Symtable *table, synt_stack stack, tToken token ,int err_code){
       if(previe.type == t_rbra){
         fprintf(stderr, "empty brackets\n");
         stack_remove(&stack);
-        exit(6);
+        exit(2);
 
       }
     }
@@ -100,7 +100,7 @@ int expr_parse(Symtable *table, synt_stack stack, tToken token ,int err_code){
 
 
       if(psa(first, 0)!=0){
-        exit(5);
+        exit(2);
       }
 
       return skip_counter;

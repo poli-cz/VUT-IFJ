@@ -21,6 +21,7 @@
   };
 
 bool div_flag = false;
+bool float_flag = false;
 
   Prec_table_sym token_to_table(tToken token, bool generate){
 
@@ -59,9 +60,16 @@ bool div_flag = false;
           if(generate){
             printf("PUSHS LF@%s\n", id_mannager(token));
             if(div_flag){
-              printf("MOVE GF@ZERO  LF@%s\n", id_mannager(token));
-              printf("CALL zero$\n");
-              div_flag = false;
+              if(float_flag){
+                printf("MOVE GF@f_ZERO LF@%s\n", id_mannager(token));
+                printf("CALL float_zero$\n");
+                div_flag = false;
+              }else{
+                printf("MOVE GF@ZERO  LF@%s\n", id_mannager(token));
+                printf("CALL zero$\n");
+                div_flag = false;
+              }
+
             }
           }
           return pid;
@@ -83,10 +91,11 @@ bool div_flag = false;
           if(generate){
             printf("PUSHS %s\n", float_to_ifj(token.value->str));
             if(div_flag){
-              printf("MOVE GF@ZERO  float@%s\n", token.value->str);
-              printf("CALL zero$\n");
+              printf("MOVE GF@f_ZERO %s\n", float_to_ifj(token.value->str));
+              printf("CALL float_zero$\n");
               div_flag = false;
             }
+            float_flag = true;
           }
           return pfloat;
       break;
@@ -222,7 +231,7 @@ void reduce_rule(psa_stack stack, int generate){
 
   }else{
     fprintf(stderr, "Missing operand in expr\n");
-    error_handler(5);
+    error_handler(2);
   }
 
 }
@@ -297,7 +306,7 @@ void reduce_by_rule(psa_stack stack, int count, int generate){
         }
         else{
           fprintf(stderr, "Unknown operand\n");
-          exit(5);
+          exit(2);
         }
       }
       else if((stack->t[(stack->top)].sym) == final_E){
@@ -315,14 +324,22 @@ void reduce_by_rule(psa_stack stack, int count, int generate){
           }
           else{
             fprintf(stderr, "Unknown operand\n");
-            exit(5);
+            exit(2);
           }
         }
         else if((stack->t[(stack->top)-1].sym) == ddiv){
           if((stack->t[(stack->top)-2].sym) == final_E){
             term.sym = final_E;
             term.data_type = stack->t[(stack->top-2)].data_type;
-            if(generate){printf("IDIVS\n");}
+            if(generate){
+              if(float_flag){
+                printf("DIVS\n");
+                float_flag = false;
+              }else{
+                printf("IDIVS\n");
+              }
+
+            }
             ps_stack_pop(stack);
             ps_stack_pop(stack);
             ps_stack_pop(stack);
@@ -332,7 +349,7 @@ void reduce_by_rule(psa_stack stack, int count, int generate){
           }
           else{
             fprintf(stderr, "Unknown operand\n");
-            exit(5);
+            exit(2);
           }
         }
         else if( ( (stack->t[(stack->top)-1].sym) == plus) || ((stack->t[(stack->top)-1].sym) == minus)){
@@ -355,7 +372,7 @@ void reduce_by_rule(psa_stack stack, int count, int generate){
           }
           else{
             fprintf(stderr, "Unknown operand\n");
-            exit(5);
+            exit(2);
           }
         }
         else if((stack->t[(stack->top)-1].sym) == rela){
@@ -372,13 +389,13 @@ void reduce_by_rule(psa_stack stack, int count, int generate){
           }
           else{
             fprintf(stderr, "Unknown operand\n");
-            exit(5);
+            exit(2);
           }
         }
 
         else{
           fprintf(stderr, "Unknown operator\n");
-          exit(5);
+          exit(2);
         }
       }
 
