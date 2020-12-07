@@ -1,0 +1,5 @@
+codegen. 
+
+zdrojový kod je procházen po řádcich a na základě prvního tokenu na každém řádku jsou 
+volány konkrétní funkce na generování, v generátoru kodu nejsou již k dispozici lokální tabulky symbolů. 
+Nedochází zde již k žádné kontole datových typů. Překrývání platnosti proměnných je řešeno speciálním zásobníkem jmen proměnných na jehož vrhol je vzždy uložena platná promenna daneho jmena
