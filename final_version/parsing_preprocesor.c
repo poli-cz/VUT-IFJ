@@ -36,14 +36,14 @@ tList syntactic_prerun(Symtable *g_table){
 
   // check for lex-error aka. token_type == 1 //
 
-    if(token->type == 1  ){  // CHECKING FOR RIGHT TOKENS
+    if(token->type == t_error  ){  // CHECKING FOR RIGHT TOKENS
       fprintf(stderr, "Invalid token --> %s\n", (*token).value->str);
       destroy_table(g_table);
       error_handler(1);
     }
   //--------------------//
 
-    if(token->type == 7){
+    if(token->type == t_eof){
       break;
     }
   }
