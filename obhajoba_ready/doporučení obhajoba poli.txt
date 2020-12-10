@@ -1,0 +1,48 @@
+celkem cca 5-6 min, tj 30-60 s na slide
+
+1. slide--
+	- představení týmu, varianta, členové atd, jen rychle
+
+2. slide -- struktura překladače
+	- 6 bloků => lex, prerun, syntax, sem, psa, codegen 
+	- Z jakých částí se skládá překladač, naše neobvyklá implementace, větší oddělení 
+	jednotlivých částí, umožňují pohodlnější debug či upravu funkcionality... atd
+
+3. slide -- lex
+	- lexikální analýza, rozdělování na tokeny, implementace jako konečný automat, 
+	při chybě vrátí token t_error s hodnotou 1
+
+4. slide -- prerun
+	- volá scanner, načítá tokeny do dvojsměrně vázaného seznamu, což nám umožuje libivolné procházení
+	zdrjového kodu, dál se předává jen ukazatel na první token
+	- načítání funkcí do globální symtable + jednoduché semantické chyby ( chybí main např)
+
+5. slide -- syntax
+	- je mu předán ukazatel na první token z prerunu
+	- rekurzivní sestup na základě LL gramatiky a LL tabulky
+	( tady se moc nezdržovat, není o čem povídat )
+
+6. slide -- semantika
+	- až po dokončení rekurzivního sestupu, zvláštní běh
+	kontrola datových typů, volání funkcí atd..
+	( tady se moc nezdržovat, není o čem povídat )
+
+7. slide -- precedenční syntaktická analýza neboli PSA
+	- zpracovává výrazy na základě precedenční tabulky
+	- je klíčovou součástí v naší implementaci neboť analýza výrazů je potřeba na všech úrovních, syntaktické, sémantické i generování kódu. 
+	- Je možné ji spouštět ve 3 režimech, kontrola syntaxe, kontrola sémantiky, generování výrazů
+	- obsáhlá implementace, je doplněněna o precedenční prerun kde jsou určovány konce výrazů a chybné tokeny
+	( tohle si nastudovat, máme to totiž jinak, asi o tom budeme víc mluvit)
+
+
+8. slide -- generování kodu 
+	- opět jako samostatný běh, kód je procházen po řádcích což je kompromis oproti procházení po tokenech
+	- k výpočtu výrazů využita PSA 
+	- ke správnému pojmenovávání identifikátorů v blocích kódu využit speciální zásobník jmen (na vrchol se pushne platná proměnná daného jména)
+	- nejprve vygenerovan basecode(vestavene funkce atd)
+
+8. slide -- práce v týmu 
+	- podle času, kecy o týmové práci
+
+
+9. slide -- zajimavosti, poli dodělá během čtvrtku ( fakt když zbyde moc času, tak vás tohle může zachránit)
