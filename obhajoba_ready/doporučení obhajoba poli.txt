@@ -41,7 +41,7 @@ celkem cca 5-6 min, tj 30-60 s na slide
 	- ke správnému pojmenovávání identifikátorů v blocích kódu využit speciální zásobník jmen (na vrchol se pushne platná proměnná daného jména)
 	- nejprve vygenerovan basecode(vestavene funkce atd)
 
-8. slide -- práce v týmu 
+9. slide -- práce v týmu 
 	- podle času, kecy o týmové práci
 
 
