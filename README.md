@@ -25,3 +25,9 @@ Překladač imperativního jazyka IFJ20 založeného na jazyku GO 1.15
 **Bodů celkem:** 5\5
 
 **Celkem bez rozšíření: 61 % (970/1584)**
+
+### Procentuální rozdělení
+**xpolis04** 40 %, 16,3 b <br/>
+**xstefe11** 30 % 12,23 b <br/>
+**xbenov04** 20 % 8,15 b <br/>
+**xsveck00** 10 % 4,075 b <br/>
