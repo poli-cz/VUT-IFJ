@@ -9,11 +9,11 @@ Překladač jazyka IFJ20 založeného na jazyku GO 1.15
 
 ### Implementace
 
-**Lexikální analýza (detekce chyb):** 84 % (143/170)
-**Syntaktická analýza (detekce chyb):** 83 % (167/200)
-**Sémantická analýza (detekce chyb):** 70 % (237/338)
-**Sémantické/běhové chyby (detekce):** 100 % (26/26)
-**Interpretace přeloženého kódu:** 46 % (397/850)
+**Lexikální analýza (detekce chyb):** 84 % (143/170) <br/>
+**Syntaktická analýza (detekce chyb):** 83 % (167/200) <br/>
+**Sémantická analýza (detekce chyb):** 70 % (237/338) <br/>
+**Sémantické/běhové chyby (detekce):** 100 % (26/26) <br/>
+**Interpretace přeloženého kódu:** 46 % (397/850) <br/>
 
 **BOOLTHEN** 0 % (0/150)
 **BASE** 0 % (0/50)
