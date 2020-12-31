@@ -15,11 +15,9 @@ Překladač imperativního jazyka IFJ20 založeného na jazyku GO 1.15
 **Sémantické/běhové chyby (detekce):** 100 % (26/26) <br/>
 **Interpretace přeloženého kódu:** 46 % (397/850) <br/>
 
-**BOOLTHEN** 0 % (0/150) <br/>
-**BASE** 0 % (0/50) <br/>
-**FUNEXP** 0 % (0/150) <br/>
+### Rozšíření
+
 **MULTIVAL** 28 % (43/150) <br/>
-**UNARY** 0 % (0/50) <br/>
 
 ### Dokumentace
 **Bodů celkem:** 5\5
