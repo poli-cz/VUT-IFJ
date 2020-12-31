@@ -1,5 +1,5 @@
 # IFJ Projekt 2020
-Překladač jazyka IFJ20 založeného na jazyku GO 1.15
+Překladač imperativního jazyka IFJ20 založeného na jazyku GO 1.15
 
 ## Struktura repozitáře
 
@@ -15,13 +15,13 @@ Překladač jazyka IFJ20 založeného na jazyku GO 1.15
 **Sémantické/běhové chyby (detekce):** 100 % (26/26) <br/>
 **Interpretace přeloženého kódu:** 46 % (397/850) <br/>
 
-**BOOLTHEN** 0 % (0/150)
-**BASE** 0 % (0/50)
-**FUNEXP** 0 % (0/150)
-**MULTIVAL** 28 % (43/150)
-**UNARY** 0 % (0/50)
+**BOOLTHEN** 0 % (0/150) <br/>
+**BASE** 0 % (0/50) <br/>
+**FUNEXP** 0 % (0/150) <br/>
+**MULTIVAL** 28 % (43/150) <br/>
+**UNARY** 0 % (0/50) <br/>
 
 ### Dokumentace
-**Bodů celkem:** 5\
+**Bodů celkem:** 5\5
 
-Celkem bez rozšíření: 61 % (970/1584)
+**Celkem bez rozšíření: 61 % (970/1584)**
